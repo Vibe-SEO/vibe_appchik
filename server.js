@@ -8,8 +8,6 @@ const cfg = (() => { try { return JSON.parse(fs.readFileSync(path.join(__dirname
 const TGT = process.env.TG_BOT_TOKEN || cfg.tgToken || '', TGN = String(process.env.TG_BOT_NAME || cfg.tgName || '').replace(/^@/, '');
 const ADMIN = String(process.env.ADMIN_EMAILS || [].concat(cfg.admins || []).join(',')).toLowerCase().split(',').map(x => x.trim()).filter(Boolean);
 const BOTF = path.join(DIR, 'bots.json'), bots = () => { try { return JSON.parse(fs.readFileSync(BOTF, 'utf8')); } catch (_) { return {}; } };
-// bots.json: { "Название": "ссылка", "__durs": { "Название": минуты } }
-const botLinks = () => { const o = bots(); delete o.__durs; return o; }, botDurs = () => { const d = bots().__durs; return d && typeof d === 'object' ? d : {}; };
 let db = { users: {}, tokens: {} };
 try { db = JSON.parse(fs.readFileSync(DBF, 'utf8')); db.users = db.users || {}; db.tokens = db.tokens || {}; }
 catch (e) { if (e.code !== 'ENOENT') { try { fs.copyFileSync(DBF, DBF + '.broken-' + Date.now()); } catch (_) {} console.error('data.json не прочитан, копия сохранена:', e.message); } }
@@ -38,50 +36,22 @@ function tgUpsert(b, cur) {
   if (!user.photo && b.photo_url) user.photo = String(b.photo_url);
   return { user };
 }
-const pub = u => ({ tg: u.tgId ? { id: u.tgId, username: u.tgUser || '', name: u.tgName || '' } : null, admin: isAdmin(u), id: u.id, name: u.name, bio: u.bio || '', color: u.color || 'p', photo: u.photo || null, until: u.until || null, premium: !!(u.until && u.until > Date.now()), friends: u.friends || [], prefs: u.prefs || null });
+const pub = u => ({ tg: u.tgId ? { id: u.tgId, username: u.tgUser || '', name: u.tgName || '' } : null, admin: isAdmin(u), id: u.id, name: u.name, bio: u.bio || '', color: u.color || 'p', photo: u.photo || null, until: u.until || null, premium: !!(u.until && u.until > Date.now()), friends: u.friends || [] });
 
 /* ---- комнаты: живут только пока в них кто-то есть ---- */
 const rooms = new Map(), socks = new Set();
-
-/* ---- бот-комнаты: «эфир» 24/7 ----
-   Комнаты постоянные. Позиция фильма = (серверное время − старт) mod длительность, поэтому
-   не хранится и не сбивается перезапуском: любой зритель в любой момент попадает в одну и ту же секунду.
-   dur (сек) по умолчанию = длительность ролика-заглушки; реальную длину фильма админ задаёт в минутах. */
-const EPOCH = 1735689600000;
-const CATALOG = [   // title обязан совпадать с BOT_MEDIA в index.html
-  { title: 'Человек-паук: Новый день', dur: 596, base: 56, ph: 0 },
-  { title: 'Круэлла', dur: 734, base: 33, ph: 137 },
-  { title: 'Двойной форсаж', dur: 888, base: 25, ph: 251 },
-  { title: 'Мстители: Финал', dur: 596, base: 41, ph: 402 },
-  { title: 'Интерстеллар', dur: 734, base: 30, ph: 77 },
-  { title: 'Форсаж 10', dur: 888, base: 38, ph: 519 },
-];
-let BD = botDurs();
-const bDur = r => (BD[r.title] > 0 ? BD[r.title] * 60 : r.bot.dur), bStart = r => EPOCH + r.bot.ph * 1000;
-const bPos = r => { const d = bDur(r), p = ((Date.now() - bStart(r)) / 1000) % d; return p < 0 ? p + d : p; };
-CATALOG.forEach((c, k) => rooms.set('botroom' + (k + 1), { id: 'botroom' + (k + 1), title: c.title, poster: 0, media: null, st: null, log: [], owner: null, ownerName: 'VIBE', members: new Map(), bot: c }));
 const uniq = r => [...new Map([...r.members.values()].map(u => [u.id, u])).values()];
-const row = r => {
-  const us = uniq(r), o = { id: r.id, title: r.title, poster: r.poster, media: r.media, count: us.length, users: us.slice(0, 5).map(u => [(u.name || '?')[0].toUpperCase(), u.color || 'p']) };
-  if (r.bot) Object.assign(o, { bot: 1, base: r.bot.base, count: us.length + r.bot.base, dur: bDur(r), start: bStart(r), now: Date.now() });
-  return o;
-};
+const row = r => { const us = uniq(r); return { id: r.id, title: r.title, poster: r.poster, media: r.media, count: us.length, users: us.slice(0, 5).map(u => [(u.name || '?')[0].toUpperCase(), u.color || 'p']) }; };
 const send = (w, o) => w.readyState === 1 && w.send(JSON.stringify(o));
 const toRoom = (r, o, except) => r.members.forEach((u, w) => w !== except && send(w, o));
 const pushRooms = () => { const list = [...rooms.values()].map(row).sort((a, b) => b.count - a.count); socks.forEach(w => w.uid && send(w, { t: 'rooms', list })); };
-const drop = r => { if (!r.bot && rooms.get(r.id) === r) { rooms.delete(r.id); pushRooms(); } };
-const xfer = r => { if (r.bot || !rooms.has(r.id) || !r.members.size || uniq(r).some(x => x.id === r.owner)) return; const n = uniq(r)[0]; r.owner = n.id; r.ownerName = n.name; toRoom(r, { t: 'host', host: n.id, hn: n.name }); }; // основатель ушёл — права переходят следующему
+const drop = r => { if (rooms.get(r.id) === r) { rooms.delete(r.id); pushRooms(); } };
+const xfer = r => { if (!rooms.has(r.id) || !r.members.size || uniq(r).some(x => x.id === r.owner)) return; const n = uniq(r)[0]; r.owner = n.id; r.ownerName = n.name; toRoom(r, { t: 'host', host: n.id, hn: n.name }); }; // основатель ушёл — права переходят следующему
 function leave(w, instant) {
   const r = rooms.get(w.room); w.room = null; if (!r || !r.members.delete(w)) return;
-  if (!r.members.size) return r.bot ? pushRooms() : instant ? drop(r) : setTimeout(() => !r.members.size && drop(r), 3000); // обрыв связи: 3 c на переподключение
+  if (!r.members.size) return instant ? drop(r) : setTimeout(() => !r.members.size && drop(r), 3000); // обрыв связи: 3 c на переподключение
   setTimeout(() => xfer(r), instant ? 0 : 3000);
   toRoom(r, { t: 'mem', list: uniq(r).map(u => ({ name: u.name, color: u.color })) }); pushRooms();
-}
-
-function botsChanged() {
-  BD = botDurs();
-  rooms.forEach(r => r.bot && toRoom(r, { t: 'bot', bot: { start: bStart(r), dur: bDur(r) }, now: Date.now() }));
-  pushRooms();
 }
 
 /* ---- HTTP ---- */
@@ -119,24 +89,15 @@ const server = http.createServer(async (req, res) => {
   }
   if (!u) return out(401, { error: 'auth' });
   if (url === '/api/me') return out(200, { user: pub(u) });
-  if (url === '/api/profile') {   // частичное обновление: приходят только изменённые поля, остальное не затирается
-    if ('name' in b) { const n = String(b.name || '').trim().slice(0, 30); if (n) u.name = n; }
-    if ('bio' in b) u.bio = String(b.bio || '').slice(0, 300);
-    if ('color' in b && /^[pkobg]$/.test(String(b.color))) u.color = b.color;
-    if ('photo' in b) u.photo = typeof b.photo === 'string' && b.photo.length < 600000 && /^(data:image\/|https?:\/\/)/.test(b.photo) ? b.photo : null;
-    if (b.prefs && typeof b.prefs === 'object' && !Array.isArray(b.prefs)) { const j = JSON.stringify(b.prefs); if (j.length < 60000) u.prefs = b.prefs; }   // настройки, скрытые строки, вкладки, блок-лист
-    flushDb(); return out(200, { user: pub(u) });   // пишем на диск сразу
-  }
+  if (url === '/api/profile') { Object.assign(u, { name: String(b.name || u.name).slice(0, 30), bio: String(b.bio || '').slice(0, 300), color: b.color || 'p', photo: b.photo || null }); save(); return out(200, { user: pub(u) }); }
   if (url === '/api/friends') { u.friends = Array.isArray(b.friends) ? b.friends : []; save(); return out(200, {}); }
   if (url === '/api/premium') { u.until = Date.now() + 30 * 864e5; save(); return out(200, { user: pub(u) }); } // заглушка: без оплаты
   if (url === '/api/bots') {   // ссылки на видео для бот-комнат: { "Название фильма": "https://vk.com/video-1_2?hash=..." }
-    if (req.method === 'GET') return out(200, { bots: botLinks(), durs: botDurs() });
+    if (req.method === 'GET') return out(200, { bots: bots() });
     if (!isAdmin(u)) return out(403, { error: 'Только для администратора (ADMIN_EMAILS)' });
     const ok = /^(https?:\/\/)?([\w-]+\.)*(vk\.com|vkvideo\.ru|rutube\.ru|youtube\.com|youtu\.be)\//i, nb = {};
     for (const [k, v] of Object.entries(b.bots || {})) { const x = String(v || '').trim().slice(0, 600); if (x && !ok.test(x)) return out(400, { error: 'Ссылка для «' + k + '» не поддерживается' }); nb[String(k).slice(0, 60)] = x; }
-    const nd = {}, src = b.durs === undefined ? botDurs() : b.durs;
-    for (const [k, v] of Object.entries(src || {})) { const x = Math.round(+v); if (x >= 1 && x <= 600) nd[String(k).slice(0, 60)] = x; }
-    fs.writeFileSync(BOTF, JSON.stringify(Object.assign({}, nb, { __durs: nd }), null, 2)); botsChanged(); return out(200, { bots: nb, durs: nd });
+    fs.writeFileSync(BOTF, JSON.stringify(nb, null, 2)); return out(200, { bots: nb });
   }
   if (url === '/api/rooms' && req.method === 'GET') return out(200, { list: [...rooms.values()].map(row) });
   if (url === '/api/rooms') {
@@ -160,13 +121,11 @@ wss.on('connection', (w, req) => {
       const r = rooms.get(m.room); if (!r) return send(w, { t: 'err', msg: 'Комната закрыта' });
       if (w.room && w.room !== r.id) leave(w, true);
       w.room = r.id; r.members.set(w, u);
-      const ex = r.bot ? { bot: { start: bStart(r), dur: bDur(r) }, st: { a: 'play', t: bPos(r), ts: Date.now() } } : {};   // бот-комната: сразу текущая секунда фильма
-      send(w, Object.assign({ t: 'init', room: r.id, t0: m.t0, h: Date.now(), title: r.title, media: r.media, log: r.log.slice(-100), st: r.st, host: r.owner, hn: r.ownerName }, ex));
+      send(w, { t: 'init', room: r.id, t0: m.t0, h: Date.now(), title: r.title, media: r.media, log: r.log.slice(-100), st: r.st, host: r.owner, hn: r.ownerName });
       toRoom(r, { t: 'mem', list: uniq(r).map(x => ({ name: x.name, color: x.color })) }); pushRooms(); return;
     }
     if (m.t === 'leave') return leave(w, true);
     const r = rooms.get(w.room); if (!r) return;
-    if (r.bot && (m.t === 'ctl' || m.t === 'media')) return; // эфир: никто не ставит на паузу и не перематывает
     if ((m.t === 'ctl' || m.t === 'media') && u.id !== r.owner && r.media && (r.media.type === 'vk' || r.media.type === 'rt')) return; // VK/Rutube: управляет только основатель; YouTube и пустые комнаты — как раньше
     if (m.t === 'ctl') { r.st = { a: m.a === 'play' ? 'play' : 'pause', t: +m.p || 0, ts: Date.now() }; toRoom(r, { t: 'ctl', p: r.st }, w); }
     else if (m.t === 'chat') { const text = String(m.text || '').trim().slice(0, 300); if (!text) return; const msg = { id: rid(4), u: u.id, name: u.name, color: u.color, premium: !!(u.until && u.until > Date.now()), text }; r.log.push(msg); if (r.log.length > 200) r.log.shift(); toRoom(r, { t: 'chat', m: msg }); }
