@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07040f">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <title>vibe</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@600;700&family=Poppins:wght@800&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      future: { hoverOnlyWhenSupported: true },
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            logo: ['Poppins', 'sans-serif'],
+            cond: ['Oswald', 'Impact', 'sans-serif'],
+          },
+          colors: {
+            night: '#07040f',
+            'violet-vibe': '#a259ff',
+            lbl: '#8f83bd',
+            hint: '#6f649a',
+          },
+        },
+      },
+    };
+  </script>
+
+  <style type="text/tailwindcss">
+    /* Только то, что неудобно выразить утилитами */
+    .blob{position:absolute;border-radius:50%;filter:blur(60px);will-change:transform}
+    .b1{width:60vmax;height:60vmax;left:-16vmax;top:-22vmax;background:rgba(125,55,230,.78);animation:d1 13s ease-in-out infinite alternate}
+    .b2{width:54vmax;height:54vmax;right:-18vmax;top:8vh;background:rgba(35,95,235,.7);animation:d2 16s ease-in-out infinite alternate}
+    .b3{width:48vmax;height:48vmax;left:-14vmax;top:48vh;background:rgba(120,40,190,.65);animation:d3 15s ease-in-out infinite alternate}
+    .b4{width:50vmax;height:50vmax;left:22vw;bottom:-28vmax;background:rgba(215,40,130,.6);animation:d4 18s ease-in-out infinite alternate}
+    .b5{width:34vmax;height:34vmax;left:38vw;top:18vh;background:rgba(40,190,255,.36);animation:d5 11s ease-in-out infinite alternate}
+    .b6{width:30vmax;height:30vmax;right:4vw;bottom:-6vmax;background:rgba(255,80,170,.4);animation:d6 14s ease-in-out infinite alternate}
+    @keyframes d1{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(34vw,10vh,0) scale(1.3)}100%{transform:translate3d(14vw,36vh,0) scale(.9)}}
+    @keyframes d2{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-30vw,26vh,0) scale(.82)}100%{transform:translate3d(-10vw,-6vh,0) scale(1.2)}}
+    @keyframes d3{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(36vw,-22vh,0) scale(1.3)}100%{transform:translate3d(12vw,-40vh,0) scale(.85)}}
+    @keyframes d4{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-38vw,-16vh,0) scale(1.2)}100%{transform:translate3d(18vw,-30vh,0) scale(.9)}}
+    @keyframes d5{0%{transform:translate3d(-20vw,0,0) scale(.8)}100%{transform:translate3d(24vw,30vh,0) scale(1.35)}}
+    @keyframes d6{0%{transform:translate3d(0,0,0) scale(1.1)}100%{transform:translate3d(-34vw,-30vh,0) scale(.8)}}
+    .aur{position:absolute;left:50%;top:50%;width:150vmax;height:150vmax;margin:-75vmax 0 0 -75vmax;background:conic-gradient(from 0deg,transparent,rgba(162,89,255,.38),transparent 28%,rgba(59,130,246,.32),transparent 58%,rgba(255,77,154,.3),transparent);filter:blur(50px);mix-blend-mode:screen;animation:aur 26s linear infinite;will-change:transform}
+    @keyframes aur{to{transform:rotate(360deg)}}
+    .spk{position:absolute;bottom:-14px;left:var(--x);width:var(--s);height:var(--s);border-radius:50%;background:#fff;box-shadow:0 0 12px 3px rgba(190,150,255,.8);opacity:0;animation:spk var(--t) linear var(--dl) infinite;will-change:transform}
+    @keyframes spk{0%{transform:translate3d(0,0,0);opacity:0}12%{opacity:.85}100%{transform:translate3d(var(--dx),-112vh,0);opacity:0}}
+    .gone{display:none!important}
+    .vr{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:4px;background:linear-gradient(90deg,#b06bff var(--v,50%),rgba(255,255,255,.18) var(--v,50%));outline:none}
+    .vr.gate{background:linear-gradient(90deg,#f5b93a var(--v),#22d3a0 var(--v))}
+    .vr::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 0 10px rgba(162,89,255,.8)}
+    .vr::-moz-range-thumb{width:20px;height:20px;border:0;border-radius:50%;background:#fff}
+    .navbtn{position:relative;color:#b8a9e6}
+    .navbtn:active{transform:scale(.98)}
+    .navbtn.on::before{content:'';position:absolute;left:-20px;top:24%;bottom:24%;width:3px;border-radius:0 4px 4px 0;background:linear-gradient(#d8c9ff,#a259ff);box-shadow:0 0 12px #a259ff}
+    .navbtn:hover{background:rgba(255,255,255,.05);color:#fff}
+    .navbtn.on{color:#fff;background:rgba(70,40,160,.45);border-color:rgba(160,120,255,.4);box-shadow:0 0 18px rgba(120,70,255,.25)}
+    .tab{position:relative;min-height:52px;border-radius:14px}
+    .tab:active{background:rgba(255,255,255,.07)}
+    .tab.on{color:#fff}.tab.on svg{filter:drop-shadow(0 0 8px #a259ff)}
+    .tab.on::before{content:'';position:absolute;top:-3px;left:32%;right:32%;height:2px;border-radius:2px;background:#a259ff;box-shadow:0 0 10px #a259ff}
+    .hb{transition:.2s}.hb.on{background:linear-gradient(135deg,rgba(150,100,255,.8),rgba(90,70,230,.8))!important;color:#fff!important;border-color:rgba(200,170,255,.75)!important;box-shadow:0 0 22px rgba(150,100,255,.7),inset 0 0 12px rgba(255,255,255,.2)!important}
+    .pop{animation:pop .35s cubic-bezier(.2,.8,.2,1)}
+    @keyframes pop{from{opacity:0;transform:translateY(30px) scale(.97)}}
+    .fade{animation:fd .45s ease backwards}
+    @keyframes fd{from{opacity:0;transform:translateY(14px)}}
+    #toast{transform:translate(-50%,-16px);opacity:0;transition:.3s}
+    #toast.show{transform:translate(-50%,0);opacity:1}
+    .leave{animation:leave .45s cubic-bezier(.5,0,.75,0) forwards}
+    @keyframes leave{to{opacity:0;transform:translateX(-10vw);filter:blur(6px)}}
+    .page-in{animation:pin .65s cubic-bezier(.2,.7,.2,1) backwards}
+    @keyframes pin{from{opacity:0;transform:translateX(10vw)}}
+    .rise{animation:rise .75s cubic-bezier(.2,.7,.2,1) backwards;animation-delay:calc(var(--i,0)*80ms + 120ms)}
+    @keyframes rise{from{opacity:0;transform:translateY(24px) scale(.98)}}
+    .slide-in{animation:sl .8s cubic-bezier(.2,.7,.2,1) backwards}
+    @keyframes sl{from{opacity:0;transform:translateX(-36px)}}
+    @keyframes ping2{75%,100%{transform:scale(2.4);opacity:0}}
+    @media (prefers-reduced-motion:reduce){.blob,.aur,.spk,.rise,.leave,.slide-in,.page-in,.pop,.fade{animation:none!important}}
+    a:focus-visible,button:focus-visible,[role=button]:focus-visible{outline:2px solid #c9b8ff;outline-offset:3px}
+    html{-webkit-tap-highlight-color:transparent}
+    button,[role=button],a[href],[data-room],[data-nav],[data-act]{cursor:pointer;touch-action:manipulation}
+    @layer components {
+      .ico { @apply w-[22px] h-[22px] shrink-0 fill-none stroke-current; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+      /* градиентная обводка карточки: фиолетовый → синий */
+      .grad-border::after {
+        content: ''; position: absolute; inset: -1.5px; border-radius: inherit; padding: 1.5px; pointer-events: none;
+        background: linear-gradient(135deg, #a259ff, rgba(162,89,255,.15) 45%, rgba(59,130,246,.75));
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor; mask-composite: exclude;
+      }
+
+    }
+  </style>
+  <style id="vibe-scroll">
+    /* полоса прокрутки в стиле VIBE (страница, чат, окна, списки — везде) */
+    html{color-scheme:dark}
+    ::-webkit-scrollbar{width:10px;height:10px;background:transparent}
+    ::-webkit-scrollbar-track{background:rgba(14,8,32,.55);border-radius:10px}
+    ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#b06bff,#6f5cff);border-radius:10px;border:2px solid #0c0720;box-shadow:0 0 10px rgba(162,89,255,.5)}
+    ::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#cdb8ff,#8a7bff)}
+    ::-webkit-scrollbar-corner{background:transparent}
+    @supports not selector(::-webkit-scrollbar){*{scrollbar-width:thin;scrollbar-color:#8a63ff rgba(14,8,32,.55)}}   /* Firefox */
+  </style>
+<style>#plw iframe,#pl{position:absolute;inset:0;width:100%;height:100%;border:0}.pcard{transition:.3s}.pcard:hover{border-color:rgba(var(--g),.65)!important;box-shadow:0 18px 50px rgba(var(--g),.38)}</style>
+<style>
+/* стартовая заставка */
+#splash{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#0a0618;overflow:hidden;transition:opacity .7s ease,visibility .7s}
+#splash.out{opacity:0;visibility:hidden}
+#splash .spl-bg{position:absolute;inset:-12%;filter:blur(20px) saturate(1.25);pointer-events:none}
+#splash .spl-w{position:relative;display:flex;flex-direction:column;align-items:center;gap:38px;padding:24px}
+#splash .spl-logo{font:800 clamp(92px,19vw,176px)/.9 Poppins,Inter,system-ui,sans-serif;letter-spacing:-.05em;padding:0 .08em 0 0;color:transparent;background:linear-gradient(100deg,#fff 0,#fff 42%,#cdb8ff 50%,#fff 58%,#fff 100%) 100% 0/260% 100%;-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 10px 44px rgba(130,90,255,.55));animation:spl-in .9s cubic-bezier(.2,.8,.2,1) both,spl-sh 2.8s ease-in-out .9s infinite}
+#splash .spl-bar{position:relative;width:200px;height:4px;border-radius:4px;background:rgba(255,255,255,.22);overflow:hidden;animation:spl-in .9s .15s both}
+#splash .spl-bar i{position:absolute;top:0;left:-30%;width:30%;height:100%;border-radius:4px;background:#fff;animation:spl-run 1.5s cubic-bezier(.65,0,.35,1) infinite}
+#splash .spl-tx{font:600 13px/1 Inter,system-ui,sans-serif;letter-spacing:.26em;color:rgba(255,255,255,.62);animation:spl-in .9s .3s both,spl-p 1.8s ease-in-out 1.2s infinite}
+@keyframes spl-f{to{transform:translate(7vmax,5vmax) scale(1.18)}}
+@keyframes spl-in{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes spl-sh{0%{background-position:100% 0}60%,100%{background-position:0 0}}
+@keyframes spl-run{to{left:100%}}
+@keyframes spl-p{50%{opacity:.4}}
+@media (prefers-reduced-motion:reduce){#splash *{animation-duration:.01s!important;animation-iteration-count:1!important}}
+</style>
+<style id="vibe-menu">
+@media(min-width:1024px){
+#prof>:first-child,#prof>#premium{grid-column:1/-1}
+#prof>#premium ul{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 32px}
+#prof>#premium{padding:36px 40px}
+}
+#burger{position:fixed;z-index:45;top:max(14px,env(safe-area-inset-top));left:max(14px,calc(50% - 226px));width:46px;height:46px;display:grid;place-items:center;border-radius:14px;border:1px solid rgba(160,120,255,.4);background:rgba(40,25,90,.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 0 18px rgba(120,70,255,.25),inset 0 0 12px rgba(120,70,255,.15);transition:transform .15s,background .2s}
+#burger:active{transform:scale(.9);background:rgba(90,55,190,.7)}
+#burger span{position:absolute;left:13px;right:13px;height:2px;border-radius:2px;background:#e6dcff;box-shadow:0 0 8px rgba(162,89,255,.8)}
+#burger span:nth-child(1){top:15px}#burger span:nth-child(2){top:22px;right:19px}#burger span:nth-child(3){top:29px}
+@media(min-width:1024px){
+#burger{left:212px;top:56px;width:50px;height:50px}
+body:has(#rooms:not(.gone)) #burger{left:176px;top:26px}
+#burger:hover{background:rgba(70,40,160,.6);border-color:rgba(190,150,255,.65);box-shadow:0 0 24px rgba(140,90,255,.5),inset 0 0 12px rgba(120,70,255,.2)}
+#burger span{left:15px;right:15px}#burger span:nth-child(2){right:21px}
+#burger span:nth-child(1){top:17px}#burger span:nth-child(2){top:24px}#burger span:nth-child(3){top:31px}
+#mnu{width:400px;padding:28px 26px;gap:18px}
+#mnu .m-about{padding:24px 22px}#mnu .m-about h3{font-size:34px}#mnu .m-about p{font-size:15.5px}
+#mnu .m-x:hover{background:rgba(70,40,160,.6);border-color:rgba(190,150,255,.65)}
+#mnu .m-card{padding:16px}
+}
+body:has(#room:not(.gone)) #burger,body:has(#src:not(.gone)) #burger,body:has(#splash) #burger{display:none}
+#mnu-ov{position:fixed;inset:0;z-index:70;background:rgba(4,2,12,.62);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
+#mnu{position:fixed;z-index:71;top:0;bottom:0;left:0;width:min(88vw,360px);display:flex;flex-direction:column;gap:14px;overflow-y:auto;overscroll-behavior:contain;padding:max(18px,env(safe-area-inset-top)) 18px max(22px,env(safe-area-inset-bottom));border-right:1px solid rgba(150,120,255,.3);border-radius:0 32px 32px 0;background:linear-gradient(160deg,rgba(38,22,86,.94),rgba(12,7,30,.96));backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 0 80px rgba(0,0,0,.7),inset 0 0 40px rgba(120,80,255,.1);transform:translateX(-104%);transition:transform .45s cubic-bezier(.2,.8,.2,1),visibility .45s;visibility:hidden}
+body.mnu-open #mnu-ov{opacity:1;visibility:visible}
+body.mnu-open #mnu{transform:none;visibility:visible}
+body.mnu-open{overflow:hidden}
+#mnu .m-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+#mnu .m-x{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;border:1px solid rgba(160,120,255,.4);background:rgba(40,25,90,.6);color:#e6dcff;transition:transform .15s}
+#mnu .m-x:active{transform:scale(.9) rotate(90deg)}
+#mnu .m-x svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+#mnu .m-it{opacity:0;transform:translateX(-22px);transition:opacity .5s ease,transform .6s cubic-bezier(.2,.8,.2,1);transition-delay:calc(var(--k)*80ms + 150ms)}
+body.mnu-open #mnu .m-it{opacity:1;transform:none}
+#mnu .m-lbl{display:flex;align-items:center;gap:12px;margin:2px 4px 10px;font:600 12.5px/1 Inter,system-ui,sans-serif;letter-spacing:.24em;color:#8f83bd}
+#mnu .m-lbl::after{content:'';flex:1;height:1.5px;background:linear-gradient(90deg,#a259ff,transparent)}
+#mnu .m-about{position:relative;overflow:hidden;border-radius:26px;padding:20px 18px;border:1.5px solid rgba(190,150,255,.55);background:radial-gradient(120% 140% at 85% 0%,rgba(130,90,255,.85),transparent 60%),linear-gradient(120deg,#8a3dff 0%,#5a3dff 60%,#3a4bff 100%);box-shadow:0 0 30px rgba(140,80,255,.45),inset 0 0 30px rgba(255,255,255,.1)}
+#mnu .m-about::before{content:'';position:absolute;inset:-40% -20%;background:conic-gradient(from 0deg,transparent,rgba(255,255,255,.18),transparent 25%);animation:aur 9s linear infinite;pointer-events:none}
+#mnu .m-about>*{position:relative}
+#mnu .m-about h3{font:700 28px/1 Oswald,Impact,sans-serif;text-transform:uppercase;margin-bottom:10px}
+#mnu .m-about p{font-size:14.5px;line-height:1.55;color:#efe6ff}
+#mnu .m-about p+p{margin-top:8px;color:#d9c9ff;font-size:13.5px}
+#mnu .m-card{position:relative;display:flex;align-items:center;gap:14px;padding:14px;border-radius:22px;border:1px solid rgba(150,120,255,.3);background:rgba(8,5,20,.55);color:#fff;text-decoration:none;transition:transform .2s,border-color .2s,box-shadow .2s}
+#mnu a.m-card:hover{border-color:rgba(190,150,255,.6);box-shadow:0 0 22px rgba(150,100,255,.35)}
+#mnu .m-card:active{transform:scale(.98)}
+#mnu .m-ic{flex:none;width:46px;height:46px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(135deg,#b06bff,#6f5cff);box-shadow:0 0 16px rgba(140,80,255,.6)}
+#mnu .m-ic.pk{background:linear-gradient(135deg,#ff4d9a,#9b5cff);box-shadow:0 0 16px rgba(255,77,154,.45)}
+#mnu .m-ic svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#mnu .m-r{min-width:0;flex:1}
+#mnu .m-r small{display:block;font:600 11px/1 Inter,system-ui,sans-serif;letter-spacing:.2em;color:#8f83bd;text-transform:uppercase;margin-bottom:6px}
+#mnu .m-r b{display:block;font:600 17px/1.2 Inter,system-ui,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#mnu .m-go{flex:none;width:20px;height:20px;fill:none;stroke:#8f7bff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+#mnu a.m-card:hover .m-go{transform:translate(2px,-2px);stroke:#fff}
+@media(prefers-reduced-motion:reduce){#mnu,#mnu-ov,#mnu .m-it{transition-duration:.01s!important;transition-delay:0s!important}#mnu .m-about::before{animation:none}}
+</style>
+</head>
+
+<body class="min-h-screen bg-night font-sans text-white overflow-x-hidden antialiased">
+<div id="splash" aria-hidden="true"><div id="splBg" class="spl-bg"></div>
+  <div class="spl-w"><div class="spl-logo">vibe</div><div class="spl-bar"><i></i></div><div class="spl-tx">LOADING...</div></div></div>
+<script>
+(() => {
+  const sp = document.getElementById('splash'), t0 = Date.now(); let loaded = document.readyState === 'complete';
+  addEventListener('load', () => loaded = true);
+  // для вошедшего пользователя ждём, пока приложение поднимется; для гостя — до экрана входа
+  const ready = () => {
+    let t = null; try { t = localStorage.getItem('vibe:tok'); } catch (_) {} if (!t) return true;
+    try { if (uid) return true; } catch (_) { return false; }
+    const l = document.getElementById('login'); return !!l && l.style.visibility !== 'hidden';
+  };
+  const iv = setInterval(() => {
+    const el = Date.now() - t0;
+    if (el > 8000 || (loaded && el > 1800 && ready())) { clearInterval(iv); sp.classList.add('out'); setTimeout(() => sp.remove(), 900); }
+  }, 100);
+})();
+</script>
+
+  <!-- Логотип vibe (SVG-спрайт) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="vibe-play" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#ff4d9a"/>
+        <stop offset="1" stop-color="#9b5cff"/>
+      </linearGradient>
+    </defs>
+    <symbol id="vibe-logo" viewBox="0 0 190 90">
+      <g transform="translate(9 16)" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 22 L21 60 L37 22"/>                      <!-- v -->
+        <path d="M54 22 V60"/>                               <!-- i -->
+        <path d="M76 0 V60"/><circle cx="95" cy="41" r="19"/> <!-- b -->
+        <path d="M131 41 H169 A19 19 0 1 0 164.6 53.2"/>     <!-- e -->
+      </g>
+      <path d="M48 9 L63 16.5 L48 24 Z" fill="url(#vibe-play)" stroke="url(#vibe-play)" stroke-width="4" stroke-linejoin="round"/>
+    </symbol>
+  </svg>
+
+  <!-- Фон: живые пятна света -->
+  <script>
+    window.vibeBgInner = function () {
+      var s = '<i class="aur"></i><i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i><i class="blob b6"></i>';
+      for (var i = 0; i < 22; i++) {
+        var sz = (2 + Math.random() * 3.5).toFixed(1);
+        s += '<i class="spk" style="--x:' + (Math.random() * 100).toFixed(1) + '%;--s:' + sz + 'px;--t:' + (9 + Math.random() * 12).toFixed(1) + 's;--dl:-' + (Math.random() * 20).toFixed(1) + 's;--dx:' + ((Math.random() - .5) * 18).toFixed(1) + 'vw"></i>';
+      }
+      return s;
+    };
+  </script>
+  <div id="vbg" aria-hidden="true" class="fixed inset-0 -z-10 overflow-hidden bg-[linear-gradient(180deg,#0c0720_0%,#080512_55%,#0a0512_100%)]"></div>
+  <script>document.getElementById('vbg').innerHTML = vibeBgInner();</script>
+  <script>document.getElementById('splBg').innerHTML = vibeBgInner();</script>
+
+  <!-- ================= ВХОД ================= -->
+  <main id="login" class="mx-auto w-full max-w-[480px] px-[22px] pt-[84px] pb-10 lg:grid lg:min-h-screen lg:max-w-none lg:grid-cols-[1.1fr_1fr] lg:p-0">
+    <aside class="relative hidden flex-col justify-between overflow-hidden p-14 lg:flex xl:p-20">
+    <svg class="h-auto w-[132px]" viewBox="0 0 190 90" role="img" aria-label="vibe"><use href="#vibe-logo"/></svg>
+    <div class="my-12">
+      <h2 class="font-cond text-[clamp(72px,8vw,132px)] font-bold uppercase leading-[.92]">Смотрите<br>вместе</h2>
+      <p class="mt-7 max-w-[430px] text-xl leading-relaxed text-[#b79cff]">Создайте комнату, отправьте ссылку друзьям — видео идёт у всех одновременно.</p>
+    </div>
+    <div class="flex items-end gap-5 pr-4">
+      <div class="relative aspect-[4/3] min-w-0 max-w-[240px] flex-1 -rotate-3 mb-6 overflow-hidden rounded-3xl border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,.5)] bg-[radial-gradient(40%_60%_at_55%_45%,rgba(230,60,50,.85),transparent_70%),linear-gradient(135deg,#1b2a4d,#5a6a86_45%,#2a1e2e)]">
+        <span class="absolute bottom-3 left-4 right-3 truncate text-[13px] font-semibold text-white [text-shadow:0_1px_6px_#000]">Человек-паук: Новый день</span>
+        <i class="absolute right-3 top-3 rounded-[10px] bg-[#ff2d7a] px-1.5 py-0.5 text-[10px] font-bold not-italic text-white">+56</i>
+      </div>
+      <div class="relative aspect-[4/3] min-w-0 max-w-[240px] flex-1 rotate-0 overflow-hidden rounded-3xl border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,.5)] bg-[linear-gradient(135deg,#f1ece6,#cfc8c1_45%,#1c1818)]">
+        <span class="absolute bottom-3 left-4 right-3 truncate text-[13px] font-semibold text-white [text-shadow:0_1px_6px_#000]">Круэлла</span>
+        <i class="absolute right-3 top-3 rounded-[10px] bg-[#ff2d7a] px-1.5 py-0.5 text-[10px] font-bold not-italic text-white">+33</i>
+      </div>
+      <div class="relative aspect-[4/3] min-w-0 max-w-[240px] flex-1 rotate-3 mb-10 overflow-hidden rounded-3xl border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,.5)] bg-gradient-to-br from-[#0b3a4a] via-[#0a1a26] to-[#060b12]">
+        <span class="absolute bottom-3 left-4 right-3 truncate text-[13px] font-semibold text-white [text-shadow:0_1px_6px_#000]">Форсаж 2</span>
+        <i class="absolute right-3 top-3 rounded-[10px] bg-[#ff2d7a] px-1.5 py-0.5 text-[10px] font-bold not-italic text-white">+25</i>
+      </div>
+    </div>
+  </aside>
+  <div class="flex flex-col items-center lg:justify-center lg:px-12">
+      <h1 class="lg:hidden" aria-label="vibe"><svg class="h-auto w-[176px]" viewBox="0 0 190 90" role="img"><use href="#vibe-logo"/></svg></h1>
+
+      <p class="mt-[26px] text-center lg:hidden text-[17px] leading-normal tracking-wider text-[#b79cff]">
+        Войдите, чтобы создавать комнаты<br>и смотреть вместе
+      </p>
+
+      <section class="grad-border relative mt-[34px] w-full lg:mt-0 lg:max-w-[460px] rounded-[36px] px-10 pt-[30px] pb-10 backdrop-blur-2xl
+                      bg-gradient-to-br from-[rgba(60,40,110,.35)] to-[rgba(20,15,50,.55)]
+                      shadow-[0_30px_80px_rgba(0,0,0,.45),inset_0_0_40px_rgba(120,80,255,.08)]
+                      max-[380px]:px-6">
+        <div class="mb-[26px] flex items-center justify-center gap-[18px]">
+          <span class="h-[1.5px] flex-1 bg-gradient-to-r from-transparent to-violet-vibe"></span>
+          <h2 class="text-lg font-semibold tracking-[.28em]">ВХОД</h2>
+          <span class="h-[1.5px] flex-1 bg-gradient-to-r from-blue-500 to-transparent"></span>
+        </div>
+
+        <label class="mb-[18px] block">
+          <span class="mb-[9px] ml-2 block text-[12.5px] font-medium tracking-[.2em] text-lbl">ПОЧТА</span>
+          <span class="flex h-[54px] items-center gap-4 rounded-full border border-[rgba(150,120,255,.28)] bg-[rgba(8,5,20,.55)] px-[22px] text-[#c9b8ff] transition hover:border-[rgba(180,150,255,.5)]
+                       focus-within:border-violet-vibe focus-within:shadow-[0_0_0_3px_rgba(162,89,255,.2)]">
+            <svg viewBox="0 0 24 24" class="ico"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/></svg>
+            <input id="email" type="email" placeholder="you@mail.com" autocomplete="email"
+                   class="min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-hint">
+          </span>
+        </label>
+
+        <label class="mb-[18px] block">
+          <span class="mb-[9px] ml-2 block text-[12.5px] font-medium tracking-[.2em] text-lbl">ПАРОЛЬ</span>
+          <span class="flex h-[54px] items-center gap-4 rounded-full border border-[rgba(150,120,255,.28)] bg-[rgba(8,5,20,.55)] px-[22px] text-[#c9b8ff] transition hover:border-[rgba(180,150,255,.5)]
+                       focus-within:border-violet-vibe focus-within:shadow-[0_0_0_3px_rgba(162,89,255,.2)]">
+            <svg viewBox="0 0 24 24" class="ico"><rect x="5" y="10.5" width="14" height="10" rx="3"/><path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5"/></svg>
+            <input id="pass" type="password" placeholder="Минимум 6 символов" autocomplete="current-password"
+                   class="min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-hint">
+          </span>
+        </label>
+
+        <label class="mb-[18px] block">
+          <span class="mb-[9px] ml-2 block text-[12.5px] font-medium tracking-[.2em] text-lbl">ИМЯ (ДЛЯ РЕГИСТРАЦИИ)</span>
+          <span class="flex h-[54px] items-center gap-4 rounded-full border border-[rgba(150,120,255,.28)] bg-[rgba(8,5,20,.55)] px-[22px] text-[#c9b8ff] transition hover:border-[rgba(180,150,255,.5)]
+                       focus-within:border-violet-vibe focus-within:shadow-[0_0_0_3px_rgba(162,89,255,.2)]">
+            <svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c.8-3.6 3.8-5.5 7.5-5.5s6.7 1.9 7.5 5.5"/></svg>
+            <input id="name" type="text" placeholder="Как вас зовут" autocomplete="name"
+                   class="min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-hint">
+          </span>
+        </label>
+
+        <button id="continue"
+                class="relative mt-2 flex h-[58px] w-full items-center justify-center rounded-full text-[17px] font-medium tracking-wide transition duration-200 active:scale-[.98] hover:brightness-110 lg:hover:-translate-y-0.5
+                       bg-gradient-to-r from-[#b06bff] via-[#8a5cff] to-[#6f5cff]
+                       shadow-[0_10px_34px_rgba(130,80,255,.55),inset_0_1px_0_rgba(255,255,255,.35)]">
+          <span>Войти / Регистрация</span>
+          <svg viewBox="0 0 24 24" class="ico absolute right-[26px]"><path d="M4 12h15M14 6l6 6-6 6"/></svg>
+        </button>
+
+        <div class="my-5 flex items-center gap-4">
+          <span class="h-px flex-1 bg-gradient-to-r from-transparent via-[rgba(150,130,255,.5)] to-transparent"></span>
+          <em class="text-[12.5px] not-italic tracking-[.18em] text-lbl">или</em>
+          <span class="h-px flex-1 bg-gradient-to-r from-transparent via-[rgba(150,130,255,.5)] to-transparent"></span>
+        </div>
+
+        <button data-act="tg" class="flex h-[54px] w-full items-center justify-center gap-3 rounded-full border-[1.5px] border-[#2f8bff] text-base text-[#eaf2ff] transition duration-200 hover:brightness-125 lg:hover:-translate-y-0.5 active:scale-[.98]
+                       bg-gradient-to-b from-[rgba(30,60,130,.55)] to-[rgba(15,30,80,.55)]
+                       shadow-[0_0_22px_rgba(47,139,255,.3),inset_0_0_14px_rgba(47,139,255,.12)]">
+          <svg viewBox="0 0 24 24" class="ico !h-6 !w-6 text-[#4da3ff]"><path d="M21 3L3 10.5l6 2.2 2.2 6L14 15l5 3.8L21 3z"/><path d="M9 12.7L21 3"/></svg>
+          <span>Войти через Telegram</span>
+        </button>
+      </section>
+    </div>
+  </main>
+
+  <!-- ================= КОМНАТЫ ================= -->
+  <main id="rooms" class="relative mx-auto gone w-full max-w-[480px] px-[14px] pt-[max(14px,env(safe-area-inset-top))] pb-[110px] lg:grid lg:min-h-screen lg:max-w-none lg:grid-cols-[264px_1fr] lg:p-0">
+<aside class="slide-in sticky top-0 hidden h-screen flex-col self-start border-r border-[rgba(150,120,255,.16)] bg-[rgba(10,6,25,.55)] px-5 py-7 backdrop-blur-xl lg:flex">
+    <svg class="ml-2 h-auto w-[104px]" viewBox="0 0 190 90" role="img" aria-label="vibe"><use href="#vibe-logo"/></svg>
+    <nav class="mt-10 flex flex-col gap-1.5 text-[15px] font-medium"><button data-nav="rooms" class="navbtn on flex w-full items-center gap-3 rounded-2xl border border-transparent px-4 py-3 text-left transition"><svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>Публичный</button><button data-nav="friends" class="navbtn flex w-full items-center gap-3 rounded-2xl border border-transparent px-4 py-3 text-left transition"><svg viewBox="0 0 24 24" class="ico"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20c.6-3.3 3.1-5 6.5-5s5.9 1.7 6.5 5"/><path d="M16 5.2a3.5 3.5 0 010 6.6M18.5 15.3c1.7.7 2.7 2.2 3 4.7"/></svg>Друзья</button><button data-nav="help" class="navbtn flex w-full items-center gap-3 rounded-2xl border border-transparent px-4 py-3 text-left transition"><svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5z"/></svg>Как пользоваться</button><button data-nav="settings" class="navbtn flex w-full items-center gap-3 rounded-2xl border border-transparent px-4 py-3 text-left transition"><svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="3.3"/><path d="M19.4 13.5a7.6 7.6 0 000-3l1.8-1.4-1.8-3.1-2.1.8a7.5 7.5 0 00-2.6-1.5L14.4 3h-3.6l-.3 2.3a7.5 7.5 0 00-2.6 1.5l-2.1-.8-1.8 3.1L6 10.5a7.6 7.6 0 000 3l-1.8 1.4 1.8 3.1 2.1-.8a7.5 7.5 0 002.6 1.5l.3 2.3h3.6l.3-2.3a7.5 7.5 0 002.6-1.5l2.1.8 1.8-3.1z"/></svg>Настройки</button></nav>
+    <div data-nav="profile" role="button" tabindex="0" class="group mt-auto flex cursor-pointer items-center gap-3 rounded-2xl border border-[rgba(150,120,255,.22)] bg-[rgba(40,25,90,.4)] p-3 transition hover:border-[rgba(190,150,255,.5)] hover:bg-[rgba(70,45,150,.5)] active:scale-[.98]">
+      <span id="me-ava" class="shrink-0"></span>
+      <span id="me-name" class="truncate text-sm font-medium">Гость</span>
+      <svg viewBox="0 0 24 24" class="ico ml-auto !h-[18px] !w-[18px] text-[#8f7bff] transition group-hover:translate-x-0.5 group-hover:text-white"><path d="M9 5l7 7-7 7"/></svg>
+    </div>
+  </aside>
+  <div class="min-w-0 lg:px-10 lg:py-9 xl:px-14">
+
+    <header class="rise mb-[14px] lg:hidden flex items-center justify-between">
+      <span class="h-[46px] w-[46px]" aria-hidden="true"></span>
+      <h1 aria-label="vibe"><svg class="h-auto w-[92px]" viewBox="0 0 190 90" role="img"><use href="#vibe-logo"/></svg></h1>
+      <button aria-label="Настройки" data-nav="settings"
+              class="hb relative grid h-[46px] w-[46px] place-items-center rounded-[14px] transition active:scale-90 active:bg-[rgba(90,55,190,.7)] border border-[rgba(160,120,255,.4)] bg-[rgba(40,25,90,.6)] text-[#e6dcff]
+                     shadow-[0_0_18px_rgba(120,70,255,.25),inset_0_0_12px_rgba(120,70,255,.15)]">
+        <svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="3.3"/><path d="M19.4 13.5a7.6 7.6 0 000-3l1.8-1.4-1.8-3.1-2.1.8a7.5 7.5 0 00-2.6-1.5L14.4 3h-3.6l-.3 2.3a7.5 7.5 0 00-2.6 1.5l-2.1-.8-1.8 3.1L6 10.5a7.6 7.6 0 000 3l-1.8 1.4 1.8 3.1 2.1-.8a7.5 7.5 0 002.6 1.5l.3 2.3h3.6l.3-2.3a7.5 7.5 0 002.6-1.5l2.1.8 1.8-3.1z"/></svg>
+      </button>
+    </header>
+
+    <section data-view="rooms">
+    <div class="rise mb-5 ml-1 lg:mb-8 lg:ml-0">
+      <h2 id="hello" class="text-2xl font-semibold tracking-tight lg:text-4xl">Привет, Гость</h2>
+      <p class="mt-1 text-[#a996e0] lg:mt-2 lg:text-lg">Выберите комнату или создайте свою</p>
+    </div>
+    <div class="rise [--i:1] lg:mb-9 lg:flex lg:items-center lg:justify-between lg:gap-6"><label class="mb-[14px] lg:mb-0 lg:h-12 lg:w-full lg:max-w-[460px] flex h-11 items-center gap-3 rounded-full border border-[rgba(150,120,255,.18)] bg-[rgba(10,6,25,.8)] px-4 text-[#a58bff] transition hover:border-[rgba(180,150,255,.45)] focus-within:border-violet-vibe focus-within:shadow-[0_0_0_3px_rgba(162,89,255,.2)]">
+      <svg viewBox="0 0 24 24" class="ico !h-5 !w-5"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+      <input id="q" type="search" placeholder="Поиск" class="min-w-0 flex-1 bg-transparent text-base font-medium text-white outline-none placeholder:text-[#b39dff]">
+    </label>
+    <button data-act="create" class="hidden h-12 shrink-0 items-center gap-2 rounded-full bg-gradient-to-r from-[#b06bff] via-[#8a5cff] to-[#6f5cff] px-6 text-[15px] font-medium shadow-[0_8px_28px_rgba(130,80,255,.5),inset_0_1px_0_rgba(255,255,255,.35)] transition duration-200 hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_12px_36px_rgba(130,80,255,.7),inset_0_1px_0_rgba(255,255,255,.35)] active:scale-[.98] lg:flex">
+      <svg viewBox="0 0 24 24" class="ico !h-5 !w-5" style="stroke-width:2.4"><path d="M12 5v14M5 12h14"/></svg>Создать комнату
+    </button>
+    </div>
+
+    <a href="#" data-nav="help" class="rise [--i:2] group transition duration-300 hover:brightness-110 active:scale-[.99] lg:hover:-translate-y-0.5 lg:hover:shadow-[0_0_48px_rgba(150,100,255,.8),inset_0_0_30px_rgba(255,255,255,.14)] relative mb-5 flex h-28 items-center justify-between overflow-hidden rounded-3xl lg:mb-10 lg:h-52 lg:rounded-[32px] lg:px-12 border-[1.5px] border-[rgba(190,150,255,.7)] px-5
+                       shadow-[0_0_30px_rgba(140,80,255,.55),inset_0_0_30px_rgba(255,255,255,.12)]"
+       style="background:
+         radial-gradient(120% 140% at 80% 20%, rgba(130,90,255,.9), transparent 60%),
+         linear-gradient(100deg,#9b3dff 0%,#6a3dff 55%,#4a4bff 100%)">
+      <!-- рисунок баннера: гранж-текстура + световые пятна + линии -->
+      <svg aria-hidden="true" class="pointer-events-none absolute inset-0 h-full w-full" preserveAspectRatio="none">
+        <defs>
+          <filter id="grunge" x="0" y="0" width="100%" height="100%">
+            <feTurbulence type="fractalNoise" baseFrequency=".018 .05" numOctaves="5" seed="11"/>
+            <feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 3 -1.25"/>
+          </filter>
+          <filter id="grain" x="0" y="0" width="100%" height="100%">
+            <feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" seed="3"/>
+            <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 2.4 -1.05"/>
+          </filter>
+          <filter id="cracks" x="0" y="0" width="100%" height="100%">
+            <feTurbulence type="turbulence" baseFrequency=".03 .02" numOctaves="3" seed="21"/>
+            <feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  9 0 0 0 -0.6"/>
+          </filter>
+          <radialGradient id="glowA" cx="78%" cy="15%" r="55%">
+            <stop offset="0" stop-color="#d9b8ff" stop-opacity=".55"/><stop offset="1" stop-color="#d9b8ff" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="glowB" cx="5%" cy="110%" r="55%">
+            <stop offset="0" stop-color="#2a1a9a" stop-opacity=".7"/><stop offset="1" stop-color="#2a1a9a" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#glowA)"/>
+        <rect width="100%" height="100%" fill="url(#glowB)"/>
+        <rect width="100%" height="100%" filter="url(#grunge)" opacity=".38" style="mix-blend-mode:overlay"/>
+        <rect width="100%" height="100%" filter="url(#cracks)" opacity=".22" style="mix-blend-mode:soft-light"/>
+        <rect width="100%" height="100%" filter="url(#grain)" opacity=".5" style="mix-blend-mode:multiply"/>
+        <g fill="none" stroke="#fff" stroke-opacity=".14" stroke-width="1.2">
+          <path d="M-10 90 C 80 70, 140 110, 230 78 S 340 40, 420 70"/>
+          <path d="M-10 104 C 90 86, 150 124, 240 92 S 350 56, 430 84"/>
+        </g>
+      </svg>
+      <span class="relative font-cond text-[30px] font-bold uppercase leading-[1.02] lg:text-[54px]">КАК<br>ПОЛЬЗОВАТЬСЯ<br>VIBE</span>
+      <span class="relative hidden max-w-[300px] text-lg leading-snug text-[#efe6ff] lg:block">Две минуты — и вы уже смотрите вместе с друзьями</span>
+      <span class="relative grid h-[52px] w-[52px] lg:h-20 lg:w-20 place-items-center rounded-full border-[2.5px] border-white bg-white/10 transition duration-300 group-hover:scale-110 group-hover:bg-white/25">
+        <svg viewBox="0 0 24 24" class="ml-[3px] h-[26px] w-[26px] fill-white lg:h-10 lg:w-10"><path d="M9 6.5v11l9-5.5z"/></svg>
+      </span>
+    </a>
+
+    <div class="rise [--i:3] mb-[14px] ml-1 flex items-center gap-3 text-base font-semibold lg:mb-5 lg:text-xl">
+      <svg viewBox="0 0 24 24" class="ico !h-[26px] !w-[26px] text-[#d8c9ff]"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>
+      <span>Публичный</span>
+    </div>
+
+    <ul id="list" class="flex flex-col gap-[10px] lg:grid lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] lg:items-stretch lg:gap-6"></ul>
+    </section>
+
+    <section data-view="friends" class="gone">
+      <div class="max-w-[720px]">
+        <h2 class="text-2xl font-semibold tracking-tight lg:text-4xl">Друзья</h2>
+        <p class="mt-1 text-[#a996e0] lg:mt-2 lg:text-lg">Добавляйте друзей и зовите смотреть вместе</p>
+        <label class="mt-5 flex h-12 items-center gap-3 rounded-full border border-[rgba(150,120,255,.28)] bg-[rgba(10,6,25,.8)] px-4 text-[#a58bff] transition hover:border-[rgba(180,150,255,.45)] focus-within:border-violet-vibe focus-within:shadow-[0_0_0_3px_rgba(162,89,255,.2)]">
+          <svg viewBox="0 0 24 24" class="ico !h-5 !w-5"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+          <input id="fq" type="search" placeholder="Найти людей или добавить по @нику" class="min-w-0 flex-1 bg-transparent text-base font-medium text-white outline-none placeholder:text-[#b39dff]">
+        </label>
+        <div id="ftabs" class="mt-4 grid grid-cols-4 gap-2"></div>
+        <ul id="flist" class="mt-4 grid gap-3"></ul>
+      </div>
+    </section>
+
+    <section data-view="help" class="gone">
+      <h2 class="rise text-2xl font-semibold tracking-tight lg:text-4xl">Как пользоваться</h2>
+      <p class="rise [--i:1] mt-1 text-[#a996e0] lg:mt-2 lg:text-lg">Три шага до совместного просмотра</p>
+
+      <div class="relative mt-7 grid gap-4 lg:mt-10 lg:grid-cols-3 lg:gap-6">
+        <span class="pointer-events-none absolute left-[calc(16.6%)] right-[calc(16.6%)] top-9 hidden h-px bg-gradient-to-r from-[rgba(176,107,255,.55)] via-[rgba(140,80,255,.35)] to-[rgba(176,107,255,.55)] lg:block"></span>
+        <div class="rise [--i:2] group relative overflow-hidden rounded-3xl border border-[rgba(150,120,255,.28)] bg-gradient-to-br from-[rgba(38,24,82,.7)] to-[rgba(18,12,42,.85)] p-6 transition duration-300 hover:-translate-y-0.5 hover:border-[rgba(190,150,255,.55)] hover:shadow-[0_18px_44px_rgba(140,80,255,.3)]">
+          <div class="flex items-center gap-3">
+            <b class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#b06bff] to-[#7c4dff] font-semibold shadow-[0_0_18px_rgba(140,80,255,.55)]">1</b>
+            <i class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-[rgba(150,120,255,.3)] bg-white/5 text-[#d8c9ff]"><svg viewBox="0 0 24 24" class="ico !h-5 !w-5" style="stroke-width:2.2"><path d="M12 5v14M5 12h14"/></svg></i>
+          </div>
+          <h3 class="mt-4 text-lg font-semibold">Создайте комнату</h3>
+          <p class="mt-1.5 text-[#a996e0]">Дайте ей название и добавьте ссылку на видео — с VK, Rutube, YouTube или Netflix.</p>
+        </div>
+        <div class="rise [--i:3] group relative overflow-hidden rounded-3xl border border-[rgba(150,120,255,.28)] bg-gradient-to-br from-[rgba(38,24,82,.7)] to-[rgba(18,12,42,.85)] p-6 transition duration-300 hover:-translate-y-0.5 hover:border-[rgba(190,150,255,.55)] hover:shadow-[0_18px_44px_rgba(140,80,255,.3)]">
+          <div class="flex items-center gap-3">
+            <b class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#b06bff] to-[#7c4dff] font-semibold shadow-[0_0_18px_rgba(140,80,255,.55)]">2</b>
+            <i class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-[rgba(150,120,255,.3)] bg-white/5 text-[#d8c9ff]"><svg viewBox="0 0 24 24" class="ico !h-5 !w-5" style="stroke-width:2.2"><path d="M15.5 8.5a3 3 0 100-6 3 3 0 000 6zM8.5 15.5a3 3 0 100-6 3 3 0 000 6zM15.5 21.5a3 3 0 100-6 3 3 0 000 6zM11 10.5l3-1M11 13.5l3 1"/></svg></i>
+          </div>
+          <h3 class="mt-4 text-lg font-semibold">Отправьте ссылку</h3>
+          <p class="mt-1.5 text-[#a996e0]">Друзья зайдут в комнату в один клик — приглашение можно скопировать прямо из комнаты.</p>
+        </div>
+        <div class="rise [--i:4] group relative overflow-hidden rounded-3xl border border-[rgba(150,120,255,.28)] bg-gradient-to-br from-[rgba(38,24,82,.7)] to-[rgba(18,12,42,.85)] p-6 transition duration-300 hover:-translate-y-0.5 hover:border-[rgba(190,150,255,.55)] hover:shadow-[0_18px_44px_rgba(140,80,255,.3)]">
+          <div class="flex items-center gap-3">
+            <b class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#b06bff] to-[#7c4dff] font-semibold shadow-[0_0_18px_rgba(140,80,255,.55)]">3</b>
+            <i class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-[rgba(150,120,255,.3)] bg-white/5 text-[#d8c9ff]"><svg viewBox="0 0 24 24" class="ico !h-5 !w-5" style="stroke-width:2.2"><path d="M20 11a8 8 0 00-14-4L4 9M4 13a8 8 0 0014 4l2-2M4 4v5h5M20 20v-5h-5"/></svg></i>
+          </div>
+          <h3 class="mt-4 text-lg font-semibold">Смотрите вместе</h3>
+          <p class="mt-1.5 text-[#a996e0]">Пауза, перемотка и чат работают у всех сразу — как в одном кинозале.</p>
+        </div>
+      </div>
+
+      <button data-act="create" class="rise [--i:5] mt-6 flex h-[54px] items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#b06bff] via-[#8a5cff] to-[#6f5cff] px-8 font-medium shadow-[0_10px_34px_rgba(130,80,255,.5)] transition hover:brightness-110 active:scale-[.98] max-lg:w-full">
+        <svg viewBox="0 0 24 24" class="ico !h-5 !w-5" style="stroke-width:2.4"><path d="M12 5v14M5 12h14"/></svg>Создать первую комнату
+      </button>
+
+      <div class="rise [--i:6] mt-10 lg:mt-14">
+        <h3 class="text-lg font-semibold lg:text-2xl">Частые вопросы</h3>
+        <div class="mt-4 grid gap-2.5 lg:grid-cols-2 lg:gap-3">
+          <details class="group rounded-2xl border border-[rgba(150,120,255,.24)] bg-[rgba(18,12,42,.6)] p-4 open:border-[rgba(190,150,255,.5)]">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-3 font-medium marker:content-none"><span>Какие площадки поддерживаются?</span><svg viewBox="0 0 24 24" class="ico !h-4 !w-4 shrink-0 text-[#b79cff] transition group-open:rotate-180"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <p class="mt-2 text-sm leading-relaxed text-[#a996e0]">VK Видео, Rutube и YouTube проигрываются прямо внутри vibe и синхронно управляются хостом. Netflix открывается в отдельной вкладке — vibe синхронизирует только чат.</p>
+          </details>
+          <details class="group rounded-2xl border border-[rgba(150,120,255,.24)] bg-[rgba(18,12,42,.6)] p-4 open:border-[rgba(190,150,255,.5)]">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-3 font-medium marker:content-none"><span>Кто управляет паузой и перемоткой?</span><svg viewBox="0 0 24 24" class="ico !h-4 !w-4 shrink-0 text-[#b79cff] transition group-open:rotate-180"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <p class="mt-2 text-sm leading-relaxed text-[#a996e0]">Для VK и Rutube управляет только основатель комнаты — остальные смотрят синхронно. Для YouTube и пустых комнат управлять может любой участник, если это разрешено в настройках комнаты.</p>
+          </details>
+          <details class="group rounded-2xl border border-[rgba(150,120,255,.24)] bg-[rgba(18,12,42,.6)] p-4 open:border-[rgba(190,150,255,.5)]">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-3 font-medium marker:content-none"><span>Что будет, если основатель выйдет?</span><svg viewBox="0 0 24 24" class="ico !h-4 !w-4 shrink-0 text-[#b79cff] transition group-open:rotate-180"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <p class="mt-2 text-sm leading-relaxed text-[#a996e0]">Права хоста автоматически переходят следующему участнику в комнате, так что просмотр не прерывается.</p>
+          </details>
+          <details class="group rounded-2xl border border-[rgba(150,120,255,.24)] bg-[rgba(18,12,42,.6)] p-4 open:border-[rgba(190,150,255,.5)]">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-3 font-medium marker:content-none"><span>Нужна регистрация, чтобы смотреть?</span><svg viewBox="0 0 24 24" class="ico !h-4 !w-4 shrink-0 text-[#b79cff] transition group-open:rotate-180"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <p class="mt-2 text-sm leading-relaxed text-[#a996e0]">Да, короткая регистрация по почте (или вход через Telegram) нужна, чтобы у вас был профиль, аватар и список друзей в комнатах.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section data-view="settings" class="gone"><div id="stg" class="max-w-[1000px]"></div></section>
+
+    <section data-view="profile" class="gone"><div id="prof" class="mx-auto flex max-w-[640px] flex-col gap-3 lg:grid lg:max-w-none lg:grid-cols-2 lg:items-start lg:gap-5 2xl:grid-cols-3"></div></section>
+
+    <nav class="fixed inset-x-0 bottom-0 z-30 flex justify-around border-t border-[rgba(150,120,255,.2)] bg-[rgba(10,6,25,.85)] px-2 pb-[max(8px,env(safe-area-inset-bottom))] pt-2 backdrop-blur-xl lg:hidden">
+      <button data-nav="rooms" class="tab flex flex-1 flex-col items-center gap-1 py-1.5 text-[11px] text-[#8f83bd] transition active:scale-95 on"><svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>Комнаты</button><button data-nav="friends" class="tab flex flex-1 flex-col items-center gap-1 py-1.5 text-[11px] text-[#8f83bd] transition active:scale-95"><svg viewBox="0 0 24 24" class="ico"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20c.6-3.3 3.1-5 6.5-5s5.9 1.7 6.5 5"/><path d="M16 5.2a3.5 3.5 0 010 6.6M18.5 15.3c1.7.7 2.7 2.2 3 4.7"/></svg>Друзья</button><button data-nav="profile" class="tab flex flex-1 flex-col items-center gap-1 py-1.5 text-[11px] text-[#8f83bd] transition active:scale-95"><svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c.8-3.6 3.8-5.5 7.5-5.5s6.7 1.9 7.5 5.5"/></svg>Профиль</button>
+    </nav>
+
+    <button id="fab" aria-label="Создать комнату" data-act="create"
+            class="fixed lg:hidden bottom-[84px] right-[max(18px,calc(50%-222px))] grid h-14 w-14 place-items-center rounded-full transition active:scale-95
+                   bg-gradient-to-br from-[#b06bff] to-[#7c4dff]
+                   shadow-[0_0_0_4px_rgba(160,100,255,.25),0_10px_30px_rgba(140,80,255,.7)]">
+      <svg viewBox="0 0 24 24" class="h-[26px] w-[26px] fill-none stroke-white" style="stroke-width:2.6;stroke-linecap:round"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  </div>
+  </main>
+
+  <main id="room" class="gone fixed inset-0 z-40 flex flex-col gap-3 overflow-hidden px-3 pb-[max(10px,env(safe-area-inset-bottom))] pt-[max(10px,env(safe-area-inset-top))] lg:gap-4 lg:p-5"></main>
+
+  <main id="src" class="gone fixed inset-0 z-40 overflow-y-auto overscroll-contain bg-night px-4 pb-16 pt-[max(14px,env(safe-area-inset-top))] lg:px-14 lg:pt-8"></main>
+
+  <div id="modal" class="gone fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm lg:items-center lg:p-6">
+    <div id="sheet" class="pop relative w-full max-w-[460px] rounded-t-[32px] border border-[rgba(150,120,255,.3)] bg-[#120b2b]/95 p-6 pb-[max(24px,env(safe-area-inset-bottom))] shadow-[0_30px_80px_rgba(0,0,0,.6)] backdrop-blur-2xl lg:rounded-[32px]"></div>
+  </div>
+  <div id="toast" role="status" class="pointer-events-none fixed left-1/2 top-5 z-[60] rounded-full border border-[rgba(160,120,255,.4)] bg-[#1a1040]/95 px-5 py-3 text-sm font-medium shadow-[0_10px_30px_rgba(0,0,0,.5)] backdrop-blur"></div>
+
+  <script>
+    const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+    const esc = t => t.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const C = { p: 'bg-[#8b3dff]', k: 'bg-[#e6338a]', o: 'bg-[#f0851c]', b: 'bg-[#2f8bff]', g: 'bg-[#12b981]' };
+    const BTN1 = 'flex h-[54px] w-full items-center justify-center rounded-full bg-gradient-to-r from-[#b06bff] via-[#8a5cff] to-[#6f5cff] font-medium shadow-[0_10px_34px_rgba(130,80,255,.5)] transition hover:brightness-110 active:scale-[.98]';
+    const BTN2 = 'flex h-[54px] w-full items-center justify-center rounded-full border border-[rgba(150,120,255,.35)] bg-white/5 font-medium transition hover:bg-white/10 active:scale-[.98]';
+    const INP = 'h-[52px] w-full rounded-full border border-[rgba(150,120,255,.28)] bg-[rgba(8,5,20,.55)] px-5 text-base text-white outline-none placeholder:text-hint focus:border-violet-vibe';
+    const PLAY = 'relative grid h-11 w-11 place-items-center rounded-full border-2 border-white/80 bg-white/15 backdrop-blur transition group-hover:scale-110 lg:h-14 lg:w-14';
+    const PI = '<svg viewBox="0 0 24 24" class="ml-0.5 h-5 w-5 fill-white lg:h-6 lg:w-6"><path d="M9 6.5v11l9-5.5z"/></svg>';
+
+    const pool = [
+      'bg-gradient-to-br from-[#6a2bd6] via-[#2a1160] to-[#140a32]',
+      'bg-[radial-gradient(40%_60%_at_55%_45%,rgba(230,60,50,.85),transparent_70%),linear-gradient(135deg,#1b2a4d,#5a6a86_45%,#2a1e2e)]',
+      'bg-[radial-gradient(45%_60%_at_30%_40%,rgba(224,29,43,.7),transparent_70%),linear-gradient(135deg,#d9d3cd,#5b5252_50%,#1c1818)]',
+      'bg-gradient-to-br from-[#0b3a4a] via-[#0a1a26] to-[#060b12]',
+      'bg-gradient-to-br from-[#e6338a] via-[#5a1a7a] to-[#1a0f40]',
+    ];
+    /* обложки демо-комнат: чёткая авторская графика вместо размытых пятен + значок-тема */
+    const bpost = [
+      'bg-[linear-gradient(150deg,#00a3ff_0%,#0057c4_45%,#001233_100%)]',
+      'bg-[linear-gradient(160deg,#ff2d55_0%,#8c0d24_38%,#101a3d_75%,#04060f_100%)]',
+      'bg-[linear-gradient(135deg,#f4efe6_0%,#48423d_42%,#0d0d0d_78%,#c2011b_100%)]',
+      'bg-[linear-gradient(135deg,#ff9a1e_0%,#c23a06_38%,#161616_74%,#000_100%)]',
+      'bg-[linear-gradient(150deg,#8b1a1a_0%,#3d0a0a_40%,#0a0a1a_75%,#000_100%)]',
+      'bg-[linear-gradient(155deg,#ff9a3d_0%,#3a1a6e_45%,#0a0620_78%,#000_100%)]',
+      'bg-[linear-gradient(135deg,#ffcf3d_0%,#ff5a1e_35%,#7a0f14_70%,#100404_100%)]',
+    ];
+    const bicon = [
+      '<circle cx="12" cy="12" r="9"/><path d="M9.5 8.3v7.4l6.2-3.7z"/>',
+      '<path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M4.5 19.5l2-2M17.5 6.5l2-2"/><circle cx="12" cy="12" r="4.2"/>',
+      '<path d="M12 3c3.4 2.1 5.4 5.3 5.4 9s-2 6.9-5.4 9c-3.4-2.1-5.4-5.3-5.4-9s2-6.9 5.4-9z"/><circle cx="12" cy="12" r="1.8"/>',
+      '<path d="M3 16.5l3.2-7h3.6l1.6 3.2h3.6l3-3.2M3 16.5h18M4.5 16.5v3.2h15v-3.2"/><circle cx="8" cy="19.7" r="1.6"/><circle cx="17" cy="19.7" r="1.6"/>',
+      '<path d="M12 2l7 3v6c0 5-3 8-7 11-4-3-7-6-7-11V5z"/><path d="M9 12l2 2 4-4"/>',
+      '<circle cx="12" cy="12" r="3.4"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(120 12 12)"/>',
+      '<path d="M2 12h6l2-4h4l2 4h6"/><path d="M6 12l-2.5 5M18 12l2.5 5"/><circle cx="7" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/><path d="M9 5l1.5 3M15 5l-1.5 3"/>'
+    ];
+    /* карточки твоих 4 фильмов: постеры — твои файлы из images/, ролики — свободные лицензионные
+       заглушки (Big Buck Bunny / Tears of Steel / Sintel). Сами vkvideo.ru-ссылки на фильмы сюда
+       сознательно НЕ вставлены — это пиратские копии, а зацикленный автоплей полнометражек на
+       публичной витрине я не делаю ни в демо, ни в проде (подробности — в чате). dur — реальный
+       хронометраж, по нему вживую считается «на какой минуте фильм» */
+    const BOT_MEDIA = {
+      'Человек-паук: Новый день': { posterIdx: 1, thumb: 'images/poster_chelovek_pauk.png', vid: 'YE7VzlLtp-4', dur: 140 },
+      'Круэлла': { posterIdx: 2, thumb: 'images/cryella.png', vid: 'R6MlUcmOul8', dur: 134 },
+      'Двойной форсаж': { posterIdx: 3, thumb: 'images/two_forcage.png', vid: 'eRsGyueVLvQ', dur: 107 },
+      'Мстители: Финал': { posterIdx: 4, thumb: 'images/mstiteli_final.png', vid: 'YE7VzlLtp-4', dur: 181 },
+      /* для этих двух фото-постера не присылали — обложка чисто авторская (градиент + значок-тема) */
+      'Интерстеллар': { posterIdx: 5, vid: 'R6MlUcmOul8', dur: 169 },
+      'Форсаж 10': { posterIdx: 6, vid: 'eRsGyueVLvQ', dur: 141 },
+    };
+    const now0 = Date.now();
+    const rooms = [
+      { title: 'VK Видео', poster: bpost[0], icon: bicon[0], users: [['L','b']], more: 0, progress: 46 },
+      ...Object.keys(BOT_MEDIA).map((title, k) => {
+        const bm = BOT_MEDIA[title];
+        return { title, poster: bpost[bm.posterIdx], icon: bicon[bm.posterIdx], thumb: bm.thumb, media: { type: 'yt', id: bm.vid, title },
+          users: [['А','p'],['М','k'],['К','o'],['В','b'],['Д','g']], more: [56, 33, 25, 41][k], dur: bm.dur, start: now0 - [46, 92, 38, 25][k] * 60000, progress: 0 };
+      }),
+    ];
+    /* прогресс-полоска каждой боевой комнаты реально идёт по кругу за dur минут —
+       пересчитывается раз в секунду и не требует полной перерисовки списка */
+    let clockOff = 0;   // смещение серверных часов (обновляется при входе в комнату)
+    function tickBots() {
+      for (let i = 0; i < rooms.length; i++) {
+        const r = rooms[i]; if (!r.dur) continue;
+        const elapsedMin = (Date.now() + clockOff - r.start) / 60000, pct = (elapsedMin % r.dur) / r.dur * 100;
+        r.progress = pct;
+        const bar = document.querySelector('[data-bar="' + i + '"]'); if (bar) bar.style.width = pct + '%';
+      }
+    }
+    setInterval(tickBots, 1000); tickBots();
+    let friends = [];
+    let me = 'Гость'; const invited = new Set();
+
+    const av = (u, i) => `<b class="grid h-6 w-6 shrink-0 place-items-center rounded-full border-2 border-[#150d33] text-[11px] font-semibold text-white ${C[u[1]]} ${i ? '-ml-1' : ''}">${u[0]}</b>`;
+
+    function render(anim) {
+      const q = $('#q').value.trim().toLowerCase();
+      const items = rooms.map((r, i) => [r, i]).filter(([r]) => r.title.toLowerCase().includes(q));
+      $('#list').innerHTML = items.length ? items.map(([r, i], k) => `
+        <li class="${anim ? 'rise' : ''} lg:h-full" style="--i:${k + 4}">
+          <a href="#" data-room="${i}" class="group relative flex h-24 items-stretch overflow-hidden rounded-[22px] border border-[rgba(150,120,255,.28)]
+                bg-gradient-to-r from-[rgba(38,24,82,.7)] to-[rgba(18,12,42,.85)] shadow-[0_6px_20px_rgba(0,0,0,.3),inset_0_0_20px_rgba(120,80,255,.08)]
+                transition duration-200 active:scale-[.98] active:border-[rgba(190,150,255,.65)]
+                lg:h-full lg:flex-col lg:rounded-[26px] lg:hover:-translate-y-1 lg:hover:border-[rgba(190,150,255,.65)] lg:hover:shadow-[0_18px_50px_rgba(140,80,255,.35)]">
+            <div class="relative grid w-[132px] shrink-0 place-items-center overflow-hidden lg:aspect-video lg:w-full">
+              <i class="absolute inset-0 ${r.poster} transition-transform duration-500 lg:group-hover:scale-110"></i>${r.thumb ? `<img src="${r.thumb}" alt="" class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 lg:group-hover:scale-110" onerror="this.remove()">` : ''}
+              <span class="${PLAY}">${PI}</span>
+              ${r.progress
+                ? '<em class="absolute left-3 top-3 hidden items-center gap-1.5 rounded-full bg-black/45 px-2.5 py-1 text-[11px] font-semibold not-italic backdrop-blur lg:flex"><b class="relative h-2 w-2 rounded-full bg-[#ff2d7a]"><b class="absolute inset-0 rounded-full bg-[#ff2d7a]" style="animation:ping2 1.6s ease-out infinite"></b></b>Идёт сейчас</em>'
+                : '<em class="absolute left-3 top-3 hidden items-center gap-1.5 rounded-full bg-black/45 px-2.5 py-1 text-[11px] font-semibold not-italic backdrop-blur lg:flex"><b class="h-2 w-2 rounded-full bg-white/50"></b>Ожидание</em>'}
+            </div>
+            <div class="flex min-w-0 flex-1 flex-col justify-center gap-2 py-3 pl-4 pr-9 lg:justify-between lg:gap-4 lg:p-5">
+              <h3 class="truncate text-sm font-semibold lg:text-lg">${esc(r.title)}</h3>
+              <div class="flex h-6 items-center justify-between gap-3 lg:h-9">
+                <div class="flex min-w-0 items-center overflow-hidden">${r.users.map(av).join('')}${r.more ? `<i class="ml-2 shrink-0 whitespace-nowrap rounded-[10px] bg-[#ff2d7a] px-1.5 py-0.5 text-[10px] font-bold not-italic text-white">+${r.more}</i>` : ''}</div>
+                <span class="hidden h-9 w-9 shrink-0 place-items-center rounded-full border border-[rgba(150,120,255,.35)] bg-white/5 text-[#c9b8ff] transition duration-200 lg:grid group-hover:translate-x-0.5 group-hover:border-transparent group-hover:bg-gradient-to-br group-hover:from-[#b06bff] group-hover:to-[#7c4dff] group-hover:text-white"><svg viewBox="0 0 24 24" class="ico !h-[18px] !w-[18px]"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+              </div>
+              <div class="h-[3px] w-full overflow-hidden rounded bg-white/15"><span data-bar="${i}" class="block h-full rounded bg-white transition-[width] duration-1000 ease-linear" style="width:${r.progress}%"></span></div>
+            </div>
+            <svg viewBox="0 0 24 24" class="absolute right-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 fill-none stroke-[#8f7bff] lg:hidden" style="stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"><path d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </li>`).join('') : '<li class="py-12 text-center text-[#a996e0] lg:col-span-full">Ничего не найдено. Создайте комнату с таким названием.</li>';
+    }
+
+    let tt; function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => el.classList.remove('show'), 2200); }
+    function openModal(html, pos = 'right-4 top-4') {
+      const sh = $('#sheet'); sh.innerHTML = `<button data-act="close" aria-label="Закрыть" class="absolute ${pos} z-10 grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-black/35 text-white/80 backdrop-blur transition hover:bg-white/15 hover:text-white active:scale-90"><svg viewBox="0 0 24 24" class="ico !h-[18px] !w-[18px]"><path d="M6 6l12 12M18 6L6 18"/></svg></button>` + html; sh.classList.remove('pop'); void sh.offsetWidth; sh.classList.add('pop');
+      $('#modal').classList.remove('gone'); const f = sh.querySelector('input'); if (f) setTimeout(() => f.focus(), 60);
+    }
+    const closeModal = () => $('#modal').classList.add('gone');
+
+    function show(v) {
+      $$('[data-view]').forEach(el => { const on = el.dataset.view === v; el.classList.toggle('gone', !on); if (on) { el.classList.remove('fade'); void el.offsetWidth; el.classList.add('fade'); } });
+      $$('.navbtn,.tab,.hb').forEach(b => b.classList.toggle('on', b.dataset.nav === v));
+      $('#fab').classList.toggle('!hidden', v === 'profile' || v === 'settings'); if (v === 'profile') renderProfile(); if (v === 'settings') renderSettings();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    const createModal = () => openModal(`
+      <h3 class="pr-10 text-xl font-semibold">Новая комната</h3>
+      <p class="mb-5 mt-1 text-sm text-[#a996e0]">Друзья увидят её в списке публичных</p>
+      <input id="f-title" maxlength="40" placeholder="Название" class="${INP} mb-3">
+      <input id="f-link" placeholder="Ссылка на видео (необязательно)" class="${INP} mb-5">
+      <button data-act="submit" class="${BTN1} mb-3">Создать комнату</button>
+      <button data-act="close" class="${BTN2}">Отмена</button>`);
+
+    function roomModal(i) {
+      const r = rooms[i], n = r.users.length + r.more;
+      openModal(`
+        <div data-act="join" data-i="${i}" role="button" tabindex="0" aria-label="Войти в комнату" class="group relative grid aspect-video place-items-center overflow-hidden rounded-2xl transition hover:brightness-110 ${r.poster}"><span class="${PLAY}">${PI}</span></div>
+        <h3 class="mt-5 text-xl font-semibold">${esc(r.title)}</h3>
+        <div class="mb-5 mt-3 flex items-center text-sm text-[#a996e0]">${r.users.map(av).join('')}<span class="ml-3">${n} в комнате</span></div>
+        <button data-act="join" data-i="${i}" class="${BTN1} mb-3">Войти в комнату</button>
+        <button data-act="copy" data-i="${i}" class="${BTN2}">Скопировать ссылку</button>`, 'right-9 top-9');
+    }
+
+    const profileModal = () => openModal(`
+      <div class="mb-6 flex items-center gap-4 pr-10">
+        ${meAv('h-14 w-14 rounded-full text-xl')}
+        <div><h3 class="text-xl font-semibold">${esc(me)}</h3><p class="text-sm text-[#a996e0]">В сети</p></div>
+      </div>
+      <button data-act="logout" class="${BTN2} mb-3">Выйти</button>
+      <button data-act="close" class="${BTN1}">Закрыть</button>`);
+
+    function logout() {
+      closeModal(); const r = $('#rooms'), l = $('#login');
+      r.classList.add('gone'); r.classList.remove('page-in');
+      l.classList.remove('gone', 'leave'); l.classList.add('page-in'); window.scrollTo(0, 0);
+    }
+
+    document.addEventListener('click', e => {
+      const t = e.target.closest('[data-nav],[data-act],[data-room],[data-invite],a[href="#"]');
+      if (!t) { if (e.target.id === 'modal') closeModal(); return; }
+      if (t.tagName === 'A') e.preventDefault();
+      const d = t.dataset;
+      if (d.nav) { closeModal(); return show(d.nav); }
+      if (d.room !== undefined) return roomModal(+d.room);
+      if (d.invite !== undefined) { const i = +d.invite; invited.has(i) ? invited.delete(i) : (invited.add(i), toast('Приглашение отправлено: ' + friends[i][0])); return renderFriends(); }
+      switch (d.act) {
+        case 'create': pickFor = null; return openSrc();
+        case 'plain': closeSrc(); return createModal();
+        case 'pickvideo': pickFor = cur; return openSrc();
+        case 'srcback': return srcView ? renderSrc(null) : closeSrc();
+        case 'plat': return renderSrc(d.p);
+        case 'item': return pickItem(d.p, +d.i);
+        case 'go': return goLink();
+        case 'ext': window.open(d.u, '_blank', 'noopener'); return;
+        case 'profile': return profileModal();
+        case 'close': return closeModal();
+        case 'logout': closeModal(); stopRoom(); closeSrc(); $('#room').classList.add('gone'); return logout();
+        case 'leave': stopRoom(); $('#room').classList.add('gone'); $('#rooms').classList.remove('gone'); return;
+        case 'soon': return toast('Скоро появится');
+        case 'editprof': return editProfileModal();
+        case 'pick': return $('#f-file').click();
+        case 'nophoto': tp = null; return paintPv();
+        case 'saveprof': { const n = $('#f-name').value.trim(); if (!n) { toast('Введите имя'); return $('#f-name').focus(); } me = n; photo = tp; color = tc; closeModal(); paintMe(); renderProfile(); return toast('Профиль обновлён'); }
+        case 'buy': return;   // оплата: buyPremium() в клиентском блоке
+        case 'gopremium': closeModal(); stopRoom(); closeSrc(); $('#room').classList.add('gone'); $('#rooms').classList.remove('gone'); show('profile'); return setTimeout(() => $('#premium').scrollIntoView({ behavior: 'smooth', block: 'start' }), 400);
+        case 'edit': return startEdit(d.m);
+        case 'editok': return endEdit(d.m, true);
+        case 'copyinv': try { navigator.clipboard.writeText('https://' + $('#inv').textContent); } catch (_) {} return toast('Ссылка-приглашение скопирована');
+        case 'send': return sendMsg();
+        case 'play': playing = !playing; return $('#pp').innerHTML = playing ? PAUSE : PI;
+        case 'people': { const r = rooms[cur]; return openModal(`<h3 class="pr-10 text-xl font-semibold">В комнате</h3><div class="mb-5 mt-4 flex items-center">${r.users.map(av).join('')}<span class="ml-3 text-sm text-[#a996e0]">${r.users.length + r.more} человек</span></div><button data-act="copyinv" class="${BTN1} mb-3">Пригласить друзей</button><button data-act="close" class="${BTN2}">Закрыть</button>`); }
+        case 'tg': return;
+        case 'join': closeModal(); return enterRoom(+d.i);
+        case 'copy': try { navigator.clipboard.writeText(location.href.split('#')[0] + '#room-' + (rooms[d.i].id || d.i)); } catch (_) {} return toast('Ссылка скопирована');
+        case 'submit': {
+          const v = $('#f-title').value.trim();
+          if (!v) { toast('Введите название комнаты'); return $('#f-title').focus(); }
+          rooms.unshift({ title: v, poster: pool[rooms.length % pool.length], users: [[me[0].toUpperCase(), 'p']], more: 0, progress: 0 });
+          closeModal(); $('#q').value = ''; show('rooms'); render(true); toast('Комната «' + v + '» создана'); return enterRoom(0);
+        }
+      }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Enter' && e.target.id === 'chat-in') sendMsg();
+      if (e.key === 'Enter' && e.target.id === 'f-title') $('[data-act="submit"]').click();
+      if (e.key === 'Enter' && e.target.closest('#login')) $('#continue').click();
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.getAttribute && e.target.getAttribute('role') === 'button') { e.preventDefault(); e.target.click(); }
+    });
+    $('#q').addEventListener('input', () => render(false));
+
+    
+
+
+    /* ---------- иконки и общие стили ---------- */
+    const ic = (p, x = '') => `<svg viewBox="0 0 24 24" class="ico ${x}">${p}</svg>`;
+    const P = {
+      user: '<circle cx="12" cy="8" r="4"/><path d="M4.5 20c.8-3.6 3.8-5.5 7.5-5.5s6.7 1.9 7.5 5.5"/>',
+      cal: '<rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/>',
+      clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+      glass: '<path d="M7 3h10M7 21h10M8 3v3l4 6-4 6v3M16 3v3l-4 6 4 6v3"/>',
+      crowd: '<circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20c.6-3.3 3.1-5 6.5-5s5.9 1.7 6.5 5"/><path d="M16 5.2a3.5 3.5 0 010 6.6M18.5 15.3c1.7.7 2.7 2.2 3 4.7"/>',
+      gear: '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',
+      img: '<rect x="3.5" y="4.5" width="17" height="15" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-4.5 4 3.5 3-2.5 4 3.5"/>',
+      bars: '<path d="M6 20V11M12 20V4M18 20v-6"/>', dots: '<path d="M5 5h3v3H5zM10.5 5h3v3h-3zM16 5h3v3h-3zM5 10.5h3v3H5zM10.5 10.5h3v3h-3zM16 10.5h3v3h-3zM5 16h3v3H5zM10.5 16h3v3h-3zM16 16h3v3h-3z"/>',
+      play: '<circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5z"/>', info: '<path d="M4 7h16M4 12h16M4 17h10"/>',
+      x: '<path d="M6 6l12 12M18 6L6 18"/>', search: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>', check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+      add: '<circle cx="10" cy="8.5" r="3.5"/><path d="M3.5 20c.6-3.3 3-5 6.5-5M18 8v6M15 11h6"/>', globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+      mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0013 0M12 17.5V21"/>', smile: '<circle cx="12" cy="12" r="9"/><path d="M8.5 14.2c1 1.4 2.1 2 3.5 2s2.5-.6 3.5-2"/><path d="M9 9.5h.01M15 9.5h.01"/>',
+      share: '<circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M8.2 10.9l7.6-3.8M8.2 13.1l7.6 3.8"/>', at: '<circle cx="12" cy="12" r="3.5"/><path d="M15.5 12v1.5a2.5 2.5 0 005 0V12a8.5 8.5 0 10-3.4 6.8"/>',
+      send: '<path d="M4 12h15M14 6l6 6-6 6"/>'
+    };
+    const PAUSE = '<svg viewBox="0 0 24 24" class="h-5 w-5 fill-white lg:h-6 lg:w-6"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>';
+    const EYE = ic('<path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.8"/>', '!h-5 !w-5');
+    const EYE_OFF = ic('<path d="M3 3l18 18M10.6 6c.4-.1.9-.1 1.4-.1 6.4 0 10 6.1 10 6.1a17 17 0 01-3.2 3.7M6.3 7.5A16.5 16.5 0 002 12s3.6 6.5 10 6.5c1.6 0 3-.4 4.2-.9"/>', '!h-5 !w-5');
+    const CARD = 'relative rounded-3xl border border-[rgba(150,120,255,.28)] bg-gradient-to-br from-[rgba(38,24,82,.7)] to-[rgba(18,12,42,.85)] shadow-[inset_0_0_24px_rgba(120,80,255,.08)]';
+    const IB = 'grid h-10 w-10 shrink-0 place-items-center rounded-[13px] border border-[rgba(160,120,255,.4)] bg-[rgba(40,25,90,.6)] text-[#e6dcff] shadow-[0_0_14px_rgba(120,70,255,.2)] transition hover:bg-[rgba(70,45,150,.6)] active:scale-90 max-[380px]:h-9 max-[380px]:w-9';
+    const eyeBtn = `<button data-eye aria-label="Скрыть" class="ml-2 grid h-8 w-8 shrink-0 place-items-center rounded-full text-[#8f83bd] transition hover:text-white active:scale-90">${EYE}</button>`;
+
+    /* ---------- ПРОФИЛЬ (всё обнулено) ---------- */
+    let bio = '', chartMode = 'bars', vt = 'top';
+    const MON = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+    document.addEventListener('click', e => {
+      const b = e.target.closest('[data-eye],[data-chart],[data-vt]'); if (!b) return;
+      if (b.dataset.chart) { chartMode = b.dataset.chart; return renderProfile(); }
+      if (b.dataset.vt) { vt = b.dataset.vt; return renderProfile(); }
+      const off = b.closest('[data-row]').classList.toggle('opacity-40'); b.innerHTML = off ? EYE_OFF : EYE;
+    });
+    document.addEventListener('input', e => { if (e.target.id === 'bio') bio = e.target.value; });
+
+    /* ---------- КОМНАТА ---------- */
+    let cur = 0, tick, playing = false, pos = 0;
+    function enterRoom(i) {
+      cur = i; const r = rooms[i], n = r.users.length + r.more, code = Math.random().toString(36).slice(2, 8);
+      stopPlayer(); playing = !r.media && r.progress > 0; pos = r.progress; clearInterval(tick);
+      const ib = (a, p, x = '') => `<button data-act="${a}" class="${IB} ${x}">${ic(p)}</button>`;
+      const rm = $('#room');
+      rm.innerHTML = `
+        <div class="flex items-center justify-between gap-1.5 lg:gap-3">
+          <div class="flex gap-1.5 lg:gap-2">${ib('leave', P.x)}${ib('pickvideo', P.play)}${ib('soon', P.gear)}${ib('soon', P.search)}</div>
+          <svg class="h-auto w-[62px] shrink-0 lg:w-[84px]" viewBox="0 0 190 90" role="img" aria-label="vibe"><use href="#vibe-logo"/></svg>
+          <div class="flex gap-1.5 lg:gap-2">${ib('soon', P.check, 'max-lg:!hidden')}${ib('soon', P.globe, 'max-lg:!hidden')}${ib('copyinv', P.add)}
+            <button data-act="people" aria-label="Участники" class="${IB} relative">${ic(P.crowd)}<em class="absolute -right-1.5 -top-1.5 grid h-5 min-w-5 place-items-center rounded-full bg-[#ff2d7a] px-1 text-[11px] font-bold not-italic">${n}</em></button></div>
+        </div>
+        <div class="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:gap-5">
+          <div class="flex flex-col lg:min-w-0 lg:flex-1 lg:justify-center">
+            <div class="relative aspect-video w-full overflow-hidden rounded-[22px] border border-[rgba(150,120,255,.35)] shadow-[0_20px_60px_rgba(0,0,0,.5),0_0_30px_rgba(120,70,255,.2)] ${r.poster}">
+              ${r.media ? '<div id="plw" class="absolute inset-0 bg-black"><div id="pl"></div></div>' : `<span class="absolute bottom-[22%] right-[6%] font-cond text-[clamp(22px,5vw,54px)] font-bold uppercase leading-none text-white [text-shadow:0_2px_14px_rgba(0,0,0,.7)]">${esc(r.title)}</span>
+              <button data-act="play" aria-label="Пауза" class="group absolute inset-0 grid place-items-center"><span id="pp" class="${PLAY}">${playing ? PAUSE : PI}</span></button>
+              <div class="absolute inset-x-0 bottom-0 h-1.5 bg-white/15"><span id="bar" class="block h-full rounded-r bg-gradient-to-r from-[#b06bff] to-[#6f5cff] shadow-[0_0_10px_#a259ff]" style="width:${pos}%"></span></div>`}
+            </div>
+            <h2 class="mt-3 truncate px-1 text-lg font-semibold lg:text-2xl">${esc(r.title)}</h2>
+          </div>
+          <section class="${CARD} flex min-h-0 flex-1 flex-col overflow-hidden p-3 backdrop-blur-xl lg:w-[380px] lg:flex-none lg:p-4">
+            <button data-act="copyinv" class="flex items-center gap-3 rounded-2xl border border-[rgba(150,120,255,.28)] bg-[rgba(8,5,20,.45)] p-3 text-left transition hover:border-[rgba(190,150,255,.5)] active:scale-[.98]">
+              ${ic(P.share, 'text-[#b79cff]')}<span class="min-w-0 text-sm"><span class="text-[#a996e0]">Ссылка-приглашение</span><br><b id="inv" class="truncate font-semibold text-[#8fb8ff]">vibe.link/${code}</b></span></button>
+            <div class="mt-3 flex items-center gap-3 px-1"><i class="h-9 w-9 shrink-0 rounded-full border border-white/20 ${r.poster}"></i><p class="min-w-0 text-sm leading-snug"><span class="text-[#a996e0]">Сейчас играет</span><br><b class="line-clamp-2 font-semibold">${esc(r.title)}</b></p></div>
+            <ul id="msgs" class="my-3 flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-1"><li id="empty" class="m-auto text-center text-sm text-hint">Здесь пока тихо — напишите первым</li></ul>
+            <div class="flex items-center gap-1 rounded-full border border-[rgba(150,120,255,.28)] bg-[rgba(8,5,20,.6)] p-1.5 focus-within:border-violet-vibe">
+              <button data-act="soon" aria-label="Голос" class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#b06bff] to-[#7c4dff] shadow-[0_0_16px_rgba(140,80,255,.6)] transition active:scale-90">${ic(P.mic, 'stroke-white')}</button>
+              <input id="chat-in" placeholder="Чат" autocomplete="off" class="min-w-0 flex-1 bg-transparent px-2 text-base text-white outline-none placeholder:text-hint">
+              <button data-act="soon" class="grid h-9 w-9 place-items-center text-[#b79cff] max-lg:hidden">${ic(P.at, '!h-5 !w-5')}</button>
+              <button data-act="soon" class="grid h-9 w-9 place-items-center text-[#b79cff]">${ic(P.smile, '!h-5 !w-5')}</button>
+              <button data-act="soon" class="grid h-9 place-items-center px-1 text-[11px] font-bold tracking-wider text-[#b79cff] max-lg:hidden">GIF</button>
+              <button data-act="soon" class="grid h-9 w-9 place-items-center text-[#b79cff] max-[380px]:hidden">${ic(P.img, '!h-5 !w-5')}</button>
+              <button data-act="send" aria-label="Отправить" class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/10 text-white transition active:scale-90 hover:bg-white/20">${ic(P.send, '!h-5 !w-5')}</button>
+            </div>
+          </section>
+        </div>`;
+      rm.classList.remove('gone', 'page-in'); void rm.offsetWidth; rm.classList.add('page-in');
+      $('#rooms').classList.add('gone'); window.scrollTo(0, 0);
+      if (r.media) mountPlayer(r.media);
+      tick = setInterval(() => { if (playing) { pos = pos >= 100 ? 0 : pos + .15; $('#bar').style.width = pos + '%'; } }, 1000);
+      toast('Вы вошли в «' + r.title + '»');
+    }
+
+    /* ---------- профиль пользователя: имя, аватар, premium ---------- */
+    Object.assign(P, {
+      pen: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>', heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/>',
+      spark: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/>',
+      lock: '<rect x="5" y="10.5" width="14" height="10" rx="3"/><path d="M8.5 10.5V8a3.5 3.5 0 017 0v2.5"/>', ban: '<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>'
+    });
+    let photo = null, color = 'p', premium = false, until = null, tp, tc, mid = 0, tgInfo = null, isAdm = false, PRICE = '100 ⭐';
+    const GR = { p: 'from-[#b06bff] to-[#6f5cff]', k: 'from-[#ff4d9a] to-[#b06bff]', o: 'from-[#ff9a3d] to-[#ff4d6a]', b: 'from-[#4da3ff] to-[#6f5cff]', g: 'from-[#22d3a0] to-[#2f8bff]' };
+    const meAv = (cls, ph = photo, co = color, nm = me) => ph ? `<img src="${ph}" alt="" class="${cls} object-cover">` : `<b class="${cls} grid place-items-center bg-gradient-to-br ${GR[co]} font-semibold">${esc((nm[0] || 'Г').toUpperCase())}</b>`;
+    function paintMe() { $('#me-ava').innerHTML = meAv('h-10 w-10 rounded-full'); $('#me-name').textContent = me; $('#hello').textContent = 'Привет, ' + me; }
+    const fmt = d => d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+    const PBTN = 'h-10 shrink-0 rounded-full bg-gradient-to-r from-[#b06bff] to-[#7c4dff] px-4 text-sm font-medium transition hover:shadow-[0_6px_20px_rgba(130,80,255,.5)] hover:brightness-110 active:scale-95';
+    const GBTN = 'h-10 shrink-0 rounded-full border border-[rgba(150,120,255,.35)] px-4 text-sm font-medium text-[#c9b8ff] transition hover:bg-white/10 active:scale-95';
+    const PM = 'border border-[rgba(200,160,255,.6)] bg-gradient-to-br from-[rgba(176,107,255,.3)] to-[rgba(79,140,255,.22)] shadow-[0_0_18px_rgba(150,90,255,.4)]';
+    const GT = 'bg-gradient-to-r from-[#ff8ad0] to-[#8fb8ff] bg-clip-text text-transparent';
+
+        const lock = (inner, label) => premium ? inner : `<div class="relative"><div class="pointer-events-none select-none blur-[6px] saturate-50 opacity-80" aria-hidden="true">${inner}</div><div class="absolute inset-0 grid place-items-center bg-gradient-to-b from-transparent via-[rgba(20,10,50,.4)] to-transparent"><button data-act="gopremium" class="group flex items-center gap-3 rounded-full border border-[rgba(255,214,242,.55)] bg-[rgba(28,14,66,.72)] py-2 pl-2 pr-5 shadow-[0_0_30px_rgba(190,110,255,.5),inset_0_0_14px_rgba(255,255,255,.08)] backdrop-blur-md transition hover:brightness-125 active:scale-95"><i class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#ff4d9a] to-[#8a5cff] shadow-[0_0_16px_rgba(255,80,170,.6)]">${ic(P.spark, '!h-5 !w-5 stroke-white')}</i><span class="text-left leading-tight"><b class="block text-[15px] font-semibold"><span class="${GT}">Доступно с</span> VIBE Premium</b><span class="text-[11px] text-[#c9b8ff]">Нажмите, чтобы узнать больше</span></span></button></div></div>`;
+
+    function renderProfile() {
+      const d = new Date(), months = [5, 4, 3, 2, 1, 0].map(k => MON[(d.getMonth() - k + 12) % 12]), tz = [40, 72, 28, 88, 56, 64];
+      const join = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' });
+      const head = (p, l, eye = true) => `<div data-row class="flex items-center px-4 py-3 transition">${ic(p, 'mr-3 text-[#d8ccff]')}<h3 class="font-semibold">${l}</h3>${eye ? eyeBtn : ''}</div>`;
+      const row = (p, l, v) => `<div data-row class="flex items-center px-4 py-3.5 transition">${ic(p, 'mr-3 text-[#c9b8ff]')}<span class="font-medium">${l}</span><span class="ml-auto text-[15px] text-[#d8ccff]">${v}</span>${eyeBtn}</div>`;
+      const seg = (m, pp) => `<button data-chart="${m}" aria-label="${m}" class="grid h-9 w-9 place-items-center rounded-xl transition active:scale-90 ${chartMode === m ? 'bg-[rgba(120,80,255,.4)] text-white shadow-[0_0_12px_rgba(140,90,255,.5)]' : 'text-[#8f83bd] hover:text-white'}">${ic(pp, '!h-5 !w-5')}</button>`;
+      const chart = chartMode === 'bars'
+        ? `<div class="flex h-28 items-end gap-3 border-b border-white/10 px-1">${months.map((m, i) => `<div class="flex flex-1 flex-col items-center justify-end"><i class="w-full max-w-[34px] rounded-t-lg bg-gradient-to-t from-[#6f5cff] to-[#b06bff] ${premium ? 'opacity-40' : ''}" style="height:${premium ? 4 : tz[i]}px"></i></div>`).join('')}</div><div class="mt-2 flex gap-3 px-1 text-xs text-hint">${months.map(m => `<span class="flex-1 text-center">${m}</span>`).join('')}</div>`
+        : `<div class="grid grid-cols-12 gap-1.5">${'<i class="aspect-square rounded-md bg-white/[.06]"></i>'.repeat(60)}</div>`;
+      const pill = (k, t) => `<button data-vt="${k}" class="h-9 rounded-full px-5 text-sm font-medium transition active:scale-95 ${vt === k ? 'bg-gradient-to-r from-[#b06bff] to-[#7c4dff] shadow-[0_6px_18px_rgba(130,80,255,.45)]' : 'border border-[rgba(150,120,255,.35)] text-[#c9b8ff] hover:bg-white/10'}">${t}</button>`;
+      const av = meAv('h-16 w-16 rounded-full text-2xl');
+      const feats = [[P.bars, 'Статистика', 'Часы в комнатах, графики и рекорды'], [P.heart, 'Любимые видео', 'Топ и история просмотров'], [P.pen, 'Редактирование сообщений', 'Поправьте текст после отправки'], [P.spark, 'Премиум-сообщения', 'Неоновая рамка, градиентный ник и значок ✦'], [P.user, 'Рамка аватара', 'Переливающееся кольцо вокруг фото'], [P.lock, 'Приватные комнаты', 'Вход по паролю — только для своих']];
+      $('#prof').innerHTML = `
+        <div class="${CARD} grad-border flex items-center gap-4 p-4 lg:p-5">
+          <button data-act="editprof" aria-label="Изменить аватар" class="relative shrink-0 transition active:scale-95">
+            ${premium ? `<span class="block rounded-full bg-gradient-to-br from-[#ff4d9a] via-[#b06bff] to-[#4da3ff] p-[3px] shadow-[0_0_20px_rgba(200,90,255,.65)]">${av}</span>` : `<span class="block rounded-full shadow-[0_0_24px_rgba(140,80,255,.5)]">${av}</span>`}
+            <i class="absolute -bottom-0.5 -right-0.5 grid h-6 w-6 place-items-center rounded-full border-2 border-[#150d33] bg-[#7c4dff]">${ic(P.pen, '!h-3 !w-3 stroke-white')}</i></button>
+          <div class="min-w-0 flex-1"><div class="flex items-center gap-2"><h2 class="truncate text-xl font-semibold ${premium ? GT : ''}">${esc(me)}</h2>${premium ? '<span class="shrink-0 rounded-full bg-gradient-to-r from-[#ff4d9a] to-[#8a5cff] px-2 py-0.5 text-[10px] font-bold tracking-wider">✦ PREMIUM</span>' : ''}</div>
+            <p class="truncate text-sm text-[#a996e0]">@${esc(tgInfo && tgInfo.username || me.toLowerCase().replace(/\s+/g, '.'))}</p>
+            <button data-act="editprof" class="mt-1 text-sm font-medium text-[#b79cff] hover:text-white">Изменить профиль</button></div>
+          <button data-nav="settings" aria-label="Настройки" class="${IB}">${ic(P.gear)}</button>
+        </div>
+        <div class="${CARD} overflow-hidden">${head(P.user, 'О себе')}<div class="px-4 pb-4"><input id="bio" maxlength="140" value="${esc(bio)}" placeholder="Расскажите о себе" class="${INP} !h-12"></div></div>
+        <div class="${CARD} overflow-hidden">${head(P.img, 'Галерея', false)}<div class="px-4 pb-4">${galHTML()}</div></div>
+        <div class="${CARD} overflow-hidden">${head(P.bars, 'Статистика', premium)}
+          ${lock(`<div class="divide-y divide-white/5">
+            <div data-row class="flex items-center px-4 py-3.5"><i class="mr-3 grid h-[22px] w-[22px] place-items-center"><b class="h-[18px] w-[18px] rounded-full bg-[#22e05a] shadow-[0_0_12px_#22e05a]"></b></i><span class="font-medium">В сети</span>${eyeBtn.replace('ml-2', 'ml-auto')}</div>
+            ${row(P.cal, 'Дата регистрации', join)}${row(P.clock, 'Время в комнатах', '0 ч')}
+            <div class="px-4 py-4"><div class="mb-3 flex items-center justify-between"><div class="flex gap-1">${seg('bars', P.bars)}${seg('dots', P.dots)}</div><span class="text-xs text-hint">Часы по месяцам</span></div>${chart}<p class="mt-3 text-center text-sm text-hint">Пока нет данных — смотрите вместе, и здесь появится график</p></div>
+            ${row(P.crowd, 'Друзья', friends.length)}${row(P.glass, 'Самый долгий сеанс', '0 ч')}${row(P.crowd, 'Самая большая комната', '0 чел.')}</div>`, 'Доступно с VIBE Premium')}</div>
+        <div class="${CARD} overflow-hidden"><div class="flex items-center px-4 py-3">${ic(P.heart, 'mr-3 text-[#d8ccff]')}<h3 class="font-semibold">Любимые видео</h3></div>
+          ${lock(`<div class="px-4 pb-5"><div class="mb-4 flex gap-2">${pill('top', 'Топ')}${pill('hist', 'История')}</div><div class="grid grid-cols-3 gap-2">${[0, 1, 2].map(i => `<i class="aspect-video rounded-xl ${pool[i + 1]}"></i>`).join('')}</div></div>`, 'Доступно с VIBE Premium')}</div>
+        <div id="premium" class="relative overflow-hidden rounded-[28px] border-[1.5px] border-[rgba(220,180,255,.6)] p-5 shadow-[0_0_40px_rgba(170,90,255,.45),inset_0_0_30px_rgba(255,255,255,.08)] lg:p-7" style="background:radial-gradient(90% 70% at 90% 0%,rgba(255,90,170,.5),transparent 60%),radial-gradient(80% 80% at 0% 100%,rgba(70,90,255,.55),transparent 60%),linear-gradient(135deg,#2a1163,#150a36)">
+          ${ic(P.spark, 'pointer-events-none absolute -right-4 -top-4 !h-32 !w-32 text-white/15')}
+          <h3 class="relative font-cond text-[38px] font-bold uppercase leading-none"><span class="${GT}">VIBE</span> PREMIUM</h3>
+          <p class="relative mt-2 text-[#d8ccff]">Больше возможностей для совместного просмотра</p>
+          <ul class="relative mt-5 flex flex-col gap-3">${feats.map(f => `<li class="flex items-center gap-3.5"><i class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-[rgba(220,180,255,.4)] bg-white/10 text-[#ffd6f2] shadow-[inset_0_0_14px_rgba(255,255,255,.1)]">${ic(f[0])}</i><div class="min-w-0"><b class="block font-semibold">${f[1]}</b><span class="text-sm leading-snug text-[#c9b8ff]">${f[2]}</span></div></li>`).join('')}</ul>
+          ${typeof lookBlock === 'function' ? lookBlock() : ''}
+          <div class="relative mt-6 flex items-end gap-2"><b class="text-4xl font-semibold">${PRICE}</b><span class="mb-1 text-[#d8ccff]">/ 30 дней</span></div>
+          ${premium ? `<p class="relative mt-2 text-sm font-medium text-[#8fffc8]">✓ Активен до ${fmt(until)}</p>` : ''}
+          <button data-act="buy" class="relative mt-4 flex h-[56px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#ff4d9a] via-[#b06bff] to-[#6f5cff] text-[17px] font-semibold shadow-[0_10px_34px_rgba(255,80,170,.45),inset_0_1px_0_rgba(255,255,255,.4)] transition hover:brightness-110 active:scale-[.98]">${ic(P.spark, '!h-5 !w-5')}${premium ? 'Продлить на 30 дней' : 'Оформить за ' + PRICE}</button>
+        </div>`;
+    }
+
+    function premiumModal(t) {
+      return; openModal(`<div class="mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-[#ff4d9a] to-[#8a5cff] shadow-[0_0_28px_rgba(255,80,170,.5)]">${ic(P.spark, '!h-7 !w-7 stroke-white')}</div>
+        <h3 class="pr-10 text-xl font-semibold">${t}</h3><p class="mb-5 mt-1.5 text-[#a996e0]">Доступно с VIBE Premium — ${PRICE} / 30 дней</p>
+        <button data-act="gopremium" class="${BTN1} mb-3">Подробнее о Premium</button><button data-act="close" class="${BTN2}">Не сейчас</button>`);
+    }
+    function editProfileModal() {
+      tp = photo; tc = color;
+      openModal(`<h3 class="pr-10 text-xl font-semibold">Ваш профиль</h3>
+        <div class="my-5 flex flex-col items-center gap-3">
+          <button data-act="pick" aria-label="Загрузить фото" class="relative transition active:scale-95"><span id="pv"></span><i class="absolute bottom-0 right-0 grid h-9 w-9 place-items-center rounded-full border-2 border-[#120b2b] bg-[#7c4dff]">${ic(P.img, '!h-4 !w-4 stroke-white')}</i></button>
+          <div class="flex gap-2"><button data-act="pick" class="${GBTN}">Загрузить фото</button><button data-act="nophoto" class="${GBTN}">Убрать</button></div>
+          <div id="sw" class="flex gap-3"></div></div>
+        <input id="f-name" maxlength="24" value="${esc(me)}" placeholder="Имя" class="${INP} mb-5">
+        <button data-act="saveprof" class="${BTN1} mb-3">Сохранить</button><button data-act="close" class="${BTN2}">Отмена</button>
+        <input id="f-file" type="file" accept="image/*" class="hidden">`);
+      paintPv();
+    }
+    function paintPv() {
+      $('#pv').innerHTML = meAv('h-24 w-24 rounded-full text-3xl', tp, tc, $('#f-name').value.trim() || me);
+      $('#sw').innerHTML = Object.keys(GR).map(k => `<button data-sw="${k}" aria-label="Цвет" class="h-8 w-8 rounded-full bg-gradient-to-br ${GR[k]} transition active:scale-90 ${!tp && tc === k ? 'ring-2 ring-white ring-offset-2 ring-offset-[#120b2b]' : 'opacity-70'}"></button>`).join('');
+    }
+    document.addEventListener('input', e => { if (e.target.id === 'f-name') paintPv(); });
+    document.addEventListener('change', e => {
+      if (e.target.id !== 'f-file' || !e.target.files[0]) return;
+      const im = new Image(); im.onload = () => {
+        const m = Math.min(im.width, im.height), c = document.createElement('canvas'); c.width = c.height = 256;
+        c.getContext('2d').drawImage(im, (im.width - m) / 2, (im.height - m) / 2, m, m, 0, 0, 256, 256);
+        tp = c.toDataURL('image/jpeg', .88); URL.revokeObjectURL(im.src); paintPv();
+      }; im.src = URL.createObjectURL(e.target.files[0]);
+    });
+
+    /* ---------- друзья ---------- */
+    let ftab = 'friends', fq = '';
+    const dir = [];
+    let recents = [];
+    let reqs = [], blocked = []; const sent = new Set();
+    const updBadge = () => { const b = $('#hb-badge'); if (!b) return; b.textContent = reqs.length; b.classList.toggle('!hidden', !reqs.length); };
+    const isFr = n => friends.some(f => f[0] === n);
+    function userProfileModal(n, c) {
+      const fi = friends.findIndex(f => f[0] === n), friend = fi > -1;
+      const bi = blocked.findIndex(b => b[0] === n), isBlk = bi > -1;
+      const ri = reqs.findIndex(u => u[0] === n), isReq = ri > -1;
+      const pending = sent.has(n.toLowerCase());
+      const uname = (n.replace(/^@/, '') || '').toLowerCase().replace(/\s+/g, '.');
+      const avatar = `<span class="block rounded-full shadow-[0_0_24px_rgba(140,80,255,.5)]"><b class="grid h-20 w-20 place-items-center rounded-full bg-gradient-to-br text-2xl font-semibold ${GR[c]}">${esc(n[0].toUpperCase())}</b></span>`;
+      const statusTxt = isBlk ? 'Заблокирован' : friend ? 'В сети' : isReq ? 'Хочет дружить' : 'Не в друзьях';
+      let actions;
+      if (isBlk) {
+        actions = `<button data-f="unb:${bi}" class="${PBTN} mb-3">Разблокировать</button>`;
+      } else if (friend) {
+        actions = `<button data-invite="${fi}" class="${invited.has(fi) ? GBTN : PBTN} mb-3">${invited.has(fi) ? 'Приглашён' : 'Позвать в комнату'}</button>
+          <button data-f="unfr:${esc(n)}" class="${GBTN} mb-3">Удалить из друзей</button>
+          <button data-f="blku:${esc(n)}" class="${GBTN}">Заблокировать</button>`;
+      } else if (isReq) {
+        actions = `<button data-f="acc:${ri}" class="${PBTN} mb-3">Принять заявку</button>
+          <button data-f="dec:${ri}" class="${GBTN}">Отклонить</button>`;
+      } else {
+        actions = `<button data-f="add:${esc(n)}" ${pending ? 'disabled' : ''} class="${pending ? GBTN + ' opacity-70' : PBTN} mb-3">${pending ? 'Отправлено' : 'Добавить в друзья'}</button>
+          <button data-f="blku:${esc(n)}" class="${GBTN}">Заблокировать</button>`;
+      }
+      openModal(`
+        <div class="mb-6 flex flex-col items-center gap-3 pr-2 pt-2 text-center">
+          ${avatar}
+          <div><h3 class="text-xl font-semibold">${esc(n)}</h3><p class="text-sm text-[#a996e0]">@${esc(uname)}</p></div>
+        </div>
+        <div class="${CARD} mb-5 divide-y divide-white/5 overflow-hidden">
+          <div class="flex items-center justify-between px-4 py-3"><span class="text-sm text-[#a996e0]">Статус</span><span class="text-sm font-medium ${isBlk ? 'text-[#ff7a9e]' : 'text-[#8fffc8]'}">${statusTxt}</span></div>
+          <div class="flex items-center justify-between px-4 py-3"><span class="text-sm text-[#a996e0]">Друзей</span><span class="text-sm font-medium text-[#d8ccff]">—</span></div>
+        </div>
+        ${actions}`);
+    }
+    document.addEventListener('click', e => {
+      const b = e.target.closest('[data-view-u]'); if (!b) return;
+      userProfileModal(b.dataset.viewU, b.dataset.viewC);
+    });
+    function renderFriends() {
+      const q = fq.trim().replace(/^@/, '').toLowerCase();
+      const T = [['friends', 'Друзья', P.crowd, 0], ['recents', 'Недавние', P.clock, 0], ['reqs', 'Заявки', P.add, reqs.length], ['blocked', `Блок (${blocked.length})`, P.ban, 0]];
+      $('#ftabs').innerHTML = T.map(([k, l, pp, c]) => `<button data-f="tab:${k}" class="relative flex flex-col items-center gap-1 rounded-2xl border py-2.5 text-[11px] transition active:scale-95 ${ftab === k && !q ? 'border-[rgba(160,120,255,.4)] bg-[rgba(70,40,160,.45)] text-white shadow-[0_0_18px_rgba(120,70,255,.25)]' : 'border-transparent text-[#8f83bd] hover:bg-white/5'}">${ic(pp)}${l}${c ? `<em class="absolute right-2 top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-[#ff2d7a] px-1 text-[10px] font-bold not-italic text-white">${c}</em>` : ''}</button>`).join('');
+      const li = (n, c, sub, btns, i = 0, clickable = true) => `<li class="${CARD} rise flex items-center gap-3 p-3.5 lg:hover:border-[rgba(190,150,255,.5)]" style="--i:${i}">${clickable
+        ? `<button data-view-u="${esc(n)}" data-view-c="${esc(c)}" aria-label="Открыть профиль" class="flex min-w-0 flex-1 items-center gap-3 rounded-2xl py-0.5 text-left transition active:scale-[.98]"><b class="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-gradient-to-br text-lg font-semibold ${GR[c]}">${esc(n[0].toUpperCase())}</b><div class="min-w-0 flex-1"><h3 class="truncate font-semibold">${esc(n)}</h3><p class="truncate text-sm text-[#a996e0]">${sub}</p></div></button>`
+        : `<b class="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-gradient-to-br text-lg font-semibold ${GR[c]}">${esc(n[0].toUpperCase())}</b><div class="min-w-0 flex-1"><h3 class="truncate font-semibold">${esc(n)}</h3><p class="truncate text-sm text-[#a996e0]">${sub}</p></div>`
+      }${btns}</li>`;
+      const addBtn = n => isFr(n) ? `<span class="px-2 text-sm text-[#8fffc8]">✓ Друзья</span>` : sent.has(n.toLowerCase()) ? `<button disabled class="${GBTN} opacity-70">Отправлено</button>` : `<button data-f="add:${esc(n)}" class="${PBTN}">Добавить</button>`;
+      const emp = (pp, t, x) => `<li class="${CARD} grid place-items-center gap-2 px-6 py-10 text-center"><i class="grid h-16 w-16 place-items-center rounded-full border border-[rgba(150,120,255,.35)] bg-white/5 text-[#c9b8ff]">${ic(pp, '!h-8 !w-8')}</i><b class="text-lg font-semibold">${t}</b><span class="text-sm text-[#a996e0]">${x}</span></li>`;
+      const sub = t => `<li class="ml-1 mt-2 text-sm font-semibold text-[#d8ccff]">${t}</li>`;
+      let h = '';
+      if (q) {
+        const m = dir.filter(u => !blocked.some(b => b[0] === u[0]) && (u[0].toLowerCase().includes(q) || u[2].includes(q)));
+        h = m.map((u, i) => li(u[0], u[1], '@' + u[2], addBtn(u[0]), i)).join('');
+        if (!m.some(u => u[2] === q)) h += li('@' + q, 'p', 'Добавить по нику', sent.has(q) ? `<button disabled class="${GBTN} opacity-70">Отправлено</button>` : `<button data-f="add:${esc(q)}" class="${PBTN}">Добавить</button>`, m.length, false);
+      } else if (ftab === 'friends') {
+        h = friends.length ? friends.map((f, i) => li(f[0], f[1], f[2], `<button data-invite="${i}" class="min-w-[104px] ${invited.has(i) ? GBTN : PBTN}">${invited.has(i) ? 'Приглашён' : 'Позвать'}</button>`, i)).join('')
+          : emp(P.crowd, 'Пока нет друзей', 'Найдите людей через поиск или добавьте из рекомендаций ниже');
+        const sg = dir.filter(u => !isFr(u[0]) && !blocked.some(b => b[0] === u[0])).slice(0, 4); if (sg.length) h += sub('Возможно, вы знакомы') + sg.map((u, i) => li(u[0], u[1], '@' + u[2], addBtn(u[0]), i)).join('');
+      } else if (ftab === 'recents') {
+        h = recents.length ? recents.map((u, i) => li(u[0], u[1], u[3], addBtn(u[0]), i)).join('') : emp(P.clock, 'Пока пусто', 'Здесь появятся те, с кем вы смотрели вместе');
+      } else if (ftab === 'reqs') {
+        h = reqs.length ? reqs.map((u, i) => li(u[0], u[1], 'хочет дружить · @' + u[2], `<div class="flex gap-2"><button data-f="acc:${i}" class="${PBTN}">Принять</button><button data-f="dec:${i}" aria-label="Отклонить" class="${GBTN} !px-3">${ic(P.x, '!h-4 !w-4')}</button></div>`, i)).join('') : emp(P.add, 'Заявок нет', 'Когда кто-то захочет дружить, заявка появится здесь');
+      } else {
+        h = blocked.length ? blocked.map((u, i) => li(u[0], u[1], 'заблокирован', `<button data-f="unb:${i}" class="${GBTN}">Разблокировать</button>`, i)).join('') : emp(P.ban, 'Список пуст', 'Заблокированных людей нет');
+      }
+      $('#flist').innerHTML = h;
+    }
+    $('#fq').addEventListener('input', e => { fq = e.target.value; renderFriends(); });
+    document.addEventListener('click', e => {
+      const b = e.target.closest('[data-f],[data-sw]'); if (!b) return;
+      if (b.dataset.sw) { tc = b.dataset.sw; tp = null; return paintPv(); }
+      const k = b.dataset.f, i = k.indexOf(':'), a = k.slice(0, i), v = k.slice(i + 1);
+      if (a === 'tab') { ftab = v; fq = ''; $('#fq').value = ''; }
+      if (a === 'add') { sent.add(v.toLowerCase()); toast('Заявка отправлена: ' + v); }
+      if (a === 'acc') { const u = reqs.splice(+v, 1)[0]; friends.push([u[0], u[1], 'в сети']); toast(u[0] + ' теперь в друзьях'); closeModal(); }
+      if (a === 'dec') { reqs.splice(+v, 1); closeModal(); }
+      if (a === 'unb') { blocked.splice(+v, 1); toast('Пользователь разблокирован'); closeModal(); }
+      if (a === 'unfr') { const idx = friends.findIndex(f => f[0] === v); if (idx > -1) { friends.splice(idx, 1); toast(v + ' удалён из друзей'); } closeModal(); }
+      if (a === 'blku') { const idx = friends.findIndex(f => f[0] === v); let c = 'p'; if (idx > -1) { c = friends[idx][1]; friends.splice(idx, 1); } const u = dir.find(x => x[0] === v); if (u) c = u[1]; blocked.push([v, c]); toast(v + ' заблокирован'); closeModal(); }
+      updBadge(); renderFriends();
+    });
+
+    /* ---------- сообщения ---------- */
+    function sendMsg() {
+      const inp = $('#chat-in'), t = inp.value.trim(); if (!t) return;
+      const e = $('#empty'); if (e) e.remove(); const id = ++mid;
+      $('#msgs').insertAdjacentHTML('beforeend', `<li id="m${id}" class="rise flex items-start gap-2.5">${meAv('h-8 w-8 shrink-0 rounded-full text-sm')}
+        <div class="min-w-0 rounded-2xl rounded-tl-md px-3.5 py-2 ${premium ? PM : 'border border-white/10 bg-white/[.07]'}">
+          <div class="mb-0.5 flex items-center gap-2 text-xs font-semibold"><span class="${premium ? GT : 'text-[#b79cff]'}">${esc(me)}</span>${premium ? '<span class="text-[#ffb3e6]">✦</span>' : ''}<button data-act="edit" data-m="${id}" aria-label="Изменить сообщение" class="ml-auto pl-3 text-[#8f83bd] transition hover:text-white">${ic(P.pen, '!h-3.5 !w-3.5')}</button></div>
+          <p data-t data-raw="${esc(t)}" class="break-words text-[15px]">${esc(t)}</p></div></li>`);
+      inp.value = ''; const m = $('#msgs'); m.scrollTop = m.scrollHeight;
+    }
+    function startEdit(id) {
+      if (!premium) return premiumModal('Редактирование сообщений');
+      const li = $('#m' + id), p = li.querySelector('[data-t]'); if (li.querySelector('.edit-wrap')) return;
+      p.classList.add('hidden');
+      p.insertAdjacentHTML('afterend', `<div class="edit-wrap mt-1 flex items-center gap-1.5"><input class="edit-in h-9 min-w-0 flex-1 rounded-full border border-[rgba(190,150,255,.5)] bg-black/30 px-3 text-[15px] text-white outline-none" maxlength="300" value="${esc(p.dataset.raw)}"><button data-act="editok" data-m="${id}" aria-label="Сохранить" class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#b06bff] to-[#7c4dff]">${ic(P.check, '!h-4 !w-4 stroke-white')}</button></div>`);
+      li.querySelector('.edit-in').focus();
+    }
+    function endEdit(id, save) {
+      const li = $('#m' + id), p = li.querySelector('[data-t]'), inp = li.querySelector('.edit-in'); if (!inp) return;
+      const v = inp.value.trim();
+      if (save && v && v !== p.dataset.raw) { p.dataset.raw = v; p.innerHTML = esc(v) + ' <em class="ml-1 text-[11px] not-italic text-hint">изм.</em>'; toast('Сообщение изменено'); }
+      li.querySelector('.edit-wrap').remove(); p.classList.remove('hidden');
+    }
+    document.addEventListener('keydown', e => {
+      if (!e.target.classList || !e.target.classList.contains('edit-in')) return;
+      const id = e.target.closest('li').id.slice(1);
+      if (e.key === 'Enter') endEdit(id, true); if (e.key === 'Escape') endEdit(id, false);
+    });
+
+    /* ---------- настройки ---------- */
+    Object.assign(P, { sl: '<path d="M6 4v16M12 4v16M18 4v16"/><circle cx="6" cy="9" r="2"/><circle cx="12" cy="15" r="2"/><circle cx="18" cy="8" r="2"/>', spk: '<path d="M4 9.5v5h3.5l4.5 4v-13l-4.5 4z"/><path d="M15.5 9a4 4 0 010 6M18 6.5a7.5 7.5 0 010 11"/>', bell: '<path d="M6 16v-5a6 6 0 0112 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 004 0"/>', sync: '<path d="M20 11a8 8 0 00-14-4L4 9M4 13a8 8 0 0014 4l2-2M4 4v5h5M20 20v-5h-5"/>', pin: '<path d="M9 4h6l-1 6 3 3H7l3-3zM12 13v8"/>', eye: '<path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.8"/>', txt: '<path d="M4 18l5-13 5 13M6 13h6M16 9h4M18 9v9"/>' });
+    const S = { tab: 'room', priv: 0, vote: 0, mic: 0, hj: 0, lang: 'Русский', font: 'Системный', bg: 'Тёмный', ni: 1, nc: 1, nb: 1, nd: 1, sync: 1, pin: 0, an: 1, scale: 'Масштаб окна', tr: 1, loc: 0, inv: 0, mat: 1, dat: 0, spk: 'По умолчанию', mcd: 'По умолчанию', vv: 100, vm: 35, gate: 30, ns: 1, agc: 1 };
+    try { Object.assign(S, JSON.parse(localStorage.vibeS || '{}')); } catch (_) {}
+    const saveS = () => { try { localStorage.vibeS = JSON.stringify(S); } catch (_) {} };
+    const CY = {
+      priv: [['Приватность', 'Друзья могут войти в комнату', P.crowd, 'Друзья'], ['Приватность', 'Войти может любой', P.globe, 'Все'], ['Приватность', 'Только по ссылке-приглашению', P.lock, 'По ссылке']],
+      vote: [['Воспроизведение', 'Голосование во время видео', P.check, 'Голосуем'], ['Воспроизведение', 'Управляет только хост', P.play, 'Хост']],
+      mic: [['Голос', 'Микрофоны включены по умолчанию', P.mic, 'Вкл'], ['Голос', 'Микрофоны выключены по умолчанию', P.mic, 'Выкл']]
+    };
+    const cyc = k => { const [t, d, p, l] = CY[k][S[k]]; return `<button data-st="c:${k}" class="${CARD} flex w-full items-center gap-4 px-5 py-4 text-left transition hover:border-[rgba(190,150,255,.5)] active:scale-[.98]"><span class="min-w-0 flex-1"><b class="block text-[13px] font-semibold uppercase tracking-[.14em]">${t}</b><span class="text-sm text-[#a996e0]">${d}</span></span><span class="grid shrink-0 place-items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-[#e6dcff]">${ic(p, '!h-7 !w-7')}${l}</span></button>`; };
+    const R = (p, l, c) => `<div class="flex min-h-[58px] items-center gap-3.5 px-4 py-2">${ic(p, 'shrink-0 text-[#d8ccff]')}<span class="min-w-0 flex-1 truncate font-medium">${l}</span><span class="flex w-[176px] max-w-[44vw] shrink-0 items-center justify-end">${c}</span></div>`;
+    const SR = (l, k) => `<div class="flex min-h-[48px] items-center gap-3 py-1.5 pl-[52px] pr-4 text-[15px] text-[#d8ccff]"><span class="min-w-0 flex-1 truncate">${l}</span><span class="flex w-[176px] max-w-[44vw] shrink-0 items-center justify-end">${TG(k)}</span></div>`;
+    const TG = k => `<button role="switch" aria-checked="${!!S[k]}" data-st="t:${k}" class="relative h-7 w-12 shrink-0 rounded-full border transition ${S[k] ? 'border-transparent bg-gradient-to-r from-[#b06bff] to-[#6f5cff] shadow-[0_0_14px_rgba(140,90,255,.6)]' : 'border-[rgba(150,120,255,.3)] bg-[rgba(8,5,20,.6)]'}"><i class="absolute top-1/2 h-5 w-5 -translate-y-1/2 rounded-full bg-white transition-all ${S[k] ? 'left-[24px]' : 'left-1 opacity-70'}"></i></button>`;
+    const SEL = (k, o) => `<select data-sel="${k}" class="h-11 w-full min-w-0 rounded-full border border-[rgba(150,120,255,.28)] bg-[rgba(8,5,20,.55)] px-4 text-sm text-white outline-none focus:border-violet-vibe">${o.map(x => `<option class="bg-[#120b2b]" ${x === S[k] ? 'selected' : ''}>${x}</option>`).join('')}</select>`;
+    const RG = (k, c = '') => `<span class="w-full min-w-0"><input type="range" min="0" max="100" value="${S[k]}" data-rg="${k}" aria-label="${k}" class="vr ${c}" style="--v:${S[k]}%"></span>`;
+    const GRP = (...r) => `<div class="${CARD} divide-y divide-white/5 overflow-hidden">${r.join('')}</div>`;
+    const STAB = {
+      room: () => `<div class="grid items-stretch gap-3 lg:grid-cols-2"><div class="grid auto-rows-min gap-3">${cyc('priv')}${cyc('vote')}${cyc('mic')}</div>${GRP(R(P.ban, 'Скрывать сообщения о входе и выходе', TG('hj')))}</div>`,
+      prefs: () => `<div class="grid items-start gap-3 lg:grid-cols-2">
+        ${GRP(R(P.globe, 'Язык', SEL('lang', ['Русский', 'English'])), R(P.txt, 'Шрифт', SEL('font', ['Системный', 'Inter', 'Oswald'])), R(P.img, 'Фон окна', SEL('bg', ['Тёмный', 'Светящийся', 'Однотонный'])),
+          R(P.bell, 'Уведомления', ''), SR('Приглашения', 'ni'), SR('Пропущенные сообщения', 'nc'), SR('Буфер обмена', 'nb'), SR('Личные сообщения', 'nd'),
+          R(P.sync, 'Точная синхронизация', TG('sync')), R(P.pin, 'Закреплённые комнаты', TG('pin')), R(P.play, 'Анимации переходов', TG('an')), R(P.dots, 'Масштаб', SEL('scale', ['Масштаб окна', '100%', '125%'])))}
+        ${GRP(R(P.globe, 'Автоперевод чата', TG('tr')), R(P.eye, 'Скрывать местоположение', TG('loc')), R(P.lock, 'Ограничить приглашения', TG('inv')), R(P.ban, 'Скрывать 18+ контент', TG('mat')), R(P.bars, 'Не передавать мои данные третьим лицам', TG('dat')), R(P.info, 'Версия', '<span class="text-[#a996e0]">vibe 1.0</span>'))}</div>`,
+      audio: () => `<div class="mx-auto max-w-[640px]">${GRP(R(P.spk, 'Динамик', SEL('spk', ['По умолчанию', 'Наушники', 'Колонки'])), R(P.crowd, 'Громкость голосов', RG('vv')), R(P.play, 'Громкость видео', RG('vm')), R(P.mic, 'Микрофон', SEL('mcd', ['По умолчанию', 'Встроенный', 'Гарнитура'])), R(P.ban, 'Порог шума', RG('gate', 'gate')), R(P.bars, 'Шумоподавление', TG('ns')), R(P.crowd, 'Авто-громкость микрофона', TG('agc')))}
+        <div class="mt-5 flex flex-col items-center gap-3"><div class="h-1.5 w-full max-w-[260px] overflow-hidden rounded bg-white/10"><i id="meter" class="block h-full w-0 rounded bg-gradient-to-r from-[#22d3a0] to-[#b06bff] transition-[width] duration-75"></i></div>
+        <button data-st="test:x" class="${GBTN} !h-11 !px-8">Проверить микрофон</button></div></div>`
+    };
+    function renderSettings() {
+      const T = [['room', 'Комната', P.play], ['prefs', 'Настройки', P.sl], ['audio', 'Аудио', P.mic]];
+      $('#stg').innerHTML = `<h2 class="text-2xl font-semibold tracking-tight lg:text-4xl">Настройки</h2><p class="mt-1 text-[#a996e0] lg:mt-2 lg:text-lg">Комната, приложение и звук</p>
+        <div class="mt-5 grid grid-cols-3 gap-2 lg:max-w-[560px]">${T.map(([k, l, p]) => `<button data-st="tab:${k}" class="flex flex-col items-center gap-1 rounded-2xl border py-2.5 text-xs transition active:scale-95 ${S.tab === k ? 'border-[rgba(160,120,255,.4)] bg-[rgba(70,40,160,.45)] text-white shadow-[0_0_18px_rgba(120,70,255,.25)]' : 'border-transparent text-[#8f83bd] hover:bg-white/5'}">${ic(p)}${l}</button>`).join('')}</div>
+        <div class="fade mt-4">${STAB[S.tab]()}</div>`;
+    }
+    async function micTest() {
+      try {
+        const st = await navigator.mediaDevices.getUserMedia({ audio: true }), ac = new AudioContext(), an = ac.createAnalyser(), d = new Uint8Array(an.fftSize), t0 = Date.now();
+        ac.createMediaStreamSource(st).connect(an); toast('Говорите — идёт проверка');
+        (function f() { an.getByteTimeDomainData(d); let x = 0; for (const v of d) x = Math.max(x, Math.abs(v - 128)); const m = $('#meter'); if (m) m.style.width = Math.min(100, x / 64 * 100) + '%';
+          if (m && Date.now() - t0 < 8000) requestAnimationFrame(f); else { st.getTracks().forEach(t => t.stop()); ac.close(); } })();
+      } catch (_) { toast('Нет доступа к микрофону'); }
+    }
+    document.addEventListener('click', e => {
+      const b = e.target.closest('[data-st]'); if (!b) return;
+      const [a, k] = b.dataset.st.split(':');
+      if (a === 'test') return micTest();
+      if (a === 'tab') S.tab = k; if (a === 't') S[k] = +!S[k]; if (a === 'c') S[k] = (S[k] + 1) % CY[k].length;
+      saveS(); renderSettings();
+    });
+    document.addEventListener('change', e => { const k = e.target.dataset && e.target.dataset.sel; if (k) { S[k] = e.target.value; saveS(); } });
+    document.addEventListener('input', e => { const k = e.target.dataset && e.target.dataset.rg; if (k) { S[k] = +e.target.value; e.target.style.setProperty('--v', S[k] + '%'); saveS(); } });
+
+    paintMe(); updBadge(); render(true); renderFriends();
+  </script>
+<script>
+/* ===== Выбор площадки + реальный плеер ===== */
+let pickFor = null, srcView = null, ytp = null, ytReady = null;
+const PL = {
+  vk: { n: 'VK Видео', sub: 'Фильмы, сериалы и ролики ВКонтакте', site: 'https://vkvideo.ru', q: 'https://vk.com/video?q=' },
+  yt: { n: 'YouTube', sub: 'Подборка: бесплатное кино и клипы', site: 'https://www.youtube.com', q: 'https://www.youtube.com/results?search_query=' },
+  rt: { n: 'Rutube', sub: 'Фильмы, сериалы и шоу', site: 'https://rutube.ru', q: 'https://rutube.ru/search/?query=' },
+  nf: { n: 'Netflix', sub: 'Популярное на Netflix', site: 'https://www.netflix.com', q: 'https://www.netflix.com/search?q=' }
+};
+const LOGO = {
+  vk: '<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="26" fill="#0077ff"/><path d="M39 31v38l32-19z" fill="#fff" stroke="#fff" stroke-width="8" stroke-linejoin="round"/></svg>',
+  yt: '<svg viewBox="0 0 100 100"><rect x="2" y="16" width="96" height="68" rx="22" fill="#f00"/><path d="M41 34v32l27-16z" fill="#fff"/></svg>',
+  rt: '<svg viewBox="0 0 100 100"><defs><linearGradient id="rtg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff3d6e"/><stop offset="1" stop-color="#5a3dff"/></linearGradient></defs><rect width="100" height="100" rx="26" fill="#12101f"/><circle cx="50" cy="50" r="30" fill="url(#rtg)"/><path d="M43 36v28l23-14z" fill="#fff"/></svg>',
+  nf: '<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="26" fill="#0b0b0b"/><path d="M33 18h12v64H33zM55 18h12v64H55z" fill="#b1060f"/><path d="M33 18h12l22 64H55z" fill="#e50914"/></svg>'
+};
+const CAT = {
+  yt: [['YE7VzlLtp-4', 'Big Buck Bunny'], ['eRsGyueVLvQ', 'Sintel'], ['R6MlUcmOul8', 'Tears of Steel'], ['dQw4w9WgXcQ', 'Rick Astley — Never Gonna Give You Up'], ['jNQXAC9IjXY', 'Me at the zoo'], ['9bZkp7q19f0', 'PSY — Gangnam Style']],
+  nf: [['Очень странные дела'], ['Уэнсдей'], ['Игра в кальмара'], ['Ведьмак'], ['Тьма'], ['Бриджертоны'], ['Бумажный дом'], ['Ход королевы']]
+};
+const openSrc = () => { const s = $('#src'); s.classList.remove('gone', 'page-in'); void s.offsetWidth; s.classList.add('page-in'); renderSrc(null); };
+const closeSrc = () => $('#src').classList.add('gone');
+
+function srcCard(v, it, i) {
+  const yt = v === 'yt';
+  return `<button data-act="item" data-p="${v}" data-i="${i}" class="group rise text-left" style="--i:${i}">
+    <span class="relative grid aspect-video place-items-center overflow-hidden rounded-2xl border border-[rgba(150,120,255,.28)] transition group-hover:border-[rgba(190,150,255,.65)] group-hover:shadow-[0_12px_36px_rgba(140,80,255,.35)] ${yt ? 'bg-black' : pool[i % 5]}">
+      ${yt ? `<img loading="lazy" alt="" src="https://i.ytimg.com/vi/${it[0]}/hqdefault.jpg" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-110" onerror="this.remove()"><span class="${PLAY}">${PI}</span>`
+           : `<span class="px-3 text-center font-cond text-xl font-bold uppercase leading-tight [text-shadow:0_2px_12px_#000]">${esc(it[0])}</span><i class="absolute right-2 top-2 h-6 w-6">${LOGO.nf}</i>`}
+    </span><h3 class="mt-2 truncate text-sm font-semibold">${esc(it[yt ? 1 : 0])}</h3></button>`;
+}
+
+const PGLOW = { vk: '0,119,255', yt: '255,50,50', rt: '150,90,255', nf: '229,9,20' };
+function renderSrc(v) {
+  srcView = v;
+  const glow = '<div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">' + vibeBgInner() + '</div>';
+  const lbl = t => `<span class="mb-2 ml-2 block text-[12.5px] font-medium tracking-[.2em] text-lbl">${t}</span>`;
+  const top = `<div class="mx-auto flex max-w-[1100px] items-center justify-between"><button data-act="srcback" aria-label="Назад" class="${IB}">${ic(v ? '<path d="M15 5l-7 7 7 7"/>' : P.x)}</button><svg class="h-auto w-[72px]" viewBox="0 0 190 90"><use href="#vibe-logo"/></svg><span class="rounded-full border border-[rgba(150,120,255,.3)] bg-white/5 px-3 py-1.5 text-[11px] font-semibold tracking-[.2em] text-lbl">ШАГ ${v ? 2 : 1}/2</span></div>`;
+  let body;
+  if (!v) {
+    body = `<div class="mx-auto mt-10 max-w-[1100px]">
+      <p class="fade text-[12.5px] font-medium tracking-[.28em] text-lbl">НОВАЯ КОМНАТА</p>
+      <h2 class="fade mt-2 font-cond text-[clamp(48px,8vw,104px)] font-bold uppercase leading-[.92]">Что смотрим?</h2>
+      <p class="fade mt-3 max-w-[520px] text-[#a996e0] lg:text-lg">Выберите площадку, вставьте ссылку — и друзья присоединятся в один клик</p>
+      <div class="mt-8 grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-6">${Object.keys(PL).map((k, i) => `
+        <button data-act="plat" data-p="${k}" class="pcard group rise ${CARD} relative flex flex-col items-start gap-5 overflow-hidden p-5 text-left active:scale-95 lg:p-7" style="--i:${i};--g:${PGLOW[k]}">
+          <i aria-hidden="true" class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-30 blur-3xl transition duration-500 group-hover:opacity-70" style="background:rgb(${PGLOW[k]})"></i>
+          <span class="relative block h-16 w-16 drop-shadow-[0_8px_24px_rgba(0,0,0,.5)] transition duration-300 group-hover:scale-110 lg:h-20 lg:w-20">${LOGO[k]}</span>
+          <span class="relative"><b class="block text-lg font-semibold">${PL[k].n}</b><span class="mt-1 block text-[13px] leading-snug text-[#a996e0]">${PL[k].sub}</span></span>
+          <span class="relative mt-auto flex items-center gap-1.5 text-sm font-medium text-[#c9b8ff] transition group-hover:gap-3 group-hover:text-white">Выбрать ${ic('<path d="M5 12h14M13 6l6 6-6 6"/>', '!h-4 !w-4')}</span></button>`).join('')}</div>
+      <button data-act="plain" class="rise [--i:5] mt-6 flex w-full items-center gap-4 rounded-3xl border border-dashed border-[rgba(150,120,255,.4)] bg-white/[.03] p-5 text-left transition hover:bg-white/[.07] active:scale-[.99]">
+        <i class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-[rgba(150,120,255,.3)] bg-white/5 text-[#d8c9ff]">${ic('<path d="M12 5v14M5 12h14"/>')}</i>
+        <span class="min-w-0 flex-1"><b class="block font-semibold">Пустая комната</b><span class="text-sm text-[#a996e0]">Без видео — выберете его позже уже в комнате</span></span>${ic('<path d="M9 5l7 7-7 7"/>', 'text-[#8f7bff]')}</button></div>`;
+  } else {
+    const p = PL[v], list = CAT[v];
+    const st = v === 'vk' ? ['Откройте VK Видео и найдите фильм или ролик', 'Нажмите «Поделиться» → «Экспортировать» и скопируйте ссылку', 'Вставьте ссылку выше — в ней будет hash, видео запустится у всех'] : ['Откройте ' + p.n + ' и найдите видео', 'Скопируйте ссылку из адресной строки', 'Вставьте её выше и нажмите «Смотреть»'];
+    body = `<div class="mx-auto mt-8 max-w-[1100px]">
+      <div class="rise flex items-center gap-4"><span class="h-16 w-16 shrink-0 drop-shadow-[0_8px_24px_rgba(0,0,0,.5)] lg:h-20 lg:w-20">${LOGO[v]}</span><div><p class="text-[12.5px] font-medium tracking-[.28em] text-lbl">ПЛОЩАДКА</p><h2 class="font-cond text-4xl font-bold uppercase leading-none lg:text-6xl">${p.n}</h2></div></div>
+      <div class="rise [--i:1] ${CARD} mt-6 p-5 lg:p-7" style="box-shadow:0 0 60px rgba(${PGLOW[v]},.14),inset 0 0 24px rgba(120,80,255,.08)">
+        <label class="block">${lbl('НАЗВАНИЕ КОМНАТЫ <i class="not-italic text-hint">(необязательно)</i>')}<input id="src-name" maxlength="40" placeholder="Например, Кино на выходных" class="${INP}"></label>
+        <label class="mt-5 block">${lbl('ССЫЛКА НА ВИДЕО')}
+          <span class="flex h-[54px] items-center gap-3 rounded-full border border-[rgba(150,120,255,.28)] bg-[rgba(8,5,20,.55)] pl-5 pr-1.5 text-[#c9b8ff] transition focus-within:border-violet-vibe focus-within:shadow-[0_0_0_3px_rgba(162,89,255,.2)]">${ic(P.share)}<input id="src-in" placeholder="Вставьте ссылку на видео" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-hint"><button data-act="paste" class="h-10 shrink-0 rounded-full bg-white/10 px-4 text-sm font-medium text-white transition hover:bg-white/20 active:scale-95">Вставить</button></span></label>
+        <p id="src-hint" data-h="${v === 'vk' ? 'Например vk.com/video-123_456 — лучше через «Поделиться → Экспортировать»' : 'Поддерживаются ссылки VK Видео, Rutube и YouTube'}" class="ml-2 mt-2 min-h-[20px] text-sm text-hint">${v === 'vk' ? 'Например vk.com/video-123_456 — лучше через «Поделиться → Экспортировать»' : 'Поддерживаются ссылки VK Видео, Rutube и YouTube'}</p>
+        <div class="mt-5 flex flex-col gap-3 lg:flex-row"><button data-act="go" class="${BTN1} lg:!w-[220px]">Смотреть</button><button data-act="ext" data-u="${p.site}" class="${BTN2} lg:!w-[240px]">Открыть ${p.n} ↗</button></div></div>
+      ${list ? `<h3 class="mb-3 mt-8 text-lg font-semibold">${v === 'nf' ? 'Популярное' : 'Или выберите из подборки'}</h3><div class="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-5">${list.map((it, i) => srcCard(v, it, i)).join('')}</div>`
+        : `<div class="mt-6 grid gap-3 lg:grid-cols-3 lg:gap-5">${st.map((t, i) => `<div class="rise ${CARD} flex items-start gap-3 p-4" style="--i:${i + 2}"><b class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#b06bff] to-[#7c4dff] text-sm font-semibold shadow-[0_0_14px_rgba(140,80,255,.5)]">${i + 1}</b><p class="text-sm leading-snug text-[#c9b8ff]">${t}</p></div>`).join('')}</div>`}</div>`;
+  }
+  const s = $('#src'); s.innerHTML = glow + top + body; s.scrollTop = 0;
+}
+
+function parseLink(u) {
+  let x;
+  if (x = u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([\w-]{11})/)) return { type: 'yt', id: x[1] };
+  if (x = u.match(/rutube\.ru\/(?:video\/(?:private\/)?|play\/embed\/)([0-9a-f]{32})(?:.*[?&]p=([\w-]+))?/i)) return { type: 'rt', id: x[1], p: x[2] || '' };
+  if (x = u.match(/(?:vk\.com|vkvideo\.ru)\/.*?video(-?\d+)_(\d+)(?:.*[?&]hash=(\w+))?/i)) return { type: 'vk', oid: x[1], id: x[2], h: x[3] || '' };
+  return null;
+}
+
+function launch(m) {
+  const nm = ($('#src-name') || {}).value; m.title = (nm && nm.trim()) || m.title || PL[m.type].n + ' — по ссылке';
+  if (pickFor != null) { const r = rooms[pickFor]; r.media = m; r.thumb = m.thumb; closeSrc(); render(false); return enterRoom(pickFor); }
+  rooms.unshift({ title: m.title, poster: pool[rooms.length % pool.length], users: [[(me[0] || 'Г').toUpperCase(), 'p']], more: 0, progress: 0, media: m, thumb: m.thumb });
+  closeSrc(); $('#q').value = ''; show('rooms'); render(true); enterRoom(0);
+}
+function pickItem(p, i) {
+  const it = CAT[p][i];
+  launch(p === 'yt' ? { type: 'yt', id: it[0], title: it[1], thumb: `https://i.ytimg.com/vi/${it[0]}/hqdefault.jpg` } : { type: 'nf', q: it[0], title: it[0] });
+}
+function goLink() {
+  const v = ($('#src-in').value || '').trim(), m = parseLink(v);
+  if (!m) return toast('Не удалось распознать ссылку');
+  if (m.type === 'yt') {
+    m.thumb = `https://i.ytimg.com/vi/${m.id}/hqdefault.jpg`;
+    return fetch('https://www.youtube.com/oembed?format=json&url=' + encodeURIComponent(v)).then(r => r.json()).then(j => { m.title = j.title; launch(m); }).catch(() => launch(m));
+  }
+  launch(m);
+}
+
+function loadYT() {
+  return ytReady || (ytReady = new Promise(res => {
+    if (window.YT && YT.Player) return res();
+    window.onYouTubeIframeAPIReady = res;
+    const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(s);
+  }));
+}
+function mountPlayer(m) {
+  const box = $('#pl'); if (!box) return;
+  const frame = (src) => box.outerHTML = `<iframe id="pl" src="${src}" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; clipboard-write" allowfullscreen></iframe>`;
+  if (m.type === 'yt') loadYT().then(() => {
+    if (!$('#pl')) return;
+    ytp = new YT.Player('pl', { videoId: m.id, playerVars: Object.assign({ autoplay: 1, playsinline: 1, rel: 0, enablejsapi: 1, loop: 1, playlist: m.id }, (rooms[cur] && rooms[cur].bot) ? { controls: 0, disablekb: 1 } : {}, /^https?:$/.test(location.protocol) ? { origin: location.origin, widget_referrer: location.href } : {}),
+      events: { onStateChange: ytState, onReady: e => { e.target.playVideo(); ytOnReady(); }, onError: ytErr, _x: () => toast('Это видео нельзя встроить — выберите другое') } });
+  });
+  else if (m.type === 'rt') frame('https://rutube.ru/play/embed/' + m.id + (m.p ? '/?p=' + m.p : ''));
+  else if (m.type === 'vk') frame(`https://vk.com/video_ext.php?oid=${m.oid}&id=${m.id}${MOB ? '' : '&hd=2&autoplay=1'}&js_api=1` + (m.h ? '&hash=' + m.h : ''));
+  else box.outerHTML = `<div class="absolute inset-0 grid place-items-center bg-gradient-to-br from-[#2a0509] to-black p-4 text-center"><div class="flex flex-col items-center gap-3"><span class="h-14 w-14">${LOGO.nf}</span><b class="text-lg">${esc(m.title)}</b>
+    <p class="max-w-[320px] text-xs text-[#d8ccff]">Netflix не разрешает встраивать свой плеер на сторонние сайты. Откройте фильм у себя и смотрите вместе, общаясь в чате.</p>
+    <button data-act="ext" data-u="${PL.nf.q + encodeURIComponent(m.q)}" class="${BTN1} !h-11 !w-auto px-6 text-sm">Открыть в Netflix</button></div></div>`;
+}
+function stopPlayer() { try { ytp && ytp.destroy(); } catch (_) {} ytp = null; }
+function stopRoom() { stopPlayer(); clearInterval(tick); $('#room').innerHTML = ''; }
+
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'src-in') goLink(); if (e.key === 'Escape') closeSrc(); });
+</script>
+<script>
+/* ===== КЛИЕНТ СЕРВЕРА VIBE ===== */
+// Если index.html лежит отдельно от server.js (например GitHub Pages), укажите адрес сервера: 'https://vibe.onrender.com'
+// Фронтенд на Netlify, сервер на Render → запросы должны идти на Render, а не на сам Netlify.
+// Если у сервиса на Render другой адрес — поменяйте RENDER_URL (или задайте <meta name="vibe-server" content="https://...">).
+const RENDER_URL = 'https://vibe-botikmaybusiness.onrender.com';
+const SERVER_URL = (document.querySelector('meta[name="vibe-server"]') || {}).content || (/(^|\.)onrender\.com$|^localhost$|^127\./.test(location.hostname) ? '' : RENDER_URL), API = SERVER_URL.replace(/\/$/, ''), LS = 'vibe:';
+let wantRoom = null, gal = [];
+let uid = null, tok = localStorage.getItem(LS + 'tok'), ws = null, curId = null, applying = 0, ytIv = null, pend = null, lastT = 0, lastS = 0, lastW = 0, rtT = 0, off = 0, log = [], wsT = null, tgBot = '', lastF = '[]';
+const sn = () => Date.now() + off, jm = m => JSON.stringify(m || null);
+async function api(p, b) {
+  try {
+    const r = await fetch(API + p, { method: b ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) }, body: b ? JSON.stringify(b) : undefined });
+    const j = await r.json().catch(() => ({}));
+    if (r.status === 401 && p !== '/api/login' && p !== '/api/tg') { tok = null; localStorage.removeItem(LS + 'tok'); localStorage.removeItem(LS + 'user'); if (uid) location.reload(); }
+    return { ok: r.ok, status: r.status, ...j };
+  } catch (_) { return { ok: false, error: 'Нет связи с сервером' }; }
+}
+const wsend = o => ws && ws.readyState === 1 && ws.send(JSON.stringify(o));
+/* «зрители-боты»: в бот-комнатах всегда сидят кружочки (реальные люди первыми, остальные — стабильные по названию) */
+const FAKE_N = 'АМКВДСЛНОЕРТИ', FAKE_C = 'pkobg';
+const botFill = (real, seed, n = 5) => { const o = real.slice(0, n); let k = [...String(seed)].reduce((a, c) => a + c.charCodeAt(0), 0); while (o.length < n) { o.push([FAKE_N[k % FAKE_N.length], FAKE_C[(k >> 1) % FAKE_C.length]]); k += 7; } return o; };
+const rowToRoom = x => {
+  const o = { id: x.id, title: x.title, poster: pool[x.poster % pool.length], users: x.users || [], more: Math.max(0, (x.count || 0) - (x.users || []).length), progress: 0, media: x.media || undefined, thumb: x.media && x.media.thumb };
+  if (x.bot) {
+    const bm = BOT_MEDIA[x.title] || {}, d = x.dur * 1000;
+    clockOff = x.now - Date.now();
+    Object.assign(o, { bot: 1, base: x.base || 0, users: botFill(x.users || [], x.title), more: Math.max(0, (x.count || 0) - 5), dur: x.dur / 60, start: x.start, media: botMedia(x.title), thumb: bm.thumb,
+      poster: bm.posterIdx != null ? bpost[bm.posterIdx] : o.poster, icon: bm.posterIdx != null ? bicon[bm.posterIdx] : undefined,
+      progress: (((x.now - x.start) % d) + d) % d / d * 100 });
+  }
+  return o;
+};
+
+/* --- вход / регистрация --- */
+$('#continue').addEventListener('click', async () => {
+  const em = $('#email').value.trim(), pw = $('#pass').value, nm = $('#name').value.trim();
+  if (!em || pw.length < 6) return toast('Введите почту и пароль (от 6 символов)');
+  let r = await api('/api/login', { email: em, password: pw });
+  if (r.error === 'nouser') { if (!nm) return toast('Аккаунта нет — укажите имя для регистрации'); r = await api('/api/register', { email: em, password: pw, name: nm }); }
+  if (!r.ok) return toast(r.error || 'Ошибка входа'); auth(r);
+});
+function auth(r) { tok = r.token; localStorage.setItem(LS + 'tok', tok); boot(r.user); }
+function showApp() {
+  const l = $('#login'), r = $('#rooms'); if (!r.classList.contains('gone')) return;
+  l.classList.add('gone'); r.classList.remove('gone', 'page-in'); void r.offsetWidth; r.classList.add('page-in'); window.scrollTo(0, 0);
+}
+function applyUser(u) {
+  uid = u.id; me = u.name; bio = u.bio || ''; color = u.color || 'p'; photo = u.photo || null; until = u.until ? new Date(u.until) : null; premium = !!u.premium;
+  friends = u.friends || []; lastF = JSON.stringify(friends); gal = Array.isArray(u.gallery) ? u.gallery : [];
+  tgInfo = u.tg || null; isAdm = !!u.admin;
+  try { localStorage.setItem(LS + 'user', JSON.stringify(u)); } catch (_) {}
+  loadPrefs(u); paintMe(); renderProfile(); renderSettings(); applyLang();
+}
+async function boot(u) {
+  applyUser(u);
+  BOT_LINKS = (await api('/api/bots')).bots || {};
+  const r = await api('/api/rooms'); setRooms(r.list || []); connect(); showApp(); render(true);
+  const h = location.hash.match(/#room-(\w{8,})/); wantRoom = h ? h[1] : (localStorage.getItem(LS + 'room') || null);
+  tryWant(); setTimeout(() => { wantRoom = null; }, 20000);
+}
+const _lo = logout;
+logout = function () { tok = null; localStorage.removeItem(LS + 'tok'); localStorage.removeItem(LS + 'user'); localStorage.removeItem(LS + 'room'); wantRoom = null; gal = []; const w = ws; ws = null; uid = null; curId = null; try { w && w.close(); } catch (_) {} rooms.length = 0; friends = []; premium = false; bio = ''; photo = null; tgInfo = null; isAdm = false; _lo(); };
+api('/api/config').then(c => { tgBot = c.tgBot || ''; if (c.price) { PRICE = c.price; try { renderProfile(); } catch (_) {} } });
+/* --- возврат из Telegram (режим редиректа) и запоминание входа --- */
+{
+  const m = location.hash.match(/^#tg=(\w+)/);
+  if (m) { tok = m[1]; try { localStorage.setItem(LS + 'tok', tok); } catch (_) {} history.replaceState(null, '', location.pathname + location.search); }
+  else if (location.hash === '#tgerr') { history.replaceState(null, '', location.pathname + location.search); setTimeout(() => toast('Не удалось подтвердить Telegram — попробуйте ещё раз'), 400); }
+}
+async function restore() {   // токен не стираем, пока сервер явно не ответил 401; вход сразу из кэша — даже если сервер просыпается
+  const l = $('#login'); l.style.visibility = 'hidden';
+  let cu = null; try { cu = JSON.parse(localStorage.getItem(LS + 'user') || 'null'); } catch (_) {}
+  const warm = !!(cu && cu.id && tok); if (warm) boot(cu);
+  for (let i = 0; i < 8 && tok; i++) {
+    const r = await api('/api/me');
+    if (r.ok) { l.style.visibility = ''; if (warm) { applyUser(r.user); tryWant(); } else boot(r.user); return; }
+    if (r.status === 401) break;
+    await new Promise(z => setTimeout(z, 1200 + i * 800));
+  }
+  l.style.visibility = '';
+}
+if (tok) (document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', restore) : restore());
+
+/* --- WebSocket --- */
+function connect() {
+  clearTimeout(wsT); if (!uid) return;
+  const w = ws = new WebSocket((API || location.origin).replace(/^http/, 'ws') + '/ws?token=' + tok);
+  w.onopen = () => { if (curId) join(curId); api('/api/bots').then(r => { if (r.bots) { BOT_LINKS = r.bots; if (window._rl) setRooms(window._rl); } }); };
+  w.onmessage = e => { try { const m = JSON.parse(e.data); if (m.t === 'premium' && m.user) { clearInterval(payIv); applyUser(m.user); toast('VIBE Premium активирован ✨'); return; } handle(m); } catch (_) {} };
+  w.onclose = ev => { if (ws !== w || !uid) return; if (ev.code === 4001) return location.reload(); wsT = setTimeout(connect, 1500); };
+}
+const join = id => wsend({ t: 'join', room: id, t0: Date.now() });
+/* демо-комнаты «для вида»: 20–30 человек; пока кто-то не создал настоящую комнату с таким же названием */
+const DEMO = [['Человек-паук: Новый день', 1, 24, 38], ['Круэлла', 2, 28, 18], ['Двойной форсаж', 3, 21, 0], ['Мстители: Финал', 0, 30, 55], ['Интерстеллар', 3, 26, 12], ['Дюна: Часть вторая', 4, 29, 64], ['Зверополис', 0, 22, 0], ['Форсаж 10', 1, 25, 7]];
+function demoRooms(l) {
+  const have = new Set(l.map(x => (x.title || '').toLowerCase()));
+  return DEMO.filter(d => !have.has(d[0].toLowerCase())).map((d, k) => {
+    const title = d[0], bm = BOT_MEDIA[title];
+    const base = { title, poster: bm ? bpost[bm.posterIdx] : pool[d[1]], icon: bm ? bicon[bm.posterIdx] : undefined,
+      users: [0, 1, 2, 3, 4].map(j => ['АМКВДСЛНОЕ'[(k * 3 + j) % 10], 'pkobg'[(k + j) % 5]]), more: d[2] - 5, progress: d[3] };
+    if (bm) Object.assign(base, { thumb: bm.thumb, media: botMedia(title), dur: bm.dur, start: Date.now() - ((k * 23 + 19) % 60) * 60000, progress: 0 });
+    return base;
+  });
+}
+function setRooms(l) {
+  const oc = curId && rooms.find(r => r.id === curId); rooms.length = 0; l.forEach(x => rooms.push(rowToRoom(x))); demoRooms(l).forEach(d => rooms.push(d));
+  if (oc) { const i = rooms.findIndex(r => r.id === curId); if (i >= 0) { Object.assign(rooms[i], { media: oc.media, thumb: oc.thumb }); cur = i; } }
+  render(false);
+}
+function applyMem(list) {
+  const r = rooms[cur]; if (!r) return;
+  const real = list.map(x => [((x.name || '?')[0] || '?').toUpperCase(), x.color || 'p']);
+  r.users = r.bot ? botFill(real, r.title) : real; r.more = r.bot ? Math.max(0, real.length + (r.base || 0) - 5) : 0;
+  const b = $('[data-act="people"] em'); if (b) b.textContent = list.length + (r.bot ? (r.base || 0) : 0);
+}
+function handle(o) {
+  if (o.t === 'rooms') return setRooms(o.list);
+  if (o.t === 'err') return toast(o.msg);
+  const r = rooms[cur]; if (!curId || !r) return;
+  if (o.t === 'init') {
+    if (o.room !== curId) return; const L = Date.now(); off = o.h + (L - o.t0) / 2 - L; r.title = o.title;
+    if (jm(o.media) !== jm(r.media)) { r.media = o.media || undefined; r.thumb = o.media && o.media.thumb; _enter(cur); }
+    log = o.log || []; replay(); render(false);
+    if (o.st && o.st.ts) setTimeout(() => remote(o.st), r.media && r.media.type === 'rt' ? 2500 : 0);
+  } else if (o.t === 'ctl') remote(o.p);
+  else if (o.t === 'chat') { log.push(o.m); addMsg(o.m); }
+  else if (o.t === 'edit') { const m = log.find(x => x.id === o.id); if (m) m.text = o.text; updMsg(o); }
+  else if (o.t === 'media') { r.media = o.media || undefined; r.thumb = o.media && o.media.thumb; r.title = o.title || r.title; _enter(cur); replay(); render(false); }
+  else if (o.t === 'mem') applyMem(o.list);
+}
+const _enter = enterRoom;
+enterRoom = async function (i) {
+  let r = rooms[i]; if (!r) return;
+  if (!r.id) {
+    const x = await api('/api/rooms', { title: r.title, poster: Math.max(0, pool.indexOf(r.poster)), media: r.media || null });
+    if (!x.ok) return toast(x.error || 'Не удалось создать комнату'); r.id = x.room.id;
+    i = rooms.findIndex(z => z.id === r.id); if (i < 0) { rooms.unshift(r); i = 0; } r = rooms[i];
+  }
+  if (curId === r.id) { _enter(i); replay(); wsend({ t: 'media', media: r.media || null, title: r.title }); return; }
+  curId = r.id; log = []; _enter(i);
+  const inv = $('#inv'); if (inv) inv.textContent = location.host + location.pathname.replace(/\/$/, '') + '#room-' + r.id;
+  join(r.id); clearInterval(ytIv); ytIv = setInterval(watch, 1000);
+};
+const _sr = stopRoom; stopRoom = function () { wsend({ t: 'leave' }); curId = null; clearInterval(ytIv); _sr(); };
+
+/* --- чат (история хранится на сервере) --- */
+sendMsg = function () {
+  const i = $('#chat-in'), t = i.value.trim(); if (!t) return; if (!curId || !ws || ws.readyState !== 1) return toast('Нет соединения с сервером');
+  wsend({ t: 'chat', text: t }); i.value = '';
+};
+const _ee = endEdit;
+endEdit = function (id, sv) {
+  const li = $('#m' + id), inp = li && li.querySelector('.edit-in'), v = inp && inp.value.trim(); _ee(id, sv);
+  if (sv && v && li.dataset.db) wsend({ t: 'edit', id: li.dataset.db, text: v });
+};
+
+/* --- профиль, друзья, Premium, Telegram (всё хранится на сервере) --- */
+const saveProfile = () => uid && api('/api/profile', { name: me, bio, color, photo });
+async function syncFriends() { const s = JSON.stringify(friends); if (!uid || s === lastF) return; lastF = s; api('/api/friends', { friends }); }
+document.addEventListener('click', e => {
+  const a = (e.target.closest('[data-act]') || { dataset: {} }).dataset.act;
+  if (a === 'saveprof') setTimeout(saveProfile, 80);
+  if (a === 'buy') buyPremium();
+  if (uid) setTimeout(syncFriends, 150);
+  if (a === 'tg') {
+    if (!tgBot) return toast('Telegram выключен: задайте TG_BOT_TOKEN и TG_BOT_NAME на сервере');
+    openModal(`<h3 class="pr-10 text-xl font-semibold">${uid ? 'Подключить Telegram' : 'Вход через Telegram'}</h3><p class="mt-1.5 text-sm text-[#a996e0]">Имя, @ник и фото подтянутся из вашего Telegram-профиля — пароль не нужен</p><div id="tgw" class="mt-6 flex min-h-[48px] justify-center"></div>`);
+    const s = document.createElement('script'); s.async = true; s.src = 'https://telegram.org/js/telegram-widget.js?22';
+    Object.assign(s.dataset, uid ? { telegramLogin: tgBot, size: 'large', onauth: 'tgAuth(user)', requestAccess: 'write' } : { telegramLogin: tgBot, size: 'large', authUrl: (API || location.origin) + '/api/tg-cb', requestAccess: 'write' }); $('#tgw').appendChild(s);
+    setTimeout(() => { const w = $('#tgw'); if (w && !w.querySelector('iframe')) w.innerHTML = '<p class="text-center text-sm text-[#ff8fa8]">Кнопка Telegram не загрузилась. Проверьте сеть/блокировщик и что у бота в @BotFather задан домен (/setdomain).</p>'; }, 6000);
+  }
+});
+document.addEventListener('change', e => { if (e.target.id === 'bio') saveProfile(); });
+/* --- оплата Premium через Telegram Stars --- */
+let payIv = null;
+function watchPremium() {   // после перехода в Telegram ждём, пока сервер получит оплату от бота
+  clearInterval(payIv); const u0 = until ? +until : 0, t0 = Date.now();
+  const check = async () => {
+    if (Date.now() - t0 > 10 * 60000) return clearInterval(payIv);
+    const r = await api('/api/me'); if (r.ok && r.user.premium && (r.user.until || 0) > u0) { clearInterval(payIv); applyUser(r.user); toast('VIBE Premium активирован ✨'); }
+  };
+  payIv = setInterval(check, 3000); document.addEventListener('visibilitychange', () => !document.hidden && check());
+}
+async function buyPremium() {
+  if (!uid) return toast('Сначала войдите в аккаунт');
+  const r = await api('/api/pay', {}); if (!r.ok || !r.link) return toast(r.error || 'Не удалось создать счёт');
+  const T = window.Telegram && Telegram.WebApp;
+  if (T && T.initData && T.openInvoice) T.openInvoice(r.link, st => { if (st === 'paid') watchPremium(); else if (st === 'failed') toast('Оплата не прошла'); }); else { window.open(r.link, '_blank'); toast('Оплатите в Telegram и вернитесь сюда — Premium включится сам'); watchPremium(); }
+}
+/* --- счётчик посетителей: один анонимный id на браузер, отправляется раз за сессию --- */
+try {
+  let vid = localStorage.getItem(LS + 'vid'); if (!vid) { vid = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2, 12)); localStorage.setItem(LS + 'vid', vid); }
+  if (!sessionStorage.getItem(LS + 'hit')) { sessionStorage.setItem(LS + 'hit', '1'); fetch(API + '/api/hit', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ vid }) }).catch(() => {}); }
+} catch (_) {}
+window.tgAuth = async u => { const r = await api('/api/tg', u); closeModal(); r.ok ? (auth(r), renderProfile(), toast('Telegram подключён')) : toast(r.error || 'Ошибка Telegram'); };
+
+const replay = () => log.forEach(addMsg);
+function addMsg(m) {
+  const box = $('#msgs'); if (!box || box.querySelector(`[data-db="${m.id}"]`)) return;
+  const e = $('#empty'); if (e) e.remove(); const id = ++mid;
+  box.insertAdjacentHTML('beforeend', `<li id="m${id}" data-db="${m.id}" class="rise flex items-start gap-2.5">${meAv('h-8 w-8 shrink-0 rounded-full text-sm', null, m.color || 'p', m.name || '?')}
+    <div class="min-w-0 rounded-2xl rounded-tl-md px-3.5 py-2 ${m.premium ? PM : 'border border-white/10 bg-white/[.07]'}">
+    <div class="mb-0.5 flex items-center gap-2 text-xs font-semibold"><span class="${m.premium ? GT : 'text-[#b79cff]'}">${esc(m.name || '')}</span>${m.u === uid ? `<button data-act="edit" data-m="${id}" aria-label="Изменить" class="ml-auto pl-3 text-[#8f83bd] transition hover:text-white">${ic(P.pen, '!h-3.5 !w-3.5')}</button>` : ''}</div>
+    <p data-t data-raw="${esc(m.text)}" class="break-words text-[15px]">${esc(m.text)}</p></div></li>`);
+  box.scrollTop = box.scrollHeight;
+}
+function updMsg(o) {
+  const li = $(`#msgs [data-db="${o.id}"]`); if (!li) return; const p = li.querySelector('[data-t]');
+  p.dataset.raw = o.text; p.innerHTML = esc(o.text) + ' <em class="ml-1 text-[11px] not-italic text-hint">изм.</em>';
+}
+
+/* --- синхронизация плеера: play / pause / seek --- */
+const RM = () => rooms[cur] && rooms[cur].media;
+const isYT = () => RM() && RM().type === 'yt' && ytp && ytp.getCurrentTime;
+const rtc = (type, data) => { const f = $('#pl'); f && f.contentWindow && f.contentWindow.postMessage(JSON.stringify({ type, data: data || {} }), '*'); };
+function send(a, t) { if (!applying && curId) wsend({ t: 'ctl', a, p: t }); }
+function localState() {
+  if (isYT()) return { a: ytp.getPlayerState() === 1 ? 'play' : 'pause', t: ytp.getCurrentTime() };
+  if (!RM()) return { a: playing ? 'play' : 'pause', t: pos };
+  return {};
+}
+function remote(p) {
+  const m = RM(), t = p.t + (p.a === 'play' ? (sn() - p.ts) / 1000 : 0);
+  if (m && m.type === 'yt' && !isYT()) { pend = p; return; }
+  applying = 1; setTimeout(() => applying = 0, 900);
+  if (isYT()) { if (Math.abs(ytp.getCurrentTime() - t) > 1) ytp.seekTo(t, true); p.a === 'play' ? ytp.playVideo() : ytp.pauseVideo(); lastT = t; }
+  else if (m && m.type === 'rt') { rtc('player:changeTime', { time: t }); rtc(p.a === 'play' ? 'player:play' : 'player:pause'); }
+  else if (!m) { playing = p.a === 'play'; pos = Math.min(100, p.t); const b = $('#bar'); if (b) b.style.width = pos + '%'; const pp = $('#pp'); if (pp) pp.innerHTML = playing ? PAUSE : PI; }
+}
+function ytState(e) { if (applying) return; if (e.data === 1) send('play', e.target.getCurrentTime()); else if (e.data === 2) send('pause', e.target.getCurrentTime()); }
+function ytOnReady() { if (pend) { const p = pend; pend = null; remote(p); } }
+function watch() {
+  if (!isYT()) return; const s = ytp.getPlayerState(), t = ytp.getCurrentTime(); if (s === 3) return;
+  const exp = lastS === 1 ? lastT + (Date.now() - lastW) / 1000 : lastT;
+  if (lastW && Math.abs(t - exp) > 1.5 && !applying) send(s === 1 ? 'play' : 'pause', t);
+  lastT = t; lastS = s; lastW = Date.now();
+}
+window.addEventListener('message', e => {
+  let d; try { d = JSON.parse(e.data); } catch (_) { return; } if (!d || !RM() || RM().type !== 'rt') return;
+  if (d.type === 'player:changeState' && !applying) { const s = d.data && d.data.state; if (s === 'playing') send('play', rtT); else if (s === 'paused') send('pause', rtT); }
+  if (d.type === 'player:currentTime') { const t = d.data && d.data.time; if (!applying && rtT && Math.abs(t - rtT) > 3) send('play', t); rtT = t; }
+});
+document.addEventListener('click', e => {
+  if (e.target.closest('[data-act="play"]') && !RM()) send(playing ? 'play' : 'pause', pos);
+  const b = $('#bar'), bar = b && b.parentElement;
+  if (bar && (e.target === bar || e.target === b) && !RM()) { const r = bar.getBoundingClientRect(); pos = Math.max(0, Math.min(100, (e.clientX - r.left) / r.width * 100)); b.style.width = pos + '%'; send(playing ? 'play' : 'pause', pos); }
+});
+
+
+/* --- VK: жёсткая валидация hash --- */
+const _pl = parseLink;
+parseLink = function (u) {
+  const x = _pl(u); if (x) return x;
+  try { const q = new URL(u); if (/(^|\.)(vk\.com|vkvideo\.ru)$/.test(q.hostname) && /video_ext/.test(q.pathname) && q.searchParams.get('oid') && q.searchParams.get('id'))
+    return { type: 'vk', oid: q.searchParams.get('oid'), id: q.searchParams.get('id'), h: q.searchParams.get('hash') || '' }; } catch (_) {}
+  return null;
+};
+const vkBad = () => false, VKMSG = 'VK: в ссылке нет параметра hash — плеер не запустится. Скопируйте ссылку через «Поделиться → Экспортировать»';
+const _gl = goLink;
+goLink = function () {
+  const i = $('#src-in'), m = parseLink((i.value || '').trim());
+  if (vkBad(m)) { i.classList.add('!border-red-400'); return toast(VKMSG); } _gl();
+};
+document.addEventListener('input', e => {
+  if (e.target.id !== 'src-in') return; const bad = vkBad(parseLink(e.target.value.trim())), was = e.target.classList.contains('!border-red-400');
+  e.target.classList.toggle('!border-red-400', !!bad); if (bad && !was) toast(VKMSG);
+});
+
+/* --- ошибки YouTube (153 / 101 / 150) --- */
+function ytErr(e) {
+  const c = e.data, m = RM(), t = c === 153 ? 'YouTube блокирует встраивание: откройте сайт по https:// (GitHub Pages, Vercel, localhost), а не из файла или песочницы' : (c === 101 || c === 150) ? 'Владелец видео запретил встраивание' : 'Не удалось загрузить видео';
+  toast(t); const w = $('#plw');
+  if (w && m && !w.querySelector('.yterr')) w.insertAdjacentHTML('beforeend', `<div class="yterr absolute inset-0 z-10 grid place-items-center bg-black/85 p-4 text-center"><div><p class="mb-3 text-sm text-[#d8ccff]">${t}</p><a href="https://www.youtube.com/watch?v=${m.id}" target="_blank" rel="noopener" class="${BTN1} !h-11 !w-auto px-6 text-sm">Открыть на YouTube</a></div></div>`);
+}
+if (location.protocol === 'file:') setTimeout(() => toast('Откройте сайт по https:// — с file:// YouTube выдаёт ошибку 153'), 1500);
+
+</script>
+<script>
+/* ===== Основатель управляет видео · свой плеер-контроль для VK/Rutube · оформление Premium ===== */
+let host = null, hostName = '', lastSt = null, vkp = null, vkFail = false, vkReady = null, pReady = false, pendE = null, cT = 0, cD = 0, cP = false, cW = Date.now();
+let began = false, lastAct = 0, apiOK = false, mountN = 0;   // began: видео реально запустилось (на телефоне нужен тап по плееру)
+const go = () => { if (began) return; began = true; const sh = $('#shield'); if (sh) sh.style.pointerEvents = ''; const h = $('#starthint'); if (h) h.remove(); const vn = $('#vknote'); if (vn) vn.remove(); };
+const MOB = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
+const isHost = () => !!host && host === uid, ctype = () => RM() && RM().type, ext = () => ctype() === 'vk' || ctype() === 'rt';
+const cPos = () => cT + (cP ? (Date.now() - cW) / 1000 : 0), fmtT = s => { s = Math.max(0, s | 0); return (s / 60 | 0) + ':' + String(s % 60).padStart(2, '0'); };
+const num = x => typeof x === 'number' ? x : x && (x.time ?? x.currentTime ?? x.position);
+const _sd = send; send = function (a, t) { if (!ext()) _sd(a, t); };   // для VK/Rutube шлём только из нашего контроля
+
+function pAct(a, t) {   // выполнить play/pause/seek в плеере
+  const tt = t != null ? t : cPos();
+  if (ctype() === 'rt') { if (t != null) rtc('player:changeTime', { time: tt }); rtc(a === 'play' ? 'player:play' : 'player:pause'); }
+  else if (ctype() === 'vk' && vkp) { try { if (t != null) vkp.seek(tt); a === 'play' ? vkp.play() : vkp.pause(); } catch (_) {} }
+  cT = tt; cW = Date.now(); cP = a === 'play'; lastAct = Date.now(); return tt;
+}
+const hostCtl = (a, t) => { if (isHost() && pReady) { _sd(a, pAct(a, t)); upd(); } };
+function setReady() { if (pReady) return; pReady = true; if (pendE) { const p = pendE; pendE = null; remote(p); } else if (isHost() && !lastSt) _sd(cP ? 'play' : 'pause', cPos()); }
+const _rm = remote; remote = function (p) {
+  lastSt = p; if (!ext()) return _rm(p); if (!pReady) { pendE = p; return; }
+  const t = p.t + (p.a === 'play' ? (sn() - p.ts) / 1000 : 0), d = Math.abs(cPos() - t);
+  const chg = (p.a === 'play') !== cP; if (!(d > 1.5 || chg)) return;
+  if (Date.now() - lastAct < (began ? (chg ? 0 : 2500) : 6000)) return;   // не долбим плеер командами, пока он не запущен
+  pAct(p.a, d > 1.5 ? t : null);
+};
+
+const loadVK = () => vkReady || (vkReady = new Promise((ok, no) => { if (window.VK && VK.VideoPlayer) return ok(); const s = document.createElement('script'); s.src = 'https://vk.com/js/api/videoplayer.js'; s.onload = ok; s.onerror = e => { vkReady = null; no(e); }; document.head.appendChild(s); setTimeout(() => { if (!(window.VK && VK.VideoPlayer)) { vkReady = null; no(); } }, 8000); }));
+function vkPlain(m) {   // простой режим: плеер VK без API (синхрона нет, зато видео играет)
+  const f = $('#pl'), w = $('#plw'); if (!f || !w) return; vkFail = true; vkp = null;
+  f.src = `https://vk.com/video_ext.php?oid=${m.oid}&id=${m.id}` + (m.h ? '&hash=' + m.h : ''); refreshCtl();
+  toast('VK-плеер не отвечает на управление — простой режим без синхронизации');
+  w.insertAdjacentHTML('beforeend', `<a id="vkopen" href="https://vk.com/video${m.oid}_${m.id}" target="_blank" rel="noopener" class="absolute bottom-2 right-2 z-[7] rounded-full bg-black/70 px-3 py-1.5 text-xs font-semibold">Открыть в VK ↗</a>`);
+}
+const _mp = mountPlayer; mountPlayer = function (m) {
+  _mp(m); cT = cD = 0; cP = false; cW = Date.now(); pReady = false; pendE = null; vkp = null; vkFail = false; began = false; lastAct = 0; apiOK = false; const mn = ++mountN;
+  if (m.type === 'vk') loadVK().then(() => {
+    const f = $('#pl'); vkp = VK.VideoPlayer(f); const on = (e, fn) => { try { vkp.on(e, (...a) => { apiOK = true; fn(...a); }); } catch (_) {} };
+    on('inited', setReady); on('started', () => { cP = true; cW = Date.now(); setReady(); go(); }); on('resumed', () => { cP = true; cW = Date.now(); }); on('paused', () => cP = false); on('ended', () => cP = false);
+    on('timeupdate', x => { const n = num(x); if (typeof n === 'number') { cT = n; cW = Date.now(); if (n > 0.2) go(); } if (x && x.duration > 0) cD = x.duration; }); setTimeout(setReady, 3500);
+  }).catch(e => { console.warn('VK API:', e); vkFail = true; refreshCtl(); toast(window.VK && VK.VideoPlayer ? 'VK API не подключился к плееру: ' + ((e && e.message) || 'ошибка') : 'Скрипт vk.com/js/api/videoplayer.js не загрузился — проверьте блокировщик рекламы/сеть'); });
+  if (m.type === 'rt') setTimeout(setReady, 3000);
+  if (m.type === 'vk' && !m.h) {   // обычная ссылка без hash — нормально; подсказку показываем только если видео реально не стартовало
+    setTimeout(() => { const w = $('#plw'); if (mn === mountN && !began && !apiOK && w && !$('#vknote')) w.insertAdjacentHTML('beforeend', `<div id="vknote" class="absolute inset-x-3 top-14 z-[7] rounded-2xl border border-white/15 bg-black/80 p-3 text-xs leading-snug backdrop-blur">Видео не запускается? Часть видео VK не отдаётся без входа в VK — <a href="https://vk.com/video${m.oid}_${m.id}" target="_blank" rel="noopener" class="font-semibold text-[#c9b8ff] underline">откройте его в VK</a>.</div>`); }, 9000);
+  }
+  if (m.type === 'vk' && MOB) setTimeout(() => { if (mn === mountN && ctype() === 'vk' && !apiOK) vkPlain(m); }, 9000);
+  refreshCtl();
+};
+window.addEventListener('message', e => {   // события Rutube: время, длительность, состояние
+  let d; try { d = JSON.parse(e.data); } catch (_) { return; } if (!d || ctype() !== 'rt' || typeof d.type !== 'string') return; const x = d.data || {};
+  if (d.type === 'player:ready') setReady(); else if (d.type === 'player:currentTime') { cT = +x.time || 0; cW = Date.now(); if (cT > 0.2) go(); } else if (d.type === 'player:durationChange') cD = +x.duration || cD; else if (d.type === 'player:changeState') { cP = x.state === 'playing'; cW = Date.now(); if (cP) go(); }
+});
+
+/* щит поверх видео + панель управления (основатель — кнопки, остальные — только ход видео) */
+function refreshCtl() {
+  const w = $('#plw'); if (!w) return; $$('#shield,#cbar,.vchip,#starthint').forEach(x => x.remove());
+  const t = ctype(); if (!t || t === 'nf' || t === 'yt' || (t === 'vk' && vkFail)) return; const H = isHost();
+  if (!ext() && H) return;   // YouTube у основателя: родные кнопки
+  const b = (k, c) => `<button data-cb="${k}" ${H ? '' : 'disabled'} class="grid h-9 min-w-9 place-items-center rounded-full bg-white/15 px-2 text-xs font-semibold text-white transition active:scale-90 ${H ? 'hover:bg-white/25' : 'opacity-40'}">${c}</button>`;
+  w.insertAdjacentHTML('beforeend', `<div id="shield" data-cb="sync" class="absolute inset-0 z-[5]" ${ext() && !began ? 'style="pointer-events:none"' : ''}></div><span class="vchip absolute left-2 top-2 z-[6] rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-semibold backdrop-blur">👑 ${esc(String(hostName || '…'))}${H ? ' · вы' : ''}</span>${ext() && !began ? '<span id="starthint" class="absolute left-1/2 top-12 z-[6] -translate-x-1/2 whitespace-nowrap rounded-full bg-black/60 px-3 py-1.5 text-xs font-semibold backdrop-blur">Нажмите на видео, чтобы запустить</span>' : ''}`);
+  if (ext()) w.insertAdjacentHTML('beforeend', `<div id="cbar" class="absolute inset-x-0 bottom-0 z-[6] flex items-center gap-1.5 bg-gradient-to-t from-black/90 to-transparent px-2.5 pb-2 pt-7">${b('pp', '<i id="cpp">' + PI + '</i>')}${b('-10', '−10')}${b('+10', '+10')}<input id="cseek" type="range" min="0" max="1000" value="0" ${H ? '' : 'disabled'} class="vr min-w-0 flex-1"><span id="ctime" class="shrink-0 text-[11px] tabular-nums text-white/90">0:00</span>${b('fs', '<svg viewBox="0 0 24 24" class="h-4 w-4 fill-none stroke-white" style="stroke-width:2"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>')}</div>`);
+  upd();
+}
+function upd() {
+  const s = $('#cseek'); if (!s) return; const p = cPos();
+  if (cD > 0 && document.activeElement !== s) { s.value = Math.min(1000, p / cD * 1000); s.style.setProperty('--v', s.value / 10 + '%'); }
+  $('#ctime').textContent = fmtT(p) + (cD ? ' / ' + fmtT(cD) : ''); $('#cpp').innerHTML = cP ? PAUSE : PI;
+}
+setInterval(() => {
+  if (!ext()) return;
+  if (ctype() === 'vk' && vkp) try { Promise.resolve(vkp.getCurrentTime && vkp.getCurrentTime()).then(n => { if (typeof n === 'number' && isFinite(n)) { cT = n; cW = Date.now(); } }).catch(() => {}); if (!cD && vkp.getDuration) Promise.resolve(vkp.getDuration()).then(n => n > 0 && (cD = n)).catch(() => {}); } catch (_) {}
+  upd();
+}, 400);
+setInterval(() => { if (curId && ext() && isHost() && pReady && cP) _sd('play', cPos()); }, 4000);   // пульс основателя: подтягивает отставших
+
+document.addEventListener('click', e => {
+  const pv = e.target.closest('[data-act="pickvideo"]'); if (pv && curId && host && !isHost() && ext()) { e.stopImmediatePropagation(); e.preventDefault(); return toast('Видео выбирает основатель комнаты'); }
+  const b = e.target.closest('[data-cb]'); if (!b) return; const k = b.dataset.cb;
+  if (k === 'fs') { const w = $('#plw'); return document.fullscreenElement ? document.exitFullscreen() : w && w.requestFullscreen && w.requestFullscreen(); }
+  if (k === 'sync') { if (!isHost() && ext() && lastSt && pReady) { const p = lastSt; pAct(p.a, p.t + (p.a === 'play' ? (sn() - p.ts) / 1000 : 0)); toast('Синхронизировано'); } return; }
+  if (!isHost()) return; if (k === 'pp') hostCtl(cP ? 'pause' : 'play'); else hostCtl(cP ? 'play' : 'pause', Math.max(0, cPos() + (k === '+10' ? 10 : -10)));
+}, true);
+document.addEventListener('change', e => { if (e.target.id === 'cseek' && isHost() && cD > 0) hostCtl(cP ? 'play' : 'pause', e.target.value / 1000 * cD); });
+const _hd = handle; handle = function (o) {
+  const hi = (o.t === 'init' && o.room === curId) || o.t === 'host';
+  if (hi) { host = o.host; hostName = o.hn || ''; if (o.t === 'init') lastSt = o.st || null; refreshCtl(); }
+  _hd(o); if (hi) refreshCtl();
+};
+const _sr2 = stopRoom; stopRoom = function () { host = null; hostName = ''; lastSt = null; vkp = null; pReady = false; _sr2(); };
+
+/* ---- VIBE Premium: оформление сообщений и режимы просмотра (локально) ---- */
+document.head.insertAdjacentHTML('beforeend', `<style>
+body[data-mt=au] #msgs li>div.min-w-0{background:linear-gradient(135deg,rgba(34,211,192,.38),rgba(138,92,255,.42))!important;border-color:rgba(150,255,230,.45)!important}
+body[data-mt=dx] #msgs li>div.min-w-0{background:linear-gradient(135deg,rgba(168,103,42,.55),rgba(90,49,20,.6))!important;border-color:rgba(230,170,110,.55)!important}
+body[data-mt=ne] #msgs li>div.min-w-0{background:rgba(10,4,30,.88)!important;border:1px solid #39f0ff!important;box-shadow:0 0 14px rgba(57,240,255,.55),inset 0 0 10px rgba(255,60,200,.25)!important}
+body[data-mt=sk] #msgs li>div.min-w-0{background:linear-gradient(135deg,rgba(255,140,60,.55),rgba(255,60,140,.5),rgba(120,50,200,.5))!important;border-color:rgba(255,190,140,.55)!important}
+body[data-mt=sa] #msgs li>div.min-w-0{background:linear-gradient(135deg,rgba(255,170,205,.5),rgba(255,120,170,.35))!important;border-color:rgba(255,200,225,.65)!important}
+body[data-mt=ic] #msgs li>div.min-w-0{background:linear-gradient(135deg,rgba(150,215,255,.45),rgba(90,140,255,.35))!important;border-color:rgba(200,235,255,.65)!important;backdrop-filter:blur(8px)}
+body[data-mt=go] #msgs li>div.min-w-0{background:linear-gradient(135deg,rgba(255,215,110,.55),rgba(170,110,20,.55))!important;border-color:rgba(255,230,150,.7)!important;box-shadow:0 0 14px rgba(255,200,80,.4)!important}
+body[data-mt=mx] #msgs li>div.min-w-0{background:rgba(0,20,8,.92)!important;border:1px solid #22e05a!important;color:#b6ffc8;font-family:ui-monospace,Menlo,Consolas,monospace}
+body[data-mt=lv] #msgs li>div.min-w-0{background:linear-gradient(135deg,rgba(255,80,30,.6),rgba(120,10,30,.65))!important;border-color:rgba(255,150,90,.65)!important;box-shadow:0 0 14px rgba(255,90,40,.4)!important}
+body[data-cozy="1"] #msgs{font-size:17px;line-height:1.55}body[data-cozy="1"] #msgs li>div.min-w-0{padding:.7rem 1rem;background:rgba(255,255,255,.13)!important}
+html body[data-oled="1"]{background:#000!important}body[data-oled="1"] .blob{display:none}body[data-clean="1"] .vchip{display:none}</style>`);
+function applyLook() { const d = document.body.dataset, p = premium; d.mt = p ? (S.mt || 'cl') : 'cl'; d.cozy = p && S.cozy ? '1' : '0'; d.oled = p && S.oled ? '1' : '0'; d.clean = p && S.clean ? '1' : '0'; }
+const _pm = paintMe; paintMe = function () { _pm(); applyLook(); };
+function lookBlock() {
+  applyLook(); const cur = premium ? (S.mt || 'cl') : 'cl';
+  const th = [['cl', 'Классика', 'Обычное сообщение', 'border border-white/15 bg-white/10'], ['dx', 'Такса', '🐕 Привет!', 'border border-[#e6aa6e]/50 bg-gradient-to-br from-[#a8672a] to-[#5a3114]'], ['au', 'Аврора', 'Смотрим вместе', 'border border-[#96ffe6]/40 bg-gradient-to-br from-[#22d3c0] to-[#8a5cff]'],
+    ['ne', 'Неон', 'Ночной город', 'border border-[#39f0ff] bg-[#0a041e] shadow-[0_0_10px_rgba(57,240,255,.6)]'], ['sk', 'Закат', 'Закат над морем', 'border border-[#ffbe8c]/50 bg-gradient-to-br from-[#ff8c3c] via-[#ff3c8c] to-[#7832c8]'],
+    ['sa', 'Сакура', 'Мило 🌸', 'border border-[#ffc8e1]/60 bg-gradient-to-br from-[#ffaacd] to-[#ff78aa]'], ['ic', 'Лёд', 'Холодный вайб', 'border border-[#c8ebff]/60 bg-gradient-to-br from-[#96d7ff] to-[#5a8cff]'],
+    ['go', 'Золото', 'Королевский ✦', 'border border-[#ffe696]/60 bg-gradient-to-br from-[#ffd76e] to-[#aa6e14]'], ['mx', 'Матрица', '> wake_up()', 'border border-[#22e05a] bg-[#001408] font-mono text-[#b6ffc8]'],
+    ['lv', 'Лава', 'Горячо 🔥', 'border border-[#ff965a]/60 bg-gradient-to-br from-[#ff501e] to-[#780a1e]']];
+  const on = k => S[k] && premium, tg = k => `<button role="switch" aria-checked="${!!on(k)}" data-lk="${k}" class="relative h-7 w-12 shrink-0 rounded-full border transition ${on(k) ? 'border-transparent bg-gradient-to-r from-[#ff4d9a] to-[#8a5cff]' : 'border-white/25 bg-black/30'}"><i class="absolute top-1/2 h-5 w-5 -translate-y-1/2 rounded-full bg-white transition-all ${on(k) ? 'left-[24px]' : 'left-1 opacity-70'}"></i></button>`;
+  const rw = (k, p, t, d) => `<div class="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 p-3"><i class="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-[rgba(220,180,255,.35)] bg-white/10 text-[#ffd6f2]">${ic(p)}</i><div class="min-w-0 flex-1"><b class="block font-semibold">${t}</b><span class="text-sm leading-snug text-[#c9b8ff]">${d}</span></div>${tg(k)}</div>`;
+  const pill = t => `<span class="rounded-full border border-[rgba(220,180,255,.5)] bg-white/10 px-2.5 py-0.5 text-[11px] font-bold">${t}</span>`;
+  return `<div class="relative mt-6 ${premium ? '' : 'opacity-60'}"><div class="flex items-center justify-between"><h4 class="text-lg font-semibold">Оформление сообщений</h4>${pill('Premium')}</div>
+    <div class="-mx-1 mt-3 flex gap-2.5 overflow-x-auto px-1 pb-1">${th.map(x => `<button data-mt="${x[0]}" class="w-[128px] shrink-0 rounded-2xl border bg-black/20 p-2 text-left transition active:scale-95 ${cur === x[0] ? 'border-[#ffd6f2] shadow-[0_0_16px_rgba(255,150,220,.45)]' : 'border-white/15'}"><span class="block truncate rounded-xl px-2.5 py-2 text-xs font-medium ${x[3]}">${x[2]}</span><b class="mt-2 block text-sm">${x[1]}</b></button>`).join('')}</div>
+    <div class="mt-5 flex items-center justify-between"><div><h4 class="text-lg font-semibold">Ваш режим просмотра</h4><p class="text-xs text-[#c9b8ff]">Сохраняется на этом устройстве</p></div>${pill('Локально')}</div>
+    <div class="mt-3 flex flex-col gap-2.5">${rw('clean', P.eye, 'Чистый экран', 'Убирает плашки и подсказки поверх видео.')}${rw('cozy', P.txt, 'Комфортный чат', 'Крупнее текст и больше воздуха в сообщениях.')}${rw('oled', P.spark, 'OLED Black', 'Глубокий чёрный фон без свечения.')}</div></div>`;
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-mt],[data-lk]'); if (!b) return; if (!premium) return;
+  if (b.dataset.mt) S.mt = b.dataset.mt; else S[b.dataset.lk] = +!S[b.dataset.lk]; saveS(); applyLook(); renderProfile();
+});
+
+/* ===== Бот-комнаты: ссылки VK/Rutube/YouTube · Telegram в профиле · живая проверка ссылки ===== */
+let BOT_LINKS = {}, BOT_DURS = {};
+function botMedia(t) {   // ссылка из админки → реальный плеер; пусто → заглушка YouTube
+  const bm = BOT_MEDIA[t] || {}, l = (BOT_LINKS[t] || '').trim(), m = l && parseLink(l);
+  return m ? Object.assign(m, { title: t, thumb: bm.thumb }) : { type: 'yt', id: bm.vid, title: t };
+}
+const _rp = renderProfile;
+renderProfile = function () {
+  _rp();
+  const tg = tgInfo, card = `<div class="${CARD} flex items-center gap-3 p-4"><i class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-[#2f8bff]/50 bg-[rgba(30,60,130,.45)]"><svg viewBox="0 0 24 24" class="ico !h-6 !w-6 text-[#4da3ff]"><path d="M21 3L3 10.5l6 2.2 2.2 6L14 15l5 3.8L21 3z"/><path d="M9 12.7L21 3"/></svg></i>
+    <div class="min-w-0 flex-1"><h3 class="font-semibold">Telegram</h3><p class="truncate text-sm text-[#a996e0]">${tg ? esc((tg.username ? '@' + tg.username : tg.name) + ' · подключён') : 'Не подключён'}</p></div>
+    ${tg ? '<span class="shrink-0 text-sm font-medium text-[#8fffc8]">✓ Привязан</span>' : `<button data-act="tg" class="${PBTN}">Подключить</button>`}</div>` + (isAdm ? `<button data-act="botlinks" class="${BTN2}">Ссылки для бот-комнат</button>` : '');
+  const h = $('#prof').firstElementChild; if (h) h.insertAdjacentHTML('afterend', card);
+};
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-act="botlinks"],[data-act="botsave"],[data-act="paste"]'); if (!b) return; const a = b.dataset.act;
+  if (a === 'paste') return navigator.clipboard.readText().then(t => { const i = $('#src-in'); i.value = t.trim(); i.dispatchEvent(new Event('input', { bubbles: true })); i.focus(); }).catch(() => toast('Нет доступа к буферу — вставьте вручную (Ctrl+V)'));
+  if (a === 'botlinks') {
+    const rb = await api('/api/bots'); BOT_LINKS = rb.bots || {}; BOT_DURS = rb.durs || {};
+    return openModal(`<h3 class="pr-10 text-xl font-semibold">Ссылки для бот-комнат</h3><p class="mb-4 mt-1 text-sm text-[#a996e0]">Вставьте обычную ссылку: vkvideo.ru/video-…_…, video_ext.php?oid=…&amp;id=…, Rutube или YouTube. Hash не нужен. Пусто — играет заглушка.</p>
+      <div class="mb-4 flex max-h-[52vh] flex-col gap-3 overflow-y-auto pr-1">${Object.keys(BOT_MEDIA).map(t => `<label class="block"><span class="mb-1.5 ml-2 block text-[12.5px] font-medium text-lbl">${esc(t)}</span><input data-bl="${esc(t)}" value="${esc(BOT_LINKS[t] || '')}" placeholder="https://vkvideo.ru/video-166348762_456240185" class="${INP}"><span class="mt-2 flex items-center gap-2"><span class="ml-2 text-[12px] text-lbl">Длина видео, мин</span><input data-bd="${esc(t)}" type="number" min="1" max="600" value="${BOT_DURS[t] || BOT_MEDIA[t].dur}" class="${INP} !w-24"></span></label>`).join('')}</div>
+      <button data-act="botsave" class="${BTN1} mb-3">Сохранить</button><button data-act="close" class="${BTN2}">Отмена</button>`);
+  }
+  const nb = {}; $$('[data-bl]').forEach(i => { const v = i.value.trim(); if (v) nb[i.dataset.bl] = v; });
+  for (const k in nb) if (!parseLink(nb[k])) return toast('Ссылка не распознана: ' + k);
+  const nd = {}; $$('[data-bd]').forEach(i => { const v = Math.round(+i.value); if (v >= 1 && v <= 600) nd[i.dataset.bd] = v; });
+  const r = await api('/api/bots', { bots: nb, durs: nd }); if (!r.ok) return toast(r.error || 'Не удалось сохранить');
+  BOT_LINKS = r.bots || {}; BOT_DURS = r.durs || {}; closeModal(); const l = await api('/api/rooms'); setRooms(l.list || []); toast('Ссылки сохранены');
+});
+document.addEventListener('input', e => {
+  if (e.target.id !== 'src-in') return; const h = $('#src-hint'); if (!h) return; const v = e.target.value.trim(), m = v && parseLink(v);
+  h.className = 'ml-2 mt-2 min-h-[20px] text-sm ' + (!v ? 'text-hint' : m ? 'text-[#8fffc8]' : 'text-[#ff8fa8]');
+  h.textContent = !v ? h.dataset.h : m ? '✓ Распознано: ' + PL[m.type].n : 'Ссылка не распознана — проверьте, что скопировали её целиком';
+});
+</script>
+<script>
+/* ===== Эфир бот-комнат: бесконечный цикл, общее время, синхронный таймлайн ===== */
+const isBot = () => { const r = rooms[cur]; return !!(curId && r && r.bot); };
+// позиция в фильме по серверному времени (одинакова у всех), сек
+const botRaw = () => { const r = rooms[cur], d = r.dur * 60; if (!(d > 0)) return 0; const p = ((sn() - r.start) / 1000) % d; return p < 0 ? p + d : p; };
+// позиция в реальном ролике (если ролик короче «фильма» — зацикливаем по его длине)
+const botT = () => { const p = botRaw(), vd = isYT() ? ytp.getDuration() : ext() ? cD : 0; return vd > 1 && p > vd ? p % vd : p; };
+
+// вход: не затирать media бот-комнаты (сервер шлёт null), взять dur/start и часы сервера
+const _hBot = handle; handle = function (o) {
+  const r = rooms[cur];
+  if (o.t === 'init' && o.room === curId && r && r.bot) {
+    o.media = r.media;
+    if (o.bot) { r.dur = o.bot.dur / 60; r.start = o.bot.start; }
+  } else if (o.t === 'bot' && r && r.bot && o.bot) { r.dur = o.bot.dur / 60; r.start = o.bot.start; }
+  _hBot(o);
+  if (o.t === 'init' && o.room === curId) clockOff = off;
+};
+
+// любая команда/пульс для бот-комнаты → всегда «текущая секунда эфира»
+const _rBot = remote; remote = function (p) { _rBot(isBot() ? { a: 'play', t: botT(), ts: sn() } : p); };
+
+// конец ролика → сразу заново с текущей секунды эфира
+const _ysBot = ytState; ytState = function (e) {
+  if (e.data === 0 && isBot()) { ytp.seekTo(botT(), true); ytp.playVideo(); return; }
+  _ysBot(e);
+};
+
+// белая полоска в комнате + постоянная подстройка плеера
+setInterval(() => {
+  if (!isBot()) return; const r = rooms[cur], w = $('#plw'); if (!w) return;
+  let b = $('#btl');
+  if (!b && !ext()) { w.insertAdjacentHTML('beforeend', '<div class="pointer-events-none absolute inset-x-0 bottom-0 z-[6] h-[3px] bg-white/15"><span id="btl" class="block h-full rounded bg-white transition-[width] duration-500 ease-linear"></span></div>'); b = $('#btl'); }
+  if (b) b.style.width = botRaw() / (r.dur * 60) * 100 + '%';
+  if (isYT()) {
+    const s = ytp.getPlayerState(), t = botT();
+    if (s === 0) ytp.seekTo(t, true);
+    if (s !== 1 && s !== 3) ytp.playVideo();
+    else if (Math.abs(ytp.getCurrentTime() - t) > 2.5) ytp.seekTo(t, true);
+  } else if (ext() && pReady) remote({});
+}, 500);
+</script>
+<script>
+/* ===== Сохранение всего: профиль, галерея, настройки, скрытые строки, заявки, комната, вход ===== */
+const PK = id => LS + 'prefs:' + id;
+let lastP = '', pT = null, lastU = '';
+const snapP = () => ({ S, cm: chartMode, vt, reqs, blocked, recents, sent: [...sent] });
+// подтянуть настройки: берём более свежие (сервер или этот браузер)
+function loadPrefs(u) {
+  let l = null; try { l = JSON.parse(localStorage.getItem(PK(u.id)) || 'null'); } catch (_) {}
+  const sv = u.prefs, p = sv && sv.S ? (l && l.S && (l.ts || 0) > (sv.ts || 0) ? l : sv) : l;
+  if (!p || !p.S) return;
+  Object.assign(S, p.S);
+  if (p.cm) chartMode = p.cm; if (p.vt) vt = p.vt;
+  [['reqs', reqs], ['blocked', blocked], ['recents', recents]].forEach(([k, a]) => Array.isArray(p[k]) && a.splice(0, a.length, ...p[k]));
+  sent.clear(); (p.sent || []).forEach(x => sent.add(x));
+  try { localStorage.vibeS = JSON.stringify(S); } catch (_) {}
+  lastP = '';
+}
+function tryWant() { if (!wantRoom) return; const i = rooms.findIndex(x => x.id === wantRoom); if (i >= 0) { wantRoom = null; enterRoom(i); } }
+
+// скрытые «глазком» строки профиля запоминаются
+const applyHid = () => { const rows = $$('#prof [data-row]'); (S.hid || []).forEach(i => { const r = rows[i]; if (!r) return; r.classList.add('opacity-40'); const b = r.querySelector('[data-eye]'); if (b) b.innerHTML = EYE_OFF; }); };
+const _rpP = renderProfile; renderProfile = function () { _rpP.apply(this, arguments); applyHid(); };
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-eye]'); if (!b) return;
+  const row = b.closest('[data-row]'), i = $$('#prof [data-row]').indexOf(row); if (i < 0) return;
+  const h = new Set(S.hid || []); row.classList.contains('opacity-40') ? h.add(i) : h.delete(i); S.hid = [...h]; saveS();
+});
+
+// «О себе»: сохраняем во время набора и при закрытии вкладки
+let bT = null;
+document.addEventListener('input', e => { if (e.target.id === 'bio') { clearTimeout(bT); bT = setTimeout(saveProfile, 500); } });
+const flushProf = () => { if (!uid || !tok) return; try { fetch(API + '/api/profile', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ name: me, bio, color }) }); } catch (_) {} };
+addEventListener('pagehide', flushProf); document.addEventListener('visibilitychange', () => document.hidden && flushProf());
+
+// галерея
+function galHTML() {
+  const add = gal.length < 6 ? `<button data-gal="add" aria-label="Добавить фото" class="grid h-36 w-28 shrink-0 place-items-center rounded-2xl border border-dashed border-[rgba(150,120,255,.4)] bg-white/[.04] text-[#c9b8ff] transition hover:bg-white/10 active:scale-95">${ic('<path d="M12 5v14M5 12h14"/>', '!h-8 !w-8')}</button>` : '';
+  return `<div class="flex gap-3 overflow-x-auto pb-1">${gal.map((g, i) => `<div class="relative h-36 w-28 shrink-0"><img src="${g}" alt="" class="h-full w-full rounded-2xl object-cover"><button data-gal="del:${i}" aria-label="Удалить" class="absolute right-1.5 top-1.5 grid h-7 w-7 place-items-center rounded-full bg-black/60 text-white transition active:scale-90">${ic(P.x, '!h-3.5 !w-3.5')}</button></div>`).join('')}${add}<input id="g-file" type="file" accept="image/*" class="hidden"></div>`;
+}
+const saveGal = () => uid && api('/api/profile', { gallery: gal });
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-gal]'); if (!b) return; const [a, i] = b.dataset.gal.split(':');
+  if (a === 'add') { const f = $('#g-file'); f && f.click(); }
+  if (a === 'del') { gal.splice(+i, 1); saveGal(); renderProfile(); }
+});
+document.addEventListener('change', e => {
+  if (e.target.id !== 'g-file' || !e.target.files[0]) return;
+  const im = new Image(), inp = e.target; im.onload = () => {
+    const k = Math.min(1, 480 / Math.max(im.width, im.height)), c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+    c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); gal.push(c.toDataURL('image/jpeg', .72)); URL.revokeObjectURL(im.src); saveGal(); renderProfile();
+  }; im.src = URL.createObjectURL(inp.files[0]); inp.value = '';
+});
+
+// мягкое ожидание комнаты, если список пришёл позже (сервер просыпался)
+const _hP = handle; handle = function (o) { _hP(o); if (o.t === 'rooms') { window._rl = o.list; setTimeout(tryWant, 0); } };
+
+// фоновый цикл: настройки → сервер и localStorage, кэш профиля, текущая комната
+setInterval(() => {
+  if (!uid) return;
+  const p = snapP(), s = JSON.stringify(p);
+  if (s !== lastP) { lastP = s; p.ts = Date.now(); try { localStorage.setItem(PK(uid), JSON.stringify(p)); } catch (_) {} clearTimeout(pT); pT = setTimeout(() => api('/api/profile', { prefs: p }), 300); }
+  const u = JSON.stringify([me, bio, color, photo, gal.length, premium, until && +until]);
+  if (u !== lastU) { lastU = u; try { const c = JSON.parse(localStorage.getItem(LS + 'user') || 'null'); if (c && c.id === uid) { Object.assign(c, { name: me, bio, color, photo, gallery: gal }); localStorage.setItem(LS + 'user', JSON.stringify(c)); } } catch (_) {} }
+  if (!wantRoom) { const c = curId || ''; if ((localStorage.getItem(LS + 'room') || '') !== c) { try { c ? localStorage.setItem(LS + 'room', c) : localStorage.removeItem(LS + 'room'); } catch (_) {} } }
+}, 1000);
+</script>
+<script>
+/* ===== Язык: Русский / English (переводит весь интерфейс на лету) ===== */
+const D = {
+'Или выберите из подборки':'Or pick from the selection','Популярное':'Popular','Вставьте обычную ссылку: vkvideo.ru/video-…_…, video_ext.php?oid=…&id=…, Rutube или YouTube. Hash не нужен. Пусто — играет заглушка.':'Paste a regular link: vkvideo.ru/video-…_…, video_ext.php?oid=…&id=…, Rutube or YouTube. No hash needed. Empty — a placeholder plays.',
+'VK Видео':'VK Video','ШАГ 1/2':'STEP 1/2','ШАГ 2/2':'STEP 2/2','НОВАЯ КОМНАТА':'NEW ROOM','Что смотрим?':'What are we watching?','Выберите площадку, вставьте ссылку — и друзья присоединятся в один клик':'Pick a platform, paste a link — and friends join in one click','Telegram выключен: задайте TG_BOT_TOKEN и TG_BOT_NAME на сервере':'Telegram is off: set TG_BOT_TOKEN and TG_BOT_NAME on the server',
+'Доступно с':'Available with','Нажмите, чтобы узнать больше':'Tap to learn more','Сохраняется на этом устройстве':'Saved on this device',
+'Смотрите':'Watch','вместе':'together','Смотрите вместе':'Watch together','Создайте комнату, отправьте ссылку друзьям — видео идёт у всех одновременно.':'Create a room, send the link to your friends — the video plays for everyone at once.',
+'Человек-паук: Новый день':'Spider-Man: Brand New Day','Круэлла':'Cruella','Форсаж 2':'2 Fast 2 Furious','Двойной форсаж':'2 Fast 2 Furious','Форсаж 10':'Fast X','Мстители: Финал':'Avengers: Endgame','Интерстеллар':'Interstellar','Дюна: Часть вторая':'Dune: Part Two','Зверополис':'Zootopia',
+'Войдите, чтобы создавать комнаты':'Sign in to create rooms','и смотреть вместе':'and watch together','ВХОД':'SIGN IN','ПОЧТА':'EMAIL','ПАРОЛЬ':'PASSWORD','ИМЯ (ДЛЯ РЕГИСТРАЦИИ)':'NAME (FOR SIGN-UP)','Минимум 6 символов':'At least 6 characters','Как вас зовут':'Your name','Войти / Регистрация':'Sign in / Sign up','или':'or','Войти через Telegram':'Sign in with Telegram','Войти через':'Sign in with','Вход через':'Sign in with',
+'Гость':'Guest','Меню':'Menu','Настройки':'Settings','Профиль':'Profile','Выберите комнату или создайте свою':'Pick a room or create your own','Поиск':'Search','Создать комнату':'Create a room','Создать первую комнату':'Create your first room','Комнаты':'Rooms','Публичный':'Public','Друзья':'Friends','Как пользоваться':'How to use','КАК':'HOW TO','ПОЛЬЗОВАТЬСЯ':'USE',
+'Две минуты — и вы уже смотрите вместе с друзьями':'Two minutes — and you are already watching with friends','Добавляйте друзей и зовите смотреть вместе':'Add friends and invite them to watch together','Найти людей или добавить по @нику':'Find people or add by @username','Три шага до совместного просмотра':'Three steps to watching together',
+'Создайте комнату':'Create a room','Дайте ей название и добавьте ссылку на видео — с VK, Rutube, YouTube или Netflix.':'Give it a name and add a video link — from VK, Rutube, YouTube or Netflix.','Отправьте ссылку':'Send the link','Друзья зайдут в комнату в один клик — приглашение можно скопировать прямо из комнаты.':'Friends join the room in one click — you can copy the invite right from the room.','Пауза, перемотка и чат работают у всех сразу — как в одном кинозале.':'Pause, seeking and chat work for everyone at once — like in a single cinema.',
+'Частые вопросы':'FAQ','Какие площадки поддерживаются?':'Which platforms are supported?','VK Видео, Rutube и YouTube проигрываются прямо внутри vibe и синхронно управляются хостом. Netflix открывается в отдельной вкладке — vibe синхронизирует только чат.':'VK Video, Rutube and YouTube play right inside vibe and are controlled in sync by the host. Netflix opens in a separate tab — vibe only syncs the chat.',
+'Кто управляет паузой и перемоткой?':'Who controls pause and seeking?','Для VK и Rutube управляет только основатель комнаты — остальные смотрят синхронно. Для YouTube и пустых комнат управлять может любой участник, если это разрешено в настройках комнаты.':'For VK and Rutube only the room founder controls playback — everyone else watches in sync. For YouTube and empty rooms any member can control it if the room settings allow.',
+'Что будет, если основатель выйдет?':'What happens if the founder leaves?','Права хоста автоматически переходят следующему участнику в комнате, так что просмотр не прерывается.':'Host rights automatically pass to the next member in the room, so the viewing is not interrupted.','Нужна регистрация, чтобы смотреть?':'Do I need to sign up to watch?','Да, короткая регистрация по почте (или вход через Telegram) нужна, чтобы у вас был профиль, аватар и список друзей в комнатах.':'Yes, a quick email sign-up (or Telegram sign-in) is needed so you have a profile, an avatar and a friends list in rooms.',
+'Ничего не найдено. Создайте комнату с таким названием.':'Nothing found. Create a room with that name.','Название':'Title','Ссылка на видео (необязательно)':'Video link (optional)','Войти в комнату':'Join the room','Скоро появится':'Coming soon','Введите имя':'Enter a name','Профиль обновлён':'Profile updated','VIBE Premium активирован (демо, без оплаты)':'VIBE Premium activated (demo, no payment)','Ссылка-приглашение скопирована':'Invite link copied','Пригласить друзей':'Invite friends','Ссылка скопирована':'Link copied','Введите название комнаты':'Enter a room name','Участники':'Members','Пауза':'Paused','Ссылка-приглашение':'Invite link','Сейчас играет':'Now playing','Голос':'Voice','Чат':'Chat','Отправить':'Send','Идёт сейчас':'Live now','Ожидание':'Waiting','В комнате':'In the room','Привет!':'Hi!',
+'янв':'Jan','фев':'Feb','мар':'Mar','апр':'Apr','май':'May','июн':'Jun','июл':'Jul','авг':'Aug','сен':'Sep','окт':'Oct','ноя':'Nov','дек':'Dec',
+'Статистика':'Statistics','Часы в комнатах, графики и рекорды':'Hours in rooms, charts and records','Любимые видео':'Favorite videos','Топ и история просмотров':'Top and watch history','Редактирование сообщений':'Message editing','Поправьте текст после отправки':'Fix the text after sending','Премиум-сообщения':'Premium messages','Неоновая рамка, градиентный ник и значок ✦':'Neon frame, gradient name and the ✦ badge','Рамка аватара':'Avatar frame','Переливающееся кольцо вокруг фото':'A shimmering ring around your photo','Приватные комнаты':'Private rooms','Вход по паролю — только для своих':'Password entry — for your people only',
+'Изменить аватар':'Change avatar','Изменить профиль':'Edit profile','Изменить':'Edit','О себе':'About me','Расскажите о себе':'Tell us about yourself','Галерея':'Gallery','Добавить фото':'Add photo','Удалить':'Delete','Дата регистрации':'Registration date','Время в комнатах':'Time in rooms','0 ч':'0 h','Часы по месяцам':'Hours by month','Пока нет данных — смотрите вместе, и здесь появится график':'No data yet — watch together and a chart will appear here','Самый долгий сеанс':'Longest session','Самая большая комната':'Biggest room','0 чел.':'0 ppl','Доступно с VIBE Premium':'Available with VIBE Premium','Больше возможностей для совместного просмотра':'More features for watching together','/ 30 дней':'/ 30 days','Продлить на 30 дней':'Extend for 30 days','Оформить за 129 ₽':'Get for 129 ₽','Подробнее о Premium':'More about Premium','Не сейчас':'Not now','Ваш профиль':'Your profile','Загрузить фото':'Upload photo','Убрать':'Remove','Имя':'Name','Сохранить':'Save','Отмена':'Cancel','Закрыть':'Close','Скрыть':'Hide','Топ':'Top','История':'History','В сети':'Online','в сети':'online','Выйти':'Log out','Цвет':'Color',
+'Недавние':'Recent','Заявки':'Requests','Блок':'Blocked','Все':'All','Добавить по нику':'Add by username','Добавить':'Add','Отправлено':'Sent','Приглашён':'Invited','Позвать':'Invite','Пока нет друзей':'No friends yet','Найдите людей через поиск или добавьте из рекомендаций ниже':'Find people via search or add from the suggestions below','Возможно, вы знакомы':'People you may know','Пока пусто':'Nothing here yet','Здесь появятся те, с кем вы смотрели вместе':'People you watched with will show up here','Заявок нет':'No requests','Когда кто-то захочет дружить, заявка появится здесь':'When someone wants to be friends, the request will appear here','заблокирован':'blocked','Разблокировать':'Unblock','Список пуст':'The list is empty','Заблокированных людей нет':'No blocked people','Принять':'Accept','Отклонить':'Decline','✓ Друзья':'✓ Friends','Пользователь разблокирован':'User unblocked','Сообщение изменено':'Message edited','изм.':'edited','Изменить сообщение':'Edit message','Здесь пока тихо — напишите первым':'It is quiet here — write first','Сохранить':'Save',
+'Русский':'Русский','Системный':'System','Тёмный':'Dark','Светящийся':'Glowing','Однотонный':'Solid','Масштаб окна':'Window scale','По умолчанию':'Default','Приватность':'Privacy','Друзья могут войти в комнату':'Friends can join the room','Войти может любой':'Anyone can join','Только по ссылке-приглашению':'Invite link only','По ссылке':'By link','Воспроизведение':'Playback','Голосование во время видео':'Voting during the video','Голосуем':'Voting','Управляет только хост':'Only the host controls','Хост':'Host','Микрофоны включены по умолчанию':'Microphones on by default','Вкл':'On','Микрофоны выключены по умолчанию':'Microphones off by default','Выкл':'Off','Скрывать сообщения о входе и выходе':'Hide join and leave messages',
+'Язык':'Language','Шрифт':'Font','Фон окна':'Window background','Уведомления':'Notifications','Приглашения':'Invitations','Пропущенные сообщения':'Missed messages','Буфер обмена':'Clipboard','Личные сообщения':'Direct messages','Точная синхронизация':'Precise sync','Закреплённые комнаты':'Pinned rooms','Анимации переходов':'Transition animations','Масштаб':'Scale','Автоперевод чата':'Chat auto-translate','Скрывать местоположение':'Hide location','Ограничить приглашения':'Limit invitations','Скрывать 18+ контент':'Hide 18+ content','Не передавать мои данные третьим лицам':'Do not share my data with third parties','Версия':'Version','Динамик':'Speaker','Наушники':'Headphones','Колонки':'Speakers','Громкость голосов':'Voice volume','Громкость видео':'Video volume','Микрофон':'Microphone','Встроенный':'Built-in','Гарнитура':'Headset','Порог шума':'Noise gate','Шумоподавление':'Noise suppression','Авто-громкость микрофона':'Mic auto-gain','Комната':'Room','Аудио':'Audio','Комната, приложение и звук':'Room, app and sound','Проверить микрофон':'Test microphone','Говорите — идёт проверка':'Speak — testing in progress','Нет доступа к микрофону':'No microphone access',
+'Фильмы, сериалы и ролики ВКонтакте':'Movies, series and clips on VKontakte','Подборка: бесплатное кино и клипы':'Selection: free movies and clips','Фильмы, сериалы и шоу':'Movies, series and shows','Популярное на Netflix':'Popular on Netflix','Очень странные дела':'Stranger Things','Уэнсдей':'Wednesday','Игра в кальмара':'Squid Game','Ведьмак':'The Witcher','Тьма':'Dark','Бриджертоны':'Bridgerton','Бумажный дом':'Money Heist','Ход королевы':'The Queen\'s Gambit','Выбрать':'Select','Пустая комната':'Empty room','Без видео — выберете его позже уже в комнате':'No video — pick one later inside the room','Откройте VK Видео и найдите фильм или ролик':'Open VK Video and find a movie or clip','Нажмите «Поделиться» → «Экспортировать» и скопируйте ссылку':'Tap “Share” → “Export” and copy the link','Вставьте ссылку выше — в ней будет hash, видео запустится у всех':'Paste the link above — it will contain a hash, so the video starts for everyone','и найдите видео':'and find a video','Скопируйте ссылку из адресной строки':'Copy the link from the address bar','Вставьте её выше и нажмите «Смотреть»':'Paste it above and press “Watch”','ПЛОЩАДКА':'PLATFORM','НАЗВАНИЕ КОМНАТЫ':'ROOM NAME','(необязательно)':'(optional)','Например, Кино на выходных':'E.g. Weekend movie night','ССЫЛКА НА ВИДЕО':'VIDEO LINK','Вставьте ссылку на видео':'Paste a video link','Например vk.com/video-123_456 — лучше через «Поделиться → Экспортировать»':'E.g. vk.com/video-123_456 — better via “Share → Export”','Поддерживаются ссылки VK Видео, Rutube и YouTube':'VK Video, Rutube and YouTube links are supported','Смотреть':'Watch','Вставить':'Paste','Назад':'Back','Открыть':'Open','Не удалось распознать ссылку':'Could not recognize the link','Это видео нельзя встроить — выберите другое':'This video cannot be embedded — pick another one','Нет связи с сервером':'No connection to the server','Нет соединения с сервером':'No connection to the server','Введите почту и пароль (от 6 символов)':'Enter email and password (6+ characters)','Аккаунта нет — укажите имя для регистрации':'No account yet — enter a name to sign up','Ошибка входа':'Sign-in error','Не удалось подтвердить Telegram — попробуйте ещё раз':'Could not verify Telegram — try again','Не удалось создать комнату':'Could not create the room','Ошибка':'Error','Telegram подключён':'Telegram connected','Ошибка Telegram':'Telegram error','Владелец видео запретил встраивание':'The video owner disabled embedding','Не удалось загрузить видео':'Could not load the video','Видео выбирает основатель комнаты':'The room founder picks the video','Синхронизировано':'Synced','Нет доступа к буферу — вставьте вручную (Ctrl+V)':'No clipboard access — paste manually (Ctrl+V)','Нажмите на видео, чтобы запустить':'Tap the video to start',
+'Классика':'Classic','Обычное сообщение':'Regular message','Такса':'Dachshund','🐕 Привет!':'🐕 Hi!','Аврора':'Aurora','Смотрим вместе':'Watching together','Неон':'Neon','Ночной город':'Night city','Закат':'Sunset','Закат над морем':'Sunset over the sea','Сакура':'Sakura','Мило 🌸':'Cute 🌸','Лёд':'Ice','Холодный вайб':'Cold vibe','Золото':'Gold','Королевский ✦':'Royal ✦','Матрица':'Matrix','Лава':'Lava','Горячо 🔥':'Hot 🔥','Оформление сообщений':'Message style','Ваш режим просмотра':'Your viewing mode','Локально':'Local','Чистый экран':'Clean screen','Убирает плашки и подсказки поверх видео.':'Removes badges and hints over the video.','Комфортный чат':'Comfy chat','Крупнее текст и больше воздуха в сообщениях.':'Larger text and more room in messages.','Глубокий чёрный фон без свечения.':'Deep black background without glow.','Не подключён':'Not connected','✓ Привязан':'✓ Linked','Подключить':'Connect','Ссылки для бот-комнат':'Links for bot rooms','Бот-комнаты: ссылки':'Bot rooms: links','Не удалось сохранить':'Could not save','Ссылки сохранены':'Links saved','Ссылка не распознана — проверьте, что скопировали её целиком':'Link not recognized — make sure you copied all of it',
+'Открыть профиль':'Open profile','Позвать в комнату':'Invite to room','Удалить из друзей':'Remove friend','Заблокировать':'Block','Добавить в друзья':'Add friend','Принять заявку':'Accept request','Хочет дружить':'Wants to be friends','Не в друзьях':'Not friends','Друзей':'Friends',
+'Неверный пароль':'Wrong password','Почта уже занята':'Email already taken','Заполните почту, имя и пароль (от 6 символов)':'Fill in email, name and password (6+ characters)','Комната закрыта':'The room is closed','Этот Telegram уже привязан к другому аккаунту':'This Telegram is already linked to another account','Telegram не настроен на сервере':'Telegram is not configured on the server','Не удалось подтвердить Telegram':'Could not verify Telegram'
+};
+const vk = s => s.replace(/VK Видео/g, 'VK Video');
+const RX = [
+ [/^Привет, (.+)$/, m => 'Hello, ' + (D[m[1]] || m[1])],
+ [/^Вы вошли в «(.+)»$/, m => 'You joined “' + (D[m[1]] || m[1]) + '”'],
+ [/^Комната «(.+)» создана$/, m => 'Room “' + m[1] + '” created'],
+ [/^Приглашение отправлено: (.+)$/, m => 'Invitation sent: ' + m[1]],
+ [/^Заявка отправлена: (.+)$/, m => 'Request sent: ' + m[1]],
+ [/^(.+) теперь в друзьях$/, m => m[1] + ' is now your friend'],
+ [/^(.+) удалён из друзей$/, m => m[1] + ' removed from friends'],
+ [/^(.+) заблокирован$/, m => m[1] + ' blocked'],
+ [/^хочет дружить · (.+)$/, m => 'wants to be friends · ' + m[1]],
+ [/^Блок \((\d+)\)$/, m => 'Blocked (' + m[1] + ')'],
+ [/^(\d+) человек$/, m => m[1] + (+m[1] === 1 ? ' person' : ' people')],
+ [/^(\d+) чел\.$/, m => m[1] + ' ppl'], [/^(\d+) ч$/, m => m[1] + ' h'],
+ [/^✓ Активен до (.+)$/, m => '✓ Active until ' + m[1]],
+ [/^✓ Распознано: (.+)$/, m => '✓ Recognized: ' + m[1]],
+ [/^Ссылка не распознана: (.+)$/, m => 'Link not recognized: ' + m[1]],
+ [/^Открыть на (.+)$/, m => 'Open on ' + vk(m[1])], [/^Открыть в (.+)$/, m => 'Open in ' + vk(m[1])], [/^Открыть (.+)$/, m => 'Open ' + vk(m[1])],
+ [/^Откройте (.+) и найдите фильм или ролик$/, m => 'Open ' + m[1] + ' and find a movie or clip'],
+ [/^Популярное на (.+)$/, m => 'Popular on ' + m[1]],
+ [/^(.+) · подключён$/, m => m[1] + ' · connected'],
+ [/^(.+) — по ссылке$/, m => m[1] + ' — by link'],
+ [/^(.+) — по ссылке$/, m => m[1] + ' — by link'],
+ [/^Видео выбирает (.+)$/, m => 'The video is picked by ' + m[1]]
+];
+const CYR = /[А-Яа-яЁё]/;
+const tr = s => {
+  const m = s.match(/^(\s*)([\s\S]*?)(\s*)$/), c = m[2]; if (!c || !CYR.test(c)) return null;
+  let r = D[c]; if (r === undefined) for (const [re, f] of RX) { const x = c.match(re); if (x) { r = f(x); break; } }
+  return r === undefined ? null : m[1] + r + m[3];
+};
+const isEN = () => S.lang === 'English';
+const TX = new WeakMap(), AT = new WeakMap(), ATTRS = ['placeholder', 'aria-label', 'title', 'alt'];
+function doText(n) {
+  const t = TX.get(n);
+  if (t && n.nodeValue === t.t) return;
+  const r = isEN() ? tr(n.nodeValue) : null;
+  if (r != null && r !== n.nodeValue) { TX.set(n, { o: n.nodeValue, t: r }); n.nodeValue = r; }
+}
+function doEl(el) {
+  if (el.nodeType !== 1) return;
+  if (el.tagName === 'OPTION') { if (isEN()) { if (!AT.has(el)) AT.set(el, {}); const r = tr(el.textContent); if (r != null) el.label = r; } else el.removeAttribute('label'); return; }
+  for (const a of ATTRS) {
+    if (!el.hasAttribute(a)) continue; const v = el.getAttribute(a), rec = AT.get(el) || {};
+    if (rec[a] && rec[a].t === v) continue;
+    const r = isEN() ? tr(v) : null;
+    if (r != null && r !== v) { rec[a] = { o: v, t: r }; AT.set(el, rec); el.setAttribute(a, r); }
+  }
+}
+function walk(root) {
+  if (!root) return;
+  if (root.nodeType === 3) return doText(root);
+  if (root.nodeType !== 1) return;
+  doEl(root);
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+  for (let n = w.nextNode(); n; n = w.nextNode()) {
+    if (n.nodeType === 3) { if (n.parentNode && /^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentNode.tagName)) continue; doText(n); } else doEl(n);
+  }
+}
+function revert() {
+  const w = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+  for (let n = w.nextNode(); n; n = w.nextNode()) {
+    if (n.nodeType === 3) { const t = TX.get(n); if (t && n.nodeValue === t.t) n.nodeValue = t.o; TX.delete(n); }
+    else { if (n.tagName === 'OPTION') n.removeAttribute('label'); const rec = AT.get(n); if (rec) { for (const a in rec) if (n.getAttribute(a) === rec[a].t) n.setAttribute(a, rec[a].o); AT.delete(n); } }
+  }
+}
+let obs = null, busy = false;
+function applyLang() {
+  document.documentElement.lang = isEN() ? 'en' : 'ru';
+  busy = true; try { isEN() ? walk(document.body) : revert(); } finally { busy = false; }
+  if (!obs) {
+    obs = new MutationObserver(ms => {
+      if (!isEN()) return; busy = true;
+      try { for (const m of ms) { if (m.type === 'childList') m.addedNodes.forEach(walk); else if (m.type === 'characterData') doText(m.target); else doEl(m.target); } } finally { busy = false; }
+    });
+    obs.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+  }
+}
+// даты на выбранном языке
+const _tld = Date.prototype.toLocaleDateString;
+Date.prototype.toLocaleDateString = function (l, o) { return _tld.call(this, isEN() && l === 'ru-RU' ? 'en-US' : l, o); };
+document.addEventListener('change', e => {
+  if (!(e.target.dataset && e.target.dataset.sel === 'lang')) return;
+  S.lang = e.target.value; saveS(); applyLang(); renderProfile(); renderSettings(); applyLang();
+});
+applyLang();
+</script>
+<script>
+/* внутри Telegram (мини-приложение / встроенный браузер): шапка и фон под цвета VIBE, на весь экран */
+try { const T = window.Telegram && Telegram.WebApp; if (T) { T.ready(); T.expand();
+  ['setHeaderColor', 'setBackgroundColor', 'setBottomBarColor'].forEach(f => { try { T[f] && T[f]('#07040f'); } catch (_) {} }); } } catch (_) {}
+</script>
+
+  <!-- ================= БУРГЕР-МЕНЮ (мобильные) ================= -->
+  <button id="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="mnu"><span></span><span></span><span></span></button>
+  <div id="mnu-ov" aria-hidden="true"></div>
+  <aside id="mnu" role="dialog" aria-label="Меню" aria-hidden="true">
+    <div class="m-top">
+      <svg class="h-auto w-[96px]" viewBox="0 0 190 90" role="img" aria-label="vibe"><use href="#vibe-logo"/></svg>
+      <button type="button" class="m-x" id="mnu-x" aria-label="Закрыть меню"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+
+    <section class="m-it" style="--k:0">
+      <div class="m-lbl">О КОМПАНИИ</div>
+      <div class="m-about">
+        <h3>О компании</h3>
+        <p>VIBE — сервис совместного просмотра. Создайте комнату, отправьте ссылку друзьям — видео идёт у всех одновременно, а чат всегда рядом.</p>
+        <p>Мы делаем так, чтобы расстояние не мешало смотреть кино и обсуждать его вместе.</p>
+      </div>
+    </section>
+
+    <a id="m-creator" class="m-card m-it" style="--k:1" href="#" target="_blank" rel="noopener noreferrer">
+      <span class="m-ic"><svg viewBox="0 0 24 24"><path d="M8 8l-4.5 4L8 16M16 8l4.5 4L16 16M13.5 5.5l-3 13"/></svg></span>
+      <span class="m-r"><small>Создатель</small><b>0xrebel.s</b></span>
+      <svg class="m-go" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg>
+    </a>
+
+    <div class="m-card m-it" style="--k:2">
+      <span class="m-ic pk"><svg viewBox="0 0 24 24"><path d="M3.5 9l4.5 3.5L12 5l4 7.5L20.5 9 19 18H5z"/><path d="M5.5 21h13"/></svg></span>
+      <span class="m-r"><small>Президент</small><b>Vayisgor</b></span>
+    </div>
+  </aside>
+
+  <script>
+  (() => {
+    // Ссылка на профиль создателя — укажите здесь свою (Telegram, Instagram и т.д.)
+    const CREATOR_URL = '';
+    const b = document.body, bg = document.getElementById('burger'), mnu = document.getElementById('mnu'), cr = document.getElementById('m-creator');
+    const set = o => { b.classList.toggle('mnu-open', o); bg.setAttribute('aria-expanded', o); mnu.setAttribute('aria-hidden', !o); };
+    bg.addEventListener('click', () => set(true));
+    document.getElementById('mnu-x').addEventListener('click', () => set(false));
+    document.getElementById('mnu-ov').addEventListener('click', () => set(false));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') set(false); });
+    if (CREATOR_URL) cr.href = CREATOR_URL;
+    else cr.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); typeof toast === 'function' && toast('Ссылка на профиль скоро появится'); });
+  })();
+  </script>
+</body>
+</html>
