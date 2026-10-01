@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: vibe
+    runtime: node
+    plan: starter            # постоянный диск (disk) на Render доступен только на платных планах
+    buildCommand: npm install
+    startCommand: node server.js
+    disk:                    # без диска data.json (аккаунты, Premium, статистика) стирается при каждом деплое/перезапуске
+      name: vibe-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: DATA_DIR
+        value: /var/data
+      - key: TG_BOT_TOKEN
+        sync: false
+      - key: TG_BOT_NAME
+        sync: false
+      - key: ADMIN_EMAILS
+        sync: false
+      - key: FRONT_URL       # адрес сайта на Netlify, например https://vibe.netlify.app
+        sync: false
+      - key: PREMIUM_STARS   # цена Premium в Telegram Stars
+        value: "100"
+      - key: TG_ADMIN_IDS    # необязательно: числовые Telegram-id админов через запятую
+        sync: false

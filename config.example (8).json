@@ -1,0 +1,8 @@
+{
+  "tgToken": "123456789:AAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "tgName": "my_vibe_bot",
+  "admins": ["you@mail.com", "@your_telegram_username"],
+  "frontUrl": "https://vibe.netlify.app",
+  "premiumStars": 100,
+  "adminTgIds": []
+}
