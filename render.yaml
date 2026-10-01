@@ -18,7 +18,7 @@ services:
         sync: false
       - key: ADMIN_EMAILS
         sync: false
-      - key: FRONT_URL       # адрес сайта на Netlify, например https://vibe.netlify.app
+      - key: vibesssssss.netlify.app
         sync: false
       - key: PREMIUM_STARS   # цена Premium в Telegram Stars
         value: "100"
