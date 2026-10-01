@@ -5,7 +5,8 @@ const PORT = process.env.PORT || 3000, DIR = process.env.DATA_DIR || __dirname, 
 /* Настройки: переменные окружения ИЛИ файл config.json рядом с server.js:
    { "tgToken": "123456:AA...(токен из BotFather)", "tgName": "my_vibe_bot", "admins": ["you@mail.com"] } */
 const cfg = (() => { try { return JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8')); } catch (_) { return {}; } })();
-const TGT = process.env.TG_BOT_TOKEN || cfg.tgToken || '', TGN = String(process.env.TG_BOT_NAME || cfg.tgName || '').replace(/^@/, '');
+const why = e => (e && e.message || String(e)) + (e && e.cause ? ' [' + (e.cause.code || e.cause.message) + ']' : '');   // причина сетевой ошибки
+const TGT = String(process.env.TG_BOT_TOKEN || cfg.tgToken || '').trim().replace(/^bot/i, ''), TGN = String(process.env.TG_BOT_NAME || cfg.tgName || '').replace(/^@/, '');
 const ADMIN = String(process.env.ADMIN_EMAILS || [].concat(cfg.admins || []).join(',')).toLowerCase().split(',').map(x => x.trim()).filter(Boolean);
 const FRONT = String(process.env.FRONT_URL || cfg.frontUrl || '').replace(/\/$/, '');   // адрес сайта на Netlify, например https://vibe.netlify.app (куда вернуть после входа через Telegram)
 const STARS = Math.max(1, +(process.env.PREMIUM_STARS || cfg.premiumStars || 100)), TGA = String(process.env.TG_ADMIN_IDS || [].concat(cfg.adminTgIds || []).join(',')).split(',').map(x => x.trim()).filter(Boolean);   // цена в Telegram Stars; числовые Telegram-id админов (необязательно)
@@ -24,7 +25,7 @@ const save = () => { if (!st) st = setTimeout(flushDb, 150); };
 /* ---- Supabase: постоянное хранилище (переживает перезапуски и деплои Render) ----
    Таблица vibe_kv(k text primary key, v jsonb): u:<id> — пользователь, t:<токен> — вход, p:<id платежа>, s:<день> — статистика, bots — ссылки бот-комнат.
    Пишутся только изменившиеся записи. data.json остаётся запасной копией. */
-const SBU = String(process.env.SUPABASE_URL || cfg.supabaseUrl || '').replace(/\/$/, ''), SBK = String(process.env.SUPABASE_KEY || cfg.supabaseKey || '').trim(), REMOTE = !!(SBU && SBK);
+const SBU = String(process.env.SUPABASE_URL || cfg.supabaseUrl || '').trim().replace(/\/$/, ''), SBK = String(process.env.SUPABASE_KEY || cfg.supabaseKey || '').trim(), REMOTE = !!(SBU && SBK);
 const sbReq = async (q, opt = {}) => {
   const headers = Object.assign({ apikey: SBK, 'Content-Type': 'application/json' }, SBK.startsWith('eyJ') ? { Authorization: 'Bearer ' + SBK } : {}, opt.headers);
   const r = await fetch(SBU + '/rest/v1/vibe_kv' + q, Object.assign({}, opt, { headers }));
@@ -52,7 +53,7 @@ async function doPush() {
       part.forEach(x => sig.set(x.k, x.h));
     }
     rfail = false;
-  } catch (e) { rfail = true; console.error('supabase save:', e.message); }
+  } catch (e) { rfail = true; console.error('supabase save:', why(e)); }
 }
 const pushRemote = () => (rq = rq.then(doPush));
 function schedRemote() { if (REMOTE && !rt) rt = setTimeout(() => { rt = null; pushRemote(); }, 1500); }
@@ -71,7 +72,7 @@ async function loadRemote() {
       }
       db = nd; BD = botDurs(); remoteRows().forEach(x => sig.set(x.k, x.h));
       console.log('Supabase: загружено аккаунтов — ' + Object.keys(db.users).length); return;
-    } catch (e) { console.error('supabase load (' + a + '/5):', e.message); if (a >= 5) throw e; await new Promise(z => setTimeout(z, 3000)); }
+    } catch (e) { console.error('supabase load (' + a + '/5):', why(e)); if (a >= 5) throw e; await new Promise(z => setTimeout(z, 3000)); }
   }
 }
 ['SIGTERM', 'SIGINT'].forEach(sg => process.on(sg, async () => { flushDb(); await Promise.race([pushRemote(), new Promise(z => setTimeout(z, 8000))]); process.exit(0); }));
@@ -174,7 +175,7 @@ function sendStatic(url, res) {   // только папка images/
 const tgApi = async (method, data) => {
   if (!TGT) return null;
   try { const r = await fetch('https://api.telegram.org/bot' + TGT + '/' + method, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data || {}) }); return await r.json(); }
-  catch (e) { console.error('tg ' + method + ':', e.message); return null; }
+  catch (e) { console.error('tg ' + method + ':', why(e)); return null; }
 };
 const dayKey = (t = Date.now()) => new Date(t).toLocaleDateString('sv-SE', { timeZone: TZ });   // YYYY-MM-DD в нужном часовом поясе
 const dayOf = k => (db.stats.days[k] = db.stats.days[k] || { h: 0, v: {}, pay: 0, stars: 0 });
