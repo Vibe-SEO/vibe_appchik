@@ -1095,7 +1095,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id
 // Если index.html лежит отдельно от server.js (например GitHub Pages), укажите адрес сервера: 'https://vibe.onrender.com'
 // Фронтенд на Netlify, сервер на Render → запросы должны идти на Render, а не на сам Netlify.
 // Если у сервиса на Render другой адрес — поменяйте RENDER_URL (или задайте <meta name="vibe-server" content="https://...">).
-const RENDER_URL = 'https://vibe.onrender.com';
+const RENDER_URL = 'vibesssssss.netlify.app';
 const SERVER_URL = (document.querySelector('meta[name="vibe-server"]') || {}).content || (/(^|\.)onrender\.com$|^localhost$|^127\./.test(location.hostname) ? '' : RENDER_URL), API = SERVER_URL.replace(/\/$/, ''), LS = 'vibe:';
 let wantRoom = null, gal = [];
 let uid = null, tok = localStorage.getItem(LS + 'tok'), ws = null, curId = null, applying = 0, ytIv = null, pend = null, lastT = 0, lastS = 0, lastW = 0, rtT = 0, off = 0, log = [], wsT = null, tgBot = '', lastF = '[]';
