@@ -107,6 +107,19 @@ const avUrl = u => {
   let c = avCache.get(u.id); if (!c || c.ph !== ph) { c = { ph, url: '/api/avatar/' + u.id + '?v=' + md5(ph).slice(0, 8) }; avCache.set(u.id, c); }
   return c.url;
 };
+/* ---- страна участника для глобуса: заголовок CDN (Cloudflare/Render) → геобаза по IP (GEO_LOOKUP=0 выключает) ---- */
+const geoCache = new Map(), GEO_ON = String(process.env.GEO_LOOKUP || cfg.geoLookup || '1') !== '0';
+const cfCC = req => { const c = String(req.headers['cf-ipcountry'] || req.headers['x-vercel-ip-country'] || '').toUpperCase(); return /^[A-Z]{2}$/.test(c) && c !== 'XX' && c !== 'T1' ? c : null; };
+async function geoLookup(req) {
+  const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim().replace(/^::ffff:/, '');
+  if (!GEO_ON || !ip || /^(127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|::1|fc|fd)/i.test(ip)) return null;
+  if (geoCache.has(ip)) return geoCache.get(ip);
+  try {
+    const r = await fetch('https://ipwho.is/' + encodeURIComponent(ip) + '?fields=success,country_code', { signal: AbortSignal.timeout(3500) }), j = await r.json();
+    const cc = j && j.success && /^[A-Z]{2}$/.test(j.country_code || '') ? j.country_code : null;
+    if (geoCache.size > 5000) geoCache.clear(); geoCache.set(ip, cc); return cc;
+  } catch (_) { return null; }
+}
 /* ---- комнаты: живут только пока в них кто-то есть ---- */
 const rooms = new Map(), socks = new Set();
 
@@ -128,6 +141,12 @@ const bDur = r => (BD[r.title] > 0 ? BD[r.title] * 60 : r.bot.dur), bStart = r =
 const bPos = r => { const d = bDur(r), p = ((Date.now() - bStart(r)) / 1000) % d; return p < 0 ? p + d : p; };
 CATALOG.forEach((c, k) => rooms.set('botroom' + (k + 1), { id: 'botroom' + (k + 1), title: c.title, poster: 0, media: null, st: null, log: [], owner: null, ownerName: 'VIBE', members: new Map(), bot: c }));
 const uniq = r => [...new Map([...r.members.values()].map(u => [u.id, u])).values()];
+// участники комнаты для чата/глобуса: имя, цвет, аватарка и страна (пока клиент не прислал «geo» или если он скрыл место — страны нет)
+const memList = r => {
+  const seen = new Map();
+  r.members.forEach((u, w) => { if (!seen.has(u.id)) seen.set(u.id, { name: u.name, color: u.color, u: u.id, ph: avUrl(u), hide: !w.geoOk || !!w.hide, cc: !w.geoOk || w.hide ? null : (w.cc || w.ccC || null) }); });
+  return [...seen.values()];
+};
 const row = r => {
   const us = uniq(r), o = { id: r.id, title: r.title, poster: r.poster, media: r.media, count: us.length, users: us.slice(0, 5).map(u => [(u.name || '?')[0].toUpperCase(), u.color || 'p']) };
   if (r.bot) Object.assign(o, { bot: 1, base: r.bot.base, count: us.length + r.bot.base, dur: bDur(r), start: bStart(r), now: Date.now() });
@@ -142,7 +161,7 @@ function leave(w, instant) {
   const r = rooms.get(w.room); w.room = null; if (!r || !r.members.delete(w)) return;
   if (!r.members.size) return r.bot ? pushRooms() : instant ? drop(r) : setTimeout(() => !r.members.size && drop(r), 3000); // обрыв связи: 3 c на переподключение
   setTimeout(() => xfer(r), instant ? 0 : 3000);
-  toRoom(r, { t: 'mem', list: uniq(r).map(u => ({ name: u.name, color: u.color })) }); pushRooms();
+  toRoom(r, { t: 'mem', list: memList(r) }); pushRooms();
 }
 
 function botsChanged() {
@@ -443,7 +462,8 @@ const wss = new WebSocketServer({ server, path: '/ws' });
 wss.on('connection', (w, req) => {
   const u = db.users[db.tokens[new URL(req.url, 'http://x').searchParams.get('token')]];
   if (!u) return w.close(4001);
-  w.uid = u.id; w.room = null; socks.add(w);
+  w.uid = u.id; w.room = null; socks.add(w); w.cc = cfCC(req);
+  if (!w.cc) geoLookup(req).then(cc => { if (cc && w.readyState === 1) { w.cc = cc; const gr = rooms.get(w.room); if (gr) toRoom(gr, { t: 'mem', list: memList(gr) }); } });
   send(w, { t: 'rooms', list: [...rooms.values()].map(row) });
   w.on('message', raw => {
     let m; try { m = JSON.parse(raw); } catch (_) { return; }
@@ -453,9 +473,13 @@ wss.on('connection', (w, req) => {
       w.room = r.id; r.members.set(w, u);
       const ex = r.bot ? { bot: { start: bStart(r), dur: bDur(r) }, st: { a: 'play', t: bPos(r), ts: Date.now() } } : {};   // бот-комната: сразу текущая секунда фильма
       send(w, Object.assign({ t: 'init', room: r.id, t0: m.t0, h: Date.now(), title: r.title, media: r.media, log: r.log.slice(-100), st: r.st, host: r.owner, hn: r.ownerName }, ex));
-      toRoom(r, { t: 'mem', list: uniq(r).map(x => ({ name: x.name, color: x.color })) }); pushRooms(); return;
+      toRoom(r, { t: 'mem', list: memList(r) }); pushRooms(); return;
     }
     if (m.t === 'leave') return leave(w, true);
+    if (m.t === 'geo') {   // клиент сообщает страну (запасной вариант по часовому поясу) и флаг «скрыть местоположение»
+      w.ccC = /^[A-Za-z]{2}$/.test(String(m.cc || '')) ? String(m.cc).toUpperCase() : null; w.hide = !!m.hide; w.geoOk = true;
+      const gr = rooms.get(w.room); if (gr) toRoom(gr, { t: 'mem', list: memList(gr) }); return;
+    }
     const r = rooms.get(w.room); if (!r) return;
     if (r.bot && (m.t === 'ctl' || m.t === 'media')) return; // эфир: никто не ставит на паузу и не перематывает
     if ((m.t === 'ctl' || m.t === 'media') && u.id !== r.owner && r.media && (r.media.type === 'vk' || r.media.type === 'rt')) return; // VK/Rutube: управляет только основатель; YouTube и пустые комнаты — как раньше
