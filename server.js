@@ -14,8 +14,8 @@ const TZ = process.env.STATS_TZ || 'Europe/Moscow';
 const BOTF = path.join(DIR, 'bots.json'), bots = () => { try { return JSON.parse(fs.readFileSync(BOTF, 'utf8')); } catch (_) { return {}; } };
 // bots.json: { "Название": "ссылка", "__durs": { "Название": минуты } }
 const botLinks = () => { const o = bots(); delete o.__durs; return o; }, botDurs = () => { const d = bots().__durs; return d && typeof d === 'object' ? d : {}; };
-let db = { users: {}, tokens: {}, payments: {}, stats: { days: {} } };
-try { db = JSON.parse(fs.readFileSync(DBF, 'utf8')); db.users = db.users || {}; db.tokens = db.tokens || {}; db.payments = db.payments || {}; db.stats = db.stats || {}; db.stats.days = db.stats.days || {}; }
+let db = { users: {}, tokens: {}, payments: {}, stats: { days: {} }, chats: {}, reqs: [] };
+try { db = JSON.parse(fs.readFileSync(DBF, 'utf8')); db.users = db.users || {}; db.tokens = db.tokens || {}; db.payments = db.payments || {}; db.stats = db.stats || {}; db.stats.days = db.stats.days || {}; db.chats = db.chats || {}; db.reqs = db.reqs || []; }
 catch (e) { if (e.code !== 'ENOENT') { try { fs.copyFileSync(DBF, DBF + '.broken-' + Date.now()); } catch (_) {} console.error('data.json не прочитан, копия сохранена:', e.message); } }
 // запись атомарная (tmp + rename): параллельные writeFile раньше могли испортить data.json, и тогда все вылетали из аккаунтов
 let st = null;
@@ -40,6 +40,7 @@ function remoteRows() {
   Object.entries(db.tokens).forEach(([t, id]) => { if (!sig.has('t:' + t)) rows.push({ k: 't:' + t, v: id, h: '1' }); });
   Object.entries(db.payments).forEach(([c, p]) => add('p:' + c, p));
   Object.entries(db.stats.days).forEach(([d, x]) => add('s:' + d, x));
+  Object.entries(db.chats || {}).forEach(([k, x]) => add('c:' + k, x)); add('q', { l: db.reqs || [] });
   try { add('bots', { txt: fs.readFileSync(BOTF, 'utf8') }); } catch (_) {}
   return rows;
 }
@@ -64,10 +65,10 @@ async function loadRemote() {
       const rows = [];
       for (let off = 0; ; off += 40) { const r = await (await sbReq('?select=k,v&order=k&limit=40&offset=' + off)).json(); rows.push(...r); if (r.length < 40) break; }
       if (!rows.length) { console.log('Supabase пока пуст — загружаю в него локальные данные'); return; }
-      const nd = { users: {}, tokens: {}, payments: {}, stats: { days: {} } };
+      const nd = { users: {}, tokens: {}, payments: {}, stats: { days: {} }, chats: {}, reqs: [] };
       for (const { k, v } of rows) {
         if (k.startsWith('u:')) nd.users[k.slice(2)] = v; else if (k.startsWith('t:')) nd.tokens[k.slice(2)] = v;
-        else if (k.startsWith('p:')) nd.payments[k.slice(2)] = v; else if (k.startsWith('s:')) nd.stats.days[k.slice(2)] = v;
+        else if (k.startsWith('p:')) nd.payments[k.slice(2)] = v; else if (k.startsWith('s:')) nd.stats.days[k.slice(2)] = v; else if (k.startsWith('c:')) nd.chats[k.slice(2)] = v; else if (k === 'q') nd.reqs = (v && v.l) || [];
         else if (k === 'bots' && v && typeof v.txt === 'string') { try { fs.writeFileSync(BOTF + '.tmp', v.txt); fs.renameSync(BOTF + '.tmp', BOTF); } catch (_) {} }
       }
       db = nd; BD = botDurs(); remoteRows().forEach(x => sig.set(x.k, x.h));
@@ -253,6 +254,102 @@ async function tgPoll() {   // long polling: не нужен публичный 
   }
 }
 
+/* ---- друзья, ники, профили, заявки, мини-чат (данные живут в db → data.json и Supabase) ---- */
+const TRL = { а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'c', ч: 'ch', ш: 'sh', щ: 'sch', ы: 'y', э: 'e', ю: 'yu', я: 'ya' };
+const slugNick = s => String(s || '').toLowerCase().split('').map(c => TRL[c] !== undefined ? TRL[c] : c).join('').replace(/[^a-z0-9_.]+/g, '.').replace(/^[._]+|[._]+$/g, '').slice(0, 24);
+const NICK_RE = /^[a-z0-9_.]{3,24}$/;
+const nickTaken = (n, except) => Object.values(db.users).some(x => x.nick === n && x.id !== except);
+function nickOf(x) {
+  if (!x.nick) {
+    let b = slugNick(x.tgUser) || slugNick(x.name); if (b.length < 3) b = 'user' + String(x.id).slice(-5);
+    let n = b, i = 1; while (nickTaken(n, x.id)) n = (b.slice(0, 20) + (++i) + Math.floor(Math.random() * 90)).slice(0, 24);
+    x.nick = n; save();
+  }
+  return x.nick;
+}
+const sPub = (x, full) => ({ id: x.id, username: nickOf(x), name: x.name || 'Без имени', color: x.color || 'p', photo: typeof x.photo === 'string' && (/^https?:/.test(x.photo) || full || x.photo.length < 30000) ? x.photo : null });
+const sFr = x => x.fr || (x.fr = []);
+const sKey = (a, b) => a < b ? a + '|' + b : b + '|' + a;
+const sThread = (a, b) => { db.chats = db.chats || {}; return db.chats[sKey(a, b)] || (db.chats[sKey(a, b)] = []); };
+const sUnread = (me, peer) => { const rd = (me.rd || {})[peer.id] || 0; return sThread(me.id, peer.id).filter(m => m.from === peer.id && m.id > rd).length; };
+const sRel = (me, o) => {
+  if (me.id === o.id) return 'self';
+  if (sFr(me).includes(o.id)) return 'friend';
+  if (db.reqs.some(r => r.from === me.id && r.to === o.id)) return 'outgoing';
+  if (db.reqs.some(r => r.from === o.id && r.to === me.id)) return 'incoming';
+  return 'none';
+};
+function sMakeFriends(a, b) {
+  if (!sFr(a).includes(b.id)) sFr(a).push(b.id); if (!sFr(b).includes(a.id)) sFr(b).push(a.id);
+  db.reqs = db.reqs.filter(r => !((r.from === a.id && r.to === b.id) || (r.from === b.id && r.to === a.id)));
+}
+function socialApi(req, url, b, me, out) {
+  db.chats = db.chats || {}; db.reqs = db.reqs || [];
+  const sp = new URL(req.url, 'http://x').searchParams, sub = url.slice('/api/social'.length).split('/').filter(Boolean).map(decodeURIComponent);
+  const find = n => { n = String(n || '').replace(/^@/, '').toLowerCase().trim(); return Object.values(db.users).find(x => nickOf(x) === n); };
+  const byId = id => db.users[id];
+  if (sub[0] === 'state') {
+    const un = {}; let tot = 0;
+    sFr(me).map(byId).filter(Boolean).forEach(f => { const n = sUnread(me, f); if (n) { un[nickOf(f)] = n; tot += n; } });
+    return out(200, {
+      me: { id: me.id, username: nickOf(me) },
+      friends: sFr(me).map(byId).filter(Boolean).map(f => sPub(f)),
+      incoming: db.reqs.filter(r => r.to === me.id).map(r => byId(r.from)).filter(Boolean).map(f => sPub(f)),
+      outgoing: db.reqs.filter(r => r.from === me.id).map(r => byId(r.to)).filter(Boolean).map(nickOf),
+      unread: un, unreadTotal: tot
+    });
+  }
+  if (sub[0] === 'search') {
+    const q = String(sp.get('q') || '').replace(/^@/, '').toLowerCase().trim();
+    if (q.length < 2) return out(200, { list: [] });
+    const list = Object.values(db.users).filter(x => x.id !== me.id).map(x => ({ x, n: nickOf(x) }))
+      .filter(o => o.n.includes(q) || String(o.x.name || '').toLowerCase().includes(q))
+      .sort((a, c) => (c.n === q) - (a.n === q) || c.n.startsWith(q) - a.n.startsWith(q) || a.n.length - c.n.length)
+      .slice(0, 20).map(o => Object.assign(sPub(o.x), { rel: sRel(me, o.x) }));
+    return out(200, { list });
+  }
+  if (sub[0] === 'user' && sub[1]) {
+    const x = find(sub[1]); if (!x) return out(404, { error: 'Пользователь не найден' });
+    return out(200, { user: Object.assign(sPub(x, true), { bio: String(x.bio || '').slice(0, 300), rel: sRel(me, x), friendsCount: sFr(x).length, gallery: (x.gallery || []).slice(0, 6) }) });
+  }
+  if (sub[0] === 'username' && req.method === 'POST') {
+    const n = String(b.username || '').replace(/^@/, '').toLowerCase().trim();
+    if (!NICK_RE.test(n)) return out(400, { error: 'Ник: 3–24 символа, латиница, цифры, точка и _' });
+    if (nickTaken(n, me.id)) return out(409, { error: 'Этот ник занят' });
+    me.nick = n; save(); return out(200, { ok: true, username: n });
+  }
+  if (req.method === 'POST' && ['request', 'accept', 'decline', 'cancel', 'remove'].includes(sub[0])) {
+    const x = find(b.username); if (!x || x.id === me.id) return out(404, { error: 'Пользователь не найден' });
+    const r = sRel(me, x);
+    if (sub[0] === 'request') {
+      if (r === 'friend') return out(200, { ok: true, rel: r });
+      if (r === 'incoming') { sMakeFriends(me, x); save(); return out(200, { ok: true, rel: 'friend' }); }   // встречные заявки — сразу дружба
+      if (r === 'none') { if (db.reqs.filter(z => z.from === me.id).length >= 100) return out(429, { error: 'Слишком много заявок' }); db.reqs.push({ from: me.id, to: x.id, ts: Date.now() }); save(); }
+      return out(200, { ok: true, rel: 'outgoing' });
+    }
+    if (sub[0] === 'accept') { if (r !== 'incoming') return out(400, { error: 'Заявки нет' }); sMakeFriends(me, x); save(); return out(200, { ok: true }); }
+    if (sub[0] === 'decline') { db.reqs = db.reqs.filter(z => !(z.from === x.id && z.to === me.id)); save(); return out(200, { ok: true }); }
+    if (sub[0] === 'cancel') { db.reqs = db.reqs.filter(z => !(z.from === me.id && z.to === x.id)); save(); return out(200, { ok: true }); }
+    if (sub[0] === 'remove') { me.fr = sFr(me).filter(i => i !== x.id); x.fr = sFr(x).filter(i => i !== me.id); save(); return out(200, { ok: true }); }
+  }
+  if (sub[0] === 'chat' && sub[1]) {
+    const x = find(sub[1]); if (!x) return out(404, { error: 'Пользователь не найден' });
+    if (!sFr(me).includes(x.id)) return out(403, { error: 'Чат доступен только друзьям' });
+    const t = sThread(me.id, x.id), last = t.length ? t[t.length - 1].id : 0;
+    me.rd = me.rd || {};
+    if (req.method === 'POST') {
+      const text = String(b.text || '').trim().slice(0, 1000); if (!text) return out(400, { error: 'Пустое сообщение' });
+      const m = { id: last + 1, from: me.id, text, ts: Date.now() }; t.push(m); if (t.length > 300) t.splice(0, t.length - 300);
+      me.rd[x.id] = m.id; save(); return out(200, { ok: true, msg: { id: m.id, mine: true, text, ts: m.ts } });
+    }
+    const since = +sp.get('since') || 0;
+    const list = t.filter(m => m.id > since).slice(-200).map(m => ({ id: m.id, mine: m.from === me.id, text: m.text, ts: m.ts }));
+    if ((me.rd[x.id] || 0) < last) { me.rd[x.id] = last; save(); }
+    return out(200, { list });
+  }
+  return out(404, { error: 'not found' });
+}
+
 /* ---- HTTP ---- */
 const body = req => new Promise(res => { let d = ''; req.on('data', c => (d += c) && d.length > 3e6 && req.destroy()); req.on('end', () => { try { res(JSON.parse(d || '{}')); } catch (_) { res({}); } }); });
 const auth = req => db.users[db.tokens[(req.headers.authorization || '').slice(7)]];
@@ -288,6 +385,7 @@ const server = http.createServer(async (req, res) => {
     return login(user);
   }
   if (!u) return out(401, { error: 'auth' });
+  if (url.startsWith('/api/social')) return socialApi(req, url, b, u, out);
   if (url === '/api/me') return out(200, { user: pub(u) });
   if (url === '/api/profile') {   // частичное обновление: приходят только изменённые поля, остальное не затирается
     if ('name' in b) { const n = String(b.name || '').trim().slice(0, 30); if (n) u.name = n; }
