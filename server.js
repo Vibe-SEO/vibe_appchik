@@ -235,6 +235,32 @@ const adminChats = () => {   // кому слать уведомления: ад
 };
 const isTgAdmin = id => adminChats().includes(String(id));
 const notifyAdmins = text => adminChats().forEach(id => tgApi('sendMessage', { chat_id: id, text }));
+
+/* ---- Доступ только для подписчиков новостного канала ----
+   Бот должен быть АДМИНИСТРАТОРОМ канала (права не нужны), иначе Telegram не отдаёт getChatMember.
+   Переменные (необязательно): TG_CHANNEL=@vibeparty_new, SUB_REQUIRED=0 — выключить проверку. */
+const SUB_CH = String(process.env.TG_CHANNEL || cfg.tgChannel || '@vibeparty_new').trim();
+const SUB_ON = !!TGT && process.env.SUB_REQUIRED !== '0';
+const subCache = new Map();   // tgId -> { ok, ts }
+const subBypass = u => isAdmin(u) || (!!u.tgId && isTgAdmin(u.tgId));
+async function isMember(tgId) {
+  const k = String(tgId), c = subCache.get(k);
+  if (c && Date.now() - c.ts < (c.ok ? 300000 : 8000)) return c.ok;   // подписан — помним 5 мин, нет — перепроверка через 8 c
+  const r = await tgApi('getChatMember', { chat_id: SUB_CH, user_id: +tgId });
+  if (r && r.ok && r.result) {
+    const st = r.result.status, ok = st === 'creator' || st === 'administrator' || st === 'member' || (st === 'restricted' && r.result.is_member === true);
+    subCache.set(k, { ok, ts: Date.now() }); return ok;
+  }
+  if (r && /user not found|PARTICIPANT_ID_INVALID/i.test(r.description || '')) { subCache.set(k, { ok: false, ts: Date.now() }); return false; }
+  console.error('sub check:', r ? r.description : 'нет ответа от Telegram', '— бот должен быть админом канала ' + SUB_CH);
+  if (c && c.ok) return true;   // Telegram временно недоступен — не выкидываем тех, кого уже проверили
+  throw new Error('sub_check_failed');
+}
+const subState = async u => {
+  if (!SUB_ON || subBypass(u)) return { tg: true, subscribed: true };
+  if (!u.tgId) return { tg: false, subscribed: false };
+  return { tg: true, subscribed: await isMember(u.tgId) };
+};
 const PAYLOAD = /^prem:([0-9a-f]+)$/;
 async function createInvoice(user) {
   const r = await tgApi('createInvoiceLink', { title: 'VIBE Premium · 30 дней', description: 'Статистика, оформление чата, редактирование сообщений и другие возможности на 30 дней', payload: 'prem:' + user.id, provider_token: '', currency: 'XTR', prices: [{ label: 'VIBE Premium', amount: STARS }] });
@@ -419,6 +445,13 @@ const server = http.createServer(async (req, res) => {
     return login(user);
   }
   if (!u) return out(401, { error: 'auth' });
+  if (url === '/api/sub') {   // экран подписки на сайте опрашивает этот адрес
+    try { return out(200, { ok: true, ...(await subState(u)), channel: SUB_CH }); } catch (_) { return out(503, { ok: false, error: 'sub_check_failed' }); }
+  }
+  if (SUB_ON && url !== '/api/me' && url !== '/api/profile') {   // всё остальное — только для подписчиков
+    let st; try { st = await subState(u); } catch (_) { return out(503, { error: 'sub_check_failed' }); }
+    if (!st.subscribed) return out(403, { error: 'sub_required' });
+  }
   if (url.startsWith('/api/social')) return socialApi(req, url, b, u, out);
   if (url === '/api/me') return out(200, { user: pub(u) });
   if (url === '/api/profile') {   // частичное обновление: приходят только изменённые поля, остальное не затирается
@@ -462,11 +495,13 @@ const wss = new WebSocketServer({ server, path: '/ws' });
 wss.on('connection', (w, req) => {
   const u = db.users[db.tokens[new URL(req.url, 'http://x').searchParams.get('token')]];
   if (!u) return w.close(4001);
+  subState(u).then(st => { if (!st.subscribed) w.close(4403); }).catch(() => w.close(4403));   // не подписан — в комнаты не пускаем
   w.uid = u.id; w.room = null; socks.add(w); w.cc = cfCC(req);
   if (!w.cc) geoLookup(req).then(cc => { if (cc && w.readyState === 1) { w.cc = cc; const gr = rooms.get(w.room); if (gr) toRoom(gr, { t: 'mem', list: memList(gr) }); } });
   send(w, { t: 'rooms', list: [...rooms.values()].map(row) });
-  w.on('message', raw => {
+  w.on('message', async raw => {
     let m; try { m = JSON.parse(raw); } catch (_) { return; }
+    try { if (!(await subState(u)).subscribed) return w.close(4403); } catch (_) { return w.close(4403); }
     if (m.t === 'join') {
       const r = rooms.get(m.room); if (!r) return send(w, { t: 'err', msg: 'Комната закрыта' });
       if (w.room && w.room !== r.id) leave(w, true);
