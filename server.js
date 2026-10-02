@@ -256,11 +256,28 @@ async function isMember(tgId) {
   if (c && c.ok) return true;   // Telegram временно недоступен — не выкидываем тех, кого уже проверили
   throw new Error('sub_check_failed');
 }
+const subTgId = u => u.tgId || u.subTg || null;   // subTg — ID, подтверждённый кнопкой «Старт» в боте (без входа через виджет)
 const subState = async u => {
   if (!SUB_ON || subBypass(u)) return { tg: true, subscribed: true };
-  if (!u.tgId) return { tg: false, subscribed: false };
-  return { tg: true, subscribed: await isMember(u.tgId) };
+  const id = subTgId(u); if (!id) return { tg: false, subscribed: false };
+  return { tg: true, subscribed: await isMember(id) };
 };
+const subCodes = new Map();   // одноразовые коды для ссылки t.me/бот?start=sub_КОД
+function subLink(u) {
+  if (!TGN) return '';
+  for (const [k, v] of subCodes) if (v.uid === u.id || Date.now() - v.ts > 6e5) subCodes.delete(k);
+  const code = rid(8); subCodes.set(code, { uid: u.id, ts: Date.now() });
+  return 'https://t.me/' + TGN + '?start=sub_' + code;
+}
+async function subStart(msg, code) {   // человек нажал «Старт» по ссылке с сайта
+  const c = subCodes.get(code), user = c && Date.now() - c.ts < 6e5 && db.users[c.uid], from = msg.from && msg.from.id;
+  if (!user || !from) return tgApi('sendMessage', { chat_id: msg.chat.id, text: 'Ссылка устарела. Вернитесь на сайт vibe и нажмите «Подтвердить в боте» ещё раз.' });
+  subCodes.delete(code); user.subTg = String(from); subCache.delete(String(from)); flushDb();
+  let ok = false; try { ok = SUB_ON ? await isMember(from) : true; } catch (_) { return tgApi('sendMessage', { chat_id: msg.chat.id, text: 'Не получилось проверить подписку. Попробуйте через минуту.' }); }
+  return tgApi('sendMessage', ok
+    ? { chat_id: msg.chat.id, text: '✅ Подписка подтверждена! Возвращайтесь на сайт — vibe уже открыт.' }
+    : { chat_id: msg.chat.id, text: 'Аккаунт подтверждён, но вы ещё не подписаны на канал. Подпишитесь и вернитесь на сайт.', reply_markup: { inline_keyboard: [[{ text: 'Подписаться на канал', url: 'https://t.me/' + SUB_CH.replace(/^@/, '') }]] } });
+}
 const PAYLOAD = /^prem:([0-9a-f]+)$/;
 async function createInvoice(user) {
   const r = await tgApi('createInvoiceLink', { title: 'VIBE Premium · 30 дней', description: 'Статистика, оформление чата, редактирование сообщений и другие возможности на 30 дней', payload: 'prem:' + user.id, provider_token: '', currency: 'XTR', prices: [{ label: 'VIBE Premium', amount: STARS }] });
@@ -287,6 +304,7 @@ async function onUpdate(u) {
     if (!db.payments[charge]) grantPremium(user, charge, sp.total_amount);   // повторная доставка апдейта не продлевает дважды
     return tgApi('sendMessage', { chat_id: msg.chat.id, text: '✨ Спасибо! VIBE Premium активирован до ' + new Date(user.until).toLocaleDateString('ru-RU', { timeZone: TZ }) + '. Возвращайтесь на сайт — всё уже включено.' });
   }
+  const sm = /^\/start(?:@\w+)?\s+sub_([0-9a-f]+)$/i.exec(String(msg.text || '').trim()); if (sm) return subStart(msg, sm[1].toLowerCase());
   const text = String(msg.text || '').trim().split(/[\s@]/)[0].toLowerCase(), from = msg.from && msg.from.id;
   if (text === '/start') return tgApi('sendMessage', { chat_id: msg.chat.id, text: 'VIBE — совместный просмотр. Этот бот принимает оплату Premium и присылает админам статистику.' + (isTgAdmin(from) ? '\n\nКоманды админа: /stats — статистика, /backup — скачать data.json' : '') });
   if (!isTgAdmin(from)) return;
@@ -446,7 +464,7 @@ const server = http.createServer(async (req, res) => {
   }
   if (!u) return out(401, { error: 'auth' });
   if (url === '/api/sub') {   // экран подписки на сайте опрашивает этот адрес
-    try { return out(200, { ok: true, ...(await subState(u)), channel: SUB_CH }); } catch (_) { return out(503, { ok: false, error: 'sub_check_failed' }); }
+    try { const st = await subState(u); return out(200, { ok: true, ...st, channel: SUB_CH, link: st.tg ? '' : subLink(u) }); } catch (_) { return out(503, { ok: false, error: 'sub_check_failed' }); }
   }
   if (SUB_ON && url !== '/api/me' && url !== '/api/profile') {   // всё остальное — только для подписчиков
     let st; try { st = await subState(u); } catch (_) { return out(503, { error: 'sub_check_failed' }); }
