@@ -472,11 +472,10 @@ const server = http.createServer(async (req, res) => {
     const r = tgUpsert(b, u); if (r.error) return out(409, { error: r.error }); const user = r.user;
     return login(user);
   }
-  if (url === '/api/tg-app') {   // автоматический вход внутри Telegram Mini App по подписанному initData — без виджета и паролей
+  if (url === '/api/tg-app') {   // внутри Mini App: вход ТОЛЬКО в уже существующий аккаунт, привязанный к этому Telegram; новые аккаунты здесь не создаются
     const tu = tgInitVerify(b.initData); if (!tu) return out(401, { error: 'Не удалось подтвердить Telegram' });
-    const cur = u && (!u.tgId || u.tgId === String(tu.id)) ? u : null;   // уже вошедший аккаунт без Telegram — привязываем, чужой — не трогаем
-    const r = tgUpsert({ id: tu.id, first_name: tu.first_name, last_name: tu.last_name, username: tu.username, photo_url: tu.photo_url }, cur);
-    if (r.error) return out(409, { error: r.error }); return login(r.user);
+    const user = Object.values(db.users).find(x => x.tgId === String(tu.id)); if (!user) return out(404, { error: 'nouser' });
+    return login(user);
   }
   if (!u) return out(401, { error: 'auth' });
   if (url === '/api/sub') {   // экран подписки на сайте опрашивает этот адрес
