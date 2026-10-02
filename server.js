@@ -99,6 +99,14 @@ function tgUpsert(b, cur) {
 }
 const pub = u => ({ tg: u.tgId ? { id: u.tgId, username: u.tgUser || '', name: u.tgName || '' } : null, admin: isAdmin(u), id: u.id, name: u.name, bio: u.bio || '', color: u.color || 'p', photo: u.photo || null, until: u.until || null, premium: !!(u.until && u.until > Date.now()), friends: u.friends || [], prefs: u.prefs || null, gallery: u.gallery || [] });
 
+/* ---- аватарки в чате: в сообщении только ссылка (http-фото как есть, загруженное фото — через /api/avatar/<id>?v=хэш) ---- */
+const avCache = new Map();
+const avUrl = u => {
+  const ph = u && u.photo; if (typeof ph !== 'string' || !ph) return null;
+  if (/^https?:\/\//.test(ph)) return ph;
+  let c = avCache.get(u.id); if (!c || c.ph !== ph) { c = { ph, url: '/api/avatar/' + u.id + '?v=' + md5(ph).slice(0, 8) }; avCache.set(u.id, c); }
+  return c.url;
+};
 /* ---- комнаты: живут только пока в них кто-то есть ---- */
 const rooms = new Map(), socks = new Set();
 
@@ -362,6 +370,13 @@ const server = http.createServer(async (req, res) => {
     const token = rid(24); db.tokens[token] = r.user.id; flushDb();
     res.writeHead(302, { Location: FRONT + '/#tg=' + token, 'Cache-Control': 'no-store' }); return res.end();
   }
+  if (req.method === 'GET' && url.startsWith('/api/avatar/')) {
+    const usr = db.users[decodeURIComponent(url.slice(12))], ph = usr && usr.photo, m = typeof ph === 'string' && /^data:image\/(png|jpe?g|webp|gif);base64,([A-Za-z0-9+/=]+)$/.exec(ph);
+    if (!m) { res.writeHead(404, { 'Access-Control-Allow-Origin': '*' }); return res.end(); }
+    const buf = Buffer.from(m[2], 'base64');
+    res.writeHead(200, { 'Content-Type': 'image/' + (m[1] === 'jpg' ? 'jpeg' : m[1]), 'Content-Length': buf.length, 'Cache-Control': 'public, max-age=31536000, immutable', 'Access-Control-Allow-Origin': '*', 'Cross-Origin-Resource-Policy': 'cross-origin', 'X-Content-Type-Options': 'nosniff' });
+    return res.end(buf);
+  }
   if (!url.startsWith('/api/')) return (req.method === 'GET' && sendStatic(url, res)) || sendPage(req, res);
   const b = req.method === 'POST' ? await body(req) : {}, u = auth(req);
   const login = user => { const token = rid(24); db.tokens[token] = user.id; flushDb(); out(200, { token, user: pub(user) }); };
@@ -445,7 +460,7 @@ wss.on('connection', (w, req) => {
     if (r.bot && (m.t === 'ctl' || m.t === 'media')) return; // эфир: никто не ставит на паузу и не перематывает
     if ((m.t === 'ctl' || m.t === 'media') && u.id !== r.owner && r.media && (r.media.type === 'vk' || r.media.type === 'rt')) return; // VK/Rutube: управляет только основатель; YouTube и пустые комнаты — как раньше
     if (m.t === 'ctl') { r.st = { a: m.a === 'play' ? 'play' : 'pause', t: +m.p || 0, ts: Date.now() }; toRoom(r, { t: 'ctl', p: r.st }, w); }
-    else if (m.t === 'chat') { const text = String(m.text || '').trim().slice(0, 300); if (!text) return; const msg = { id: rid(4), u: u.id, name: u.name, color: u.color, premium: !!(u.until && u.until > Date.now()), text }; r.log.push(msg); if (r.log.length > 200) r.log.shift(); toRoom(r, { t: 'chat', m: msg }); }
+    else if (m.t === 'chat') { const text = String(m.text || '').trim().slice(0, 300); if (!text) return; const msg = { id: rid(4), u: u.id, name: u.name, color: u.color, premium: !!(u.until && u.until > Date.now()), ph: avUrl(u), text }; r.log.push(msg); if (r.log.length > 200) r.log.shift(); toRoom(r, { t: 'chat', m: msg }); }
     else if (m.t === 'edit') { const x = r.log.find(z => z.id === m.id && z.u === u.id); if (x) { x.text = String(m.text || '').slice(0, 300); toRoom(r, { t: 'edit', id: x.id, text: x.text }); } }
     else if (m.t === 'media') { r.media = m.media || null; r.title = String(m.title || r.title).slice(0, 60); r.st = null; toRoom(r, { t: 'media', media: r.media, title: r.title }, w); pushRooms(); }
   });
