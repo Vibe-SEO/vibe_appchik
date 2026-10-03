@@ -45,9 +45,19 @@ function remoteRows() {
   try { add('bots', { txt: fs.readFileSync(BOTF, 'utf8') }); } catch (_) {}
   return rows;
 }
+const delQ = new Set();   // ключи, которые нужно стереть в Supabase (удалённые аккаунты) — иначе после перезапуска они бы «воскресли»
+const rdel = k => { sig.delete(k); if (REMOTE) delQ.add(k); };
 async function doPush() {
   if (!REMOTE) return;
   try {
+    if (delQ.size) {
+      const ks = [...delQ];
+      for (let i = 0; i < ks.length; i += 40) {
+        const part = ks.slice(i, i + 40);
+        await sbReq('?k=in.(' + part.map(k => '"' + encodeURIComponent(k) + '"').join(',') + ')', { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
+        part.forEach(k => delQ.delete(k));
+      }
+    }
     const rows = remoteRows();
     for (let i = 0; i < rows.length; i += 25) {
       const part = rows.slice(i, i + 25), at = new Date().toISOString();
@@ -107,7 +117,23 @@ function tgUpsert(b, cur) {
   if (!user.photo && b.photo_url) user.photo = String(b.photo_url);
   return { user };
 }
-const pub = u => ({ tg: u.tgId ? { id: u.tgId, username: u.tgUser || '', name: u.tgName || '' } : null, admin: isAdmin(u), id: u.id, name: u.name, bio: u.bio || '', color: u.color || 'p', photo: u.photo || null, until: u.until || null, premium: !!(u.until && u.until > Date.now()), friends: u.friends || [], prefs: u.prefs || null, gallery: u.gallery || [] });
+const pub = u => ({ tg: u.tgId ? { id: u.tgId, username: u.tgUser || '', name: u.tgName || '' } : null, admin: isAdmin(u), id: u.id, name: u.name, bio: u.bio || '', color: u.color || 'p', photo: u.photo || null, until: u.until || null, premium: !!(u.until && u.until > Date.now()), friends: u.friends || [], prefs: u.prefs || null, gallery: u.gallery || [], created: u.created || null, stats: statsPub(u) });
+
+/* ---- статистика: время в комнатах, самый долгий сеанс, самая большая комната, часы по месяцам ----
+   Хранится в user.stat = { sec, longest, biggest, mo: { 'YYYY-MM': сек } }. Считается раз в 20 с, пока человек сидит в комнате. */
+function statOf(x) { return x.stat || (x.stat = { sec: 0, longest: 0, biggest: 0, mo: {} }); }
+function statsPub(x, online) {
+  const s = x.stat || {}, mo = s.mo || {}, now = new Date(), monthly = [], h = v => Math.round((v || 0) / 36) / 100;   // часы с точностью до 0.01
+  for (let i = 5; i >= 0; i--) monthly.push(h(mo[new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1)).toISOString().slice(0, 7)]));
+  return { hours: h(s.sec), longest: h(s.longest), biggest: s.biggest || 0, monthly, joined: x.created || null, online: online === undefined ? undefined : !!online };
+}
+function tickStats(w) {
+  const x = db.users[w.uid]; if (!x || !w.room || !w.tk) return;
+  const now = Date.now(), dt = Math.min(60000, now - w.tk); w.tk = now; if (dt <= 0) return;
+  const s = statOf(x), d = dt / 1000, k = dayKey().slice(0, 7);
+  s.sec += d; w.sess = (w.sess || 0) + d; if (w.sess > s.longest) s.longest = w.sess;
+  s.mo[k] = (s.mo[k] || 0) + d; const ks = Object.keys(s.mo).sort(); while (ks.length > 12) delete s.mo[ks.shift()];
+}
 
 /* ---- аватарки в чате: в сообщении только ссылка (http-фото как есть, загруженное фото — через /api/avatar/<id>?v=хэш) ---- */
 const avCache = new Map();
@@ -168,6 +194,7 @@ const pushRooms = () => { const list = [...rooms.values()].map(row).sort((a, b) 
 const drop = r => { if (!r.bot && rooms.get(r.id) === r) { rooms.delete(r.id); pushRooms(); } };
 const xfer = r => { if (r.bot || !rooms.has(r.id) || !r.members.size || uniq(r).some(x => x.id === r.owner)) return; const n = uniq(r)[0]; r.owner = n.id; r.ownerName = n.name; toRoom(r, { t: 'host', host: n.id, hn: n.name }); }; // основатель ушёл — права переходят следующему
 function leave(w, instant) {
+  tickStats(w);
   const r = rooms.get(w.room); w.room = null; if (!r || !r.members.delete(w)) return;
   if (!r.members.size) return r.bot ? pushRooms() : instant ? drop(r) : setTimeout(() => !r.members.size && drop(r), 3000); // обрыв связи: 3 c на переподключение
   setTimeout(() => xfer(r), instant ? 0 : 3000);
@@ -179,6 +206,9 @@ function botsChanged() {
   rooms.forEach(r => r.bot && toRoom(r, { t: 'bot', bot: { start: bStart(r), dur: bDur(r) }, now: Date.now() }));
   pushRooms();
 }
+
+// время в комнатах: раз в 20 c начисляем всем, кто сейчас в комнате
+setInterval(() => { let any = false; socks.forEach(w => { if (w.room) { tickStats(w); any = true; } }); if (any) save(); }, 20000);
 
 // эфир: раз в 10 c напоминаем всем зрителям бот-комнат текущую секунду фильма
 setInterval(() => rooms.forEach(r => r.bot && r.members.size &&
@@ -391,7 +421,7 @@ function socialApi(req, url, b, me, out) {
   }
   if (sub[0] === 'user' && sub[1]) {
     const x = find(sub[1]); if (!x) return out(404, { error: 'Пользователь не найден' });
-    return out(200, { user: Object.assign(sPub(x, true), { bio: String(x.bio || '').slice(0, 300), rel: sRel(me, x), friendsCount: sFr(x).length, gallery: (x.gallery || []).slice(0, 6) }) });
+    return out(200, { user: Object.assign(sPub(x, true), { bio: String(x.bio || '').slice(0, 300), rel: sRel(me, x), friendsCount: sFr(x).length, gallery: (x.gallery || []).slice(0, 6), created: x.created || null, stats: statsPub(x, [...socks].some(w => w.uid === x.id)), hid: x.prefs && x.prefs.S && Array.isArray(x.prefs.S.hid) ? x.prefs.S.hid : [] }) });
   }
   if (sub[0] === 'username' && req.method === 'POST') {
     const n = String(b.username || '').replace(/^@/, '').toLowerCase().trim();
@@ -478,6 +508,20 @@ const server = http.createServer(async (req, res) => {
     return login(user);
   }
   if (!u) return out(401, { error: 'auth' });
+  if (url === '/api/delete-account' && req.method === 'POST') {   // удаление аккаунта: доступно всегда (даже без подписки на канал)
+    if (String(b.confirm || '').trim().toUpperCase() !== 'УДАЛИТЬ') return out(400, { error: 'Подтвердите удаление' });
+    const id = u.id;
+    rdel('u:' + id);
+    for (const [t, owner] of Object.entries(db.tokens)) if (owner === id) { delete db.tokens[t]; rdel('t:' + t); }   // все входы человека на всех устройствах
+    Object.values(db.users).forEach(x => { if (x.id === id) return; if (Array.isArray(x.fr)) x.fr = x.fr.filter(i => i !== id); if (x.rd) delete x.rd[id]; });   // из списков друзей и «прочитано» других
+    db.reqs = (db.reqs || []).filter(r => r.from !== id && r.to !== id);
+    for (const k of Object.keys(db.chats || {})) if (k.split('|').includes(id)) { delete db.chats[k]; rdel('c:' + k); }   // личные переписки
+    Object.values(db.payments).forEach(p => { if (p.uid === id) p.uid = null; });   // записи об оплатах остаются для учёта, но без привязки к человеку
+    for (const [c, v] of subCodes) if (v.uid === id) subCodes.delete(c);
+    delete db.users[id]; avCache.delete(id);
+    [...socks].forEach(w => { if (w.uid === id) { try { w.close(4001); } catch (_) {} } });   // выкидываем из комнат; хост комнаты перейдёт следующему
+    flushDb(); return out(200, { ok: true });
+  }
   if (url === '/api/sub') {   // экран подписки на сайте опрашивает этот адрес
     try { const st = await subState(u); return out(200, { ok: true, ...st, channel: SUB_CH, link: st.tg ? '' : subLink(u) }); } catch (_) { return out(503, { ok: false, error: 'sub_check_failed' }); }
   }
@@ -538,7 +582,8 @@ wss.on('connection', (w, req) => {
     if (m.t === 'join') {
       const r = rooms.get(m.room); if (!r) return send(w, { t: 'err', msg: 'Комната закрыта' });
       if (w.room && w.room !== r.id) leave(w, true);
-      w.room = r.id; r.members.set(w, u);
+      w.room = r.id; r.members.set(w, u); w.tk = Date.now(); w.sess = 0;
+      if (!r.bot) { const n = uniq(r).length; uniq(r).forEach(x => { const s = statOf(x); if (n > s.biggest) s.biggest = n; }); save(); }   // «самая большая комната» — по живым людям
       const ex = r.bot ? { bot: { start: bStart(r), dur: bDur(r) }, st: { a: 'play', t: bPos(r), ts: Date.now() } } : {};   // бот-комната: сразу текущая секунда фильма
       send(w, Object.assign({ t: 'init', room: r.id, t0: m.t0, h: Date.now(), title: r.title, media: r.media, log: r.log.slice(-100), st: r.st, host: r.owner, hn: r.ownerName }, ex));
       toRoom(r, { t: 'mem', list: memList(r) }); pushRooms(); return;
@@ -561,6 +606,7 @@ wss.on('connection', (w, req) => {
 (async () => {
   if (REMOTE) { try { await loadRemote(); } catch (e) { console.error('Supabase недоступен — остановка, чтобы не потерять данные:', e.message); process.exit(1); } schedRemote(); }
   else console.warn('ВНИМАНИЕ: SUPABASE_URL/SUPABASE_KEY не заданы — данные только в data.json (на бесплатном Render он стирается)');
+  { let fix = 0; Object.values(db.users).forEach(x => { if (!x.created) { x.created = Date.now(); fix++; } }); if (fix) { console.log('Старым аккаунтам без даты регистрации проставлена сегодняшняя: ' + fix); save(); } }   // у кого даты не было — отсчёт «с нами с» пойдёт с сегодняшнего дня
   server.listen(PORT, () => console.log('vibe: http://localhost:' + PORT + (TGT ? ' · бот включён' : ' · бот НЕ настроен (TG_BOT_TOKEN)') + (REMOTE ? ' · Supabase' : '')));
   if (TGT) tgPoll();
 })();
