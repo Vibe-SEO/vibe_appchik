@@ -1,6 +1,7 @@
 // npm i ws && node server.js   (index.html лежит рядом)
 const http = require('http'), fs = require('fs'), path = require('path'), crypto = require('crypto');
 const { WebSocketServer } = require('ws'), zlib = require('zlib');
+const SEC = require('./security');
 const PORT = process.env.PORT || 3000, DIR = process.env.DATA_DIR || __dirname, DBF = path.join(DIR, 'data.json'); // DATA_DIR — папка на постоянном диске хостинга, иначе вход слетает при каждом перезапуске
 /* Настройки: переменные окружения ИЛИ файл config.json рядом с server.js:
    { "tgToken": "123456:AA...(токен из BotFather)", "tgName": "my_vibe_bot", "admins": ["you@mail.com"] } */
