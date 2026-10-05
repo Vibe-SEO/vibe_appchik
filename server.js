@@ -472,6 +472,57 @@ const server = http.createServer((req, res) => {
 });
 server.requestTimeout = 15000;
 server.headersTimeout = 10000;
+/* ---- обложки по ссылке (YouTube / Rutube / VK): сервер сам ходит на площадку, браузеру CORS не мешает ---- */
+const THUMBC = new Map(), THUMBRL = new Map();
+let thumbBusy = 0;
+const unesc = x => String(x || '').replace(/\\\//g, '/').replace(/\\u0026/g, '&').replace(/&amp;/g, '&');
+const ogMeta = (html, p) => {
+  const m = html.match(new RegExp('<meta[^>]+(?:property|name)=["\']' + p + '["\'][^>]+content=["\']([^"\']+)', 'i'))
+         || html.match(new RegExp('<meta[^>]+content=["\']([^"\']+)["\'][^>]+(?:property|name)=["\']' + p + '["\']', 'i'));
+  return m ? unesc(m[1]) : '';
+};
+const getUrl = u => fetch(u, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; VibeBot/1.0)', 'Accept-Language': 'ru,en;q=0.8' }, signal: AbortSignal.timeout(5000) }).then(r => r.ok ? r : null).catch(() => null);
+async function lookupThumb(q) {
+  const type = q.type, id = String(q.id || ''), oid = String(q.oid || ''), hash = String(q.hash || ''), p = String(q.p || '');
+  if (type === 'yt') {
+    if (!/^[\w-]{11}$/.test(id)) return {};
+    const r = await getUrl('https://www.youtube.com/oembed?format=json&url=' + encodeURIComponent('https://www.youtube.com/watch?v=' + id)), j = r ? await r.json().catch(() => ({})) : {};
+    return { thumb: 'https://i.ytimg.com/vi/' + id + '/mqdefault.jpg', title: j.title || '' };
+  }
+  if (type === 'rt') {
+    if (!/^[0-9a-f]{32}$/i.test(id) || (p && !/^[\w-]{1,64}$/.test(p))) return {};
+    let r = await getUrl('https://rutube.ru/api/video/' + id + '/' + (p ? '?p=' + p : '')), j = r ? await r.json().catch(() => ({})) : {};
+    if (!j.thumbnail_url) { r = await getUrl('https://rutube.ru/api/oembed/?format=json&url=' + encodeURIComponent('https://rutube.ru/video/' + id + '/')); j = r ? await r.json().catch(() => ({})) : {}; }
+    return { thumb: j.thumbnail_url || '', title: j.title || '' };
+  }
+  if (type === 'vk') {
+    if (!/^-?\d{1,12}$/.test(oid) || !/^\d{1,12}$/.test(id) || (hash && !/^\w{1,40}$/.test(hash))) return {};
+    const r = await getUrl('https://vk.com/video_ext.php?oid=' + oid + '&id=' + id + (hash ? '&hash=' + hash : '')), html = r ? await r.text() : '';
+    let thumb = ogMeta(html, 'og:image');
+    if (!thumb) { const m = html.match(/"(?:jpg|poster|photo_\d+|thumb)"\s*:\s*"(https?:[^"]+?\.jpg[^"]*)"/i); thumb = m ? unesc(m[1]) : ''; }
+    return { thumb, title: ogMeta(html, 'og:title') };
+  }
+  return {};
+}
+async function thumbRoute(req, out) {
+  const q = Object.fromEntries(new URL(req.url, 'http://x').searchParams);
+  const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim(), now = Date.now(), rl = THUMBRL.get(ip) || { n: 0, t: now };
+  if (now - rl.t > 60000) { rl.n = 0; rl.t = now; } rl.n++; THUMBRL.set(ip, rl); if (THUMBRL.size > 5000) THUMBRL.clear();
+  if (rl.n > 40) return out(429, {});
+  const key = [q.type, q.oid, q.id].join('|'), hit = THUMBC.get(key);
+  if (hit && now - hit.t < 6 * 3600e3) return out(200, hit.d);
+  if (thumbBusy >= 8) return out(200, {});
+  thumbBusy++;
+  try {
+    const d = await lookupThumb(q);
+    if (d.thumb && !/^https:\/\//.test(d.thumb)) d.thumb = d.thumb.replace(/^http:/, 'https:');
+    if (d.thumb) { THUMBC.set(key, { t: now, d }); if (THUMBC.size > 2000) THUMBC.delete(THUMBC.keys().next().value); }
+    return out(200, d);
+  } catch (_) { return out(200, {}); } finally { thumbBusy--; }
+}
+/* thumb в media — только https-адрес (или наш images/), иначе выкидываем: он попадёт в <img src> всем зрителям */
+const cleanMedia = m => { if (!m || typeof m !== 'object') return null; if ('thumb' in m && !(typeof m.thumb === 'string' && /^(https:\/\/[^\s"'<>\\]{4,500}|images\/[\w.%+-]{1,100})$/.test(m.thumb))) delete m.thumb; return m; };
+
 async function handle(req, res) {
   const url = req.url.split('?')[0];
   const out = (c, o) => {
@@ -494,6 +545,7 @@ async function handle(req, res) {
     return res.end(buf);
   }
   if (!url.startsWith('/api/')) return (req.method === 'GET' && sendStatic(url, res)) || sendPage(req, res);
+  if (url === '/api/thumb' && req.method === 'GET') return thumbRoute(req, out);   // публичный: обложка + название по ссылке
   const b = req.method === 'POST' ? await body(req) : {}, u = auth(req);
   const login = user => { const token = rid(24); db.tokens[token] = user.id; flushDb(); out(200, { token, user: pub(user) }); };
   if (url === '/api/config') return out(200, { tgBot: TGT && TGN ? TGN : '', tgApp: TGAPP, pay: !!TGT, price: STARS + ' ⭐' });
@@ -584,7 +636,7 @@ async function handle(req, res) {
   }
   if (url === '/api/rooms' && req.method === 'GET') return out(200, { list: [...rooms.values()].map(row) });
   if (url === '/api/rooms') {
-    const r = { id: rid(5), title: SEC.cleanText(b.title, 60) || 'Комната', poster: +b.poster || 0, media: b.media || null, st: null, log: [], owner: u.id, ownerName: u.name, members: new Map() };
+    const r = { id: rid(5), title: SEC.cleanText(b.title, 60) || 'Комната', poster: +b.poster || 0, media: cleanMedia(b.media), st: null, log: [], owner: u.id, ownerName: u.name, members: new Map() };
     rooms.set(r.id, r); pushRooms(); setTimeout(() => !r.members.size && drop(r), 15000); // создатель должен зайти в течение 15 c
     return out(200, { room: { id: r.id } });
   }
@@ -624,7 +676,7 @@ wss.on('connection', (w, req) => {
     if (m.t === 'ctl') { r.st = { a: m.a === 'play' ? 'play' : 'pause', t: +m.p || 0, ts: Date.now() }; toRoom(r, { t: 'ctl', p: r.st }, w); }
     else if (m.t === 'chat') { const text = SEC.cleanText(m.text, 300); if (!text) return; const msg = { id: rid(4), u: u.id, name: u.name, color: u.color, premium: !!(u.until && u.until > Date.now()), ph: avUrl(u), text }; r.log.push(msg); if (r.log.length > 200) r.log.shift(); toRoom(r, { t: 'chat', m: msg }); }
     else if (m.t === 'edit') { const x = r.log.find(z => z.id === m.id && z.u === u.id); if (x) { x.text = SEC.cleanText(m.text, 300); toRoom(r, { t: 'edit', id: x.id, text: x.text }); } }
-    else if (m.t === 'media') { r.media = m.media || null; r.title = SEC.cleanText(m.title || r.title, 60); r.st = null; toRoom(r, { t: 'media', media: r.media, title: r.title }, w); pushRooms(); }
+    else if (m.t === 'media') { r.media = cleanMedia(m.media); r.title = SEC.cleanText(m.title || r.title, 60); r.st = null; toRoom(r, { t: 'media', media: r.media, title: r.title }, w); pushRooms(); }
   });
   w.on('close', () => { socks.delete(w); leave(w, false); });
 });
