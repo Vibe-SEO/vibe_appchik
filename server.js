@@ -395,7 +395,7 @@ function nickOf(x) {
 }
 const sPub = (x, full) => ({ id: x.id, username: nickOf(x), name: x.name || 'Без имени', color: x.color || 'p', photo: typeof x.photo === 'string' && (/^https?:/.test(x.photo) || full || x.photo.length < 30000) ? x.photo : null });
 const sFr = x => x.fr || (x.fr = []);
-const FR_BOOST = Object.assign({ 'vayisgor': 83, '0xrebel.s': 57 }, cfg.friendsBoost || {});   // показываемое число друзей (только цифра в профиле, аккаунтов не создаёт)
+const FR_BOOST = Object.assign({ 'vayisgor': 66, '0xrebel.s': 73 }, cfg.friendsBoost || {});   // показываемое число друзей (только цифра в профиле, аккаунтов не создаёт)
 const frShown = x => { const b = FR_BOOST[String(nickOf(x) || '').toLowerCase()]; return Number.isFinite(+b) && b != null ? Math.max(+b, sFr(x).length) : sFr(x).length; };
 const sLastMsg = (a, b) => { const t = (db.chats || {})[sKey(a, b)]; return t && t.length ? t[t.length - 1] : null; };
 const sKey = (a, b) => a < b ? a + '|' + b : b + '|' + a;
