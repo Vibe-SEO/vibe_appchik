@@ -395,6 +395,9 @@ function nickOf(x) {
 }
 const sPub = (x, full) => ({ id: x.id, username: nickOf(x), name: x.name || 'Без имени', color: x.color || 'p', photo: typeof x.photo === 'string' && (/^https?:/.test(x.photo) || full || x.photo.length < 30000) ? x.photo : null });
 const sFr = x => x.fr || (x.fr = []);
+const FR_BOOST = Object.assign({ 'vayisgor': 83, '0xrebel.s': 57 }, cfg.friendsBoost || {});   // показываемое число друзей (только цифра в профиле, аккаунтов не создаёт)
+const frShown = x => { const b = FR_BOOST[String(nickOf(x) || '').toLowerCase()]; return Number.isFinite(+b) && b != null ? Math.max(+b, sFr(x).length) : sFr(x).length; };
+const sLastMsg = (a, b) => { const t = (db.chats || {})[sKey(a, b)]; return t && t.length ? t[t.length - 1] : null; };
 const sKey = (a, b) => a < b ? a + '|' + b : b + '|' + a;
 const sThread = (a, b) => { db.chats = db.chats || {}; return db.chats[sKey(a, b)] || (db.chats[sKey(a, b)] = []); };
 const sUnread = (me, peer) => { const rd = (me.rd || {})[peer.id] || 0; return sThread(me.id, peer.id).filter(m => m.from === peer.id && m.id > rd).length; };
@@ -418,7 +421,8 @@ function socialApi(req, url, b, me, out) {
     const un = {}; let tot = 0;
     sFr(me).map(byId).filter(Boolean).forEach(f => { const n = sUnread(me, f); if (n) { un[nickOf(f)] = n; tot += n; } });
     return out(200, {
-      me: { id: me.id, username: nickOf(me) },
+      me: { id: me.id, username: nickOf(me), friendsCount: frShown(me) },
+      last: Object.fromEntries(sFr(me).map(byId).filter(Boolean).map(f => { const m = sLastMsg(me.id, f.id); return m ? [nickOf(f), { text: String(m.text).slice(0, 120), ts: m.ts, mine: m.from === me.id }] : null; }).filter(Boolean)),
       friends: sFr(me).map(byId).filter(Boolean).map(f => sPub(f)),
       incoming: db.reqs.filter(r => r.to === me.id).map(r => byId(r.from)).filter(Boolean).map(f => sPub(f)),
       outgoing: db.reqs.filter(r => r.from === me.id).map(r => byId(r.to)).filter(Boolean).map(nickOf),
@@ -436,7 +440,7 @@ function socialApi(req, url, b, me, out) {
   }
   if (sub[0] === 'user' && sub[1]) {
     const x = find(sub[1]); if (!x) return out(404, { error: 'Пользователь не найден' });
-    return out(200, { user: Object.assign(sPub(x, true), { bio: String(x.bio || '').slice(0, 300), rel: sRel(me, x), friendsCount: sFr(x).length, gallery: (x.gallery || []).slice(0, 6), created: x.created || null, stats: statsPub(x, [...socks].some(w => w.uid === x.id)), hid: x.prefs && x.prefs.S && Array.isArray(x.prefs.S.hid) ? x.prefs.S.hid : [] }) });
+    return out(200, { user: Object.assign(sPub(x, true), { bio: String(x.bio || '').slice(0, 300), rel: sRel(me, x), friendsCount: frShown(x), gallery: (x.gallery || []).slice(0, 6), created: x.created || null, stats: statsPub(x, [...socks].some(w => w.uid === x.id)), hid: x.prefs && x.prefs.S && Array.isArray(x.prefs.S.hid) ? x.prefs.S.hid : [] }) });
   }
   if (sub[0] === 'username' && req.method === 'POST') {
     const n = String(b.username || '').replace(/^@/, '').toLowerCase().trim();
@@ -464,6 +468,7 @@ function socialApi(req, url, b, me, out) {
     const t = sThread(me.id, x.id), last = t.length ? t[t.length - 1].id : 0;
     me.rd = me.rd || {};
     if (req.method === 'POST') {
+      if (!SEC.rateLimit('dm:' + me.id, 30, 10e3)) return out(429, { error: 'Слишком часто, подождите немного' });
       const text = SEC.cleanText(b.text, 1000); if (!text) return out(400, { error: 'Пустое сообщение' });
       const m = { id: last + 1, from: me.id, text, ts: Date.now() }; t.push(m); if (t.length > 300) t.splice(0, t.length - 300);
       me.rd[x.id] = m.id; save(); return out(200, { ok: true, msg: { id: m.id, mine: true, text, ts: m.ts } });
@@ -534,7 +539,7 @@ async function thumbRoute(req, out) {
   } catch (_) { return out(200, {}); } finally { thumbBusy--; }
 }
 /* thumb в media — только https-адрес (или наш images/), иначе выкидываем: он попадёт в <img src> всем зрителям */
-const cleanMedia = m => { if (!m || typeof m !== 'object') return null; if ('thumb' in m && !(typeof m.thumb === 'string' && /^(https:\/\/[^\s"'<>\\]{4,500}|images\/[\w.%+-]{1,100})$/.test(m.thumb))) delete m.thumb; return m; };
+const cleanMedia = m => { if (!m || typeof m !== 'object') return null; if ('thumb' in m && !(typeof m.thumb === 'string' && /^(https:\/\/[^\s"'<>\\]{4,500}|images\/[\w.%+-]{1,100}(?:\?v=\d{1,6})?)$/.test(m.thumb))) delete m.thumb; return m; };
 
 async function handle(req, res) {
   const url = req.url.split('?')[0];
