@@ -198,13 +198,15 @@ const memList = r => {
   return [...seen.values()];
 };
 const row = r => {
-  const us = uniq(r), o = { id: r.id, title: r.title, poster: r.poster, media: r.media, count: us.length, users: us.slice(0, 5).map(u => [(u.name || '?')[0].toUpperCase(), u.color || 'p']) };
+  const us = uniq(r), o = { id: r.id, title: r.title, poster: r.poster, media: r.media, priv: r.priv ? 1 : 0, count: us.length, users: us.slice(0, 5).map(u => [(u.name || '?')[0].toUpperCase(), u.color || 'p']) };
   if (r.bot) Object.assign(o, { bot: 1, base: r.bot.base, count: us.length + r.bot.base, dur: bDur(r), start: bStart(r), now: Date.now() });
   return o;
 };
 const send = (w, o) => w.readyState === 1 && w.send(JSON.stringify(o));
 const toRoom = (r, o, except) => r.members.forEach((u, w) => w !== except && send(w, o));
-const pushRooms = () => { const list = [...rooms.values()].map(row).sort((a, b) => b.count - a.count); socks.forEach(w => w.uid && send(w, { t: 'rooms', list })); };
+const seeRoom = (r, w) => !r.priv || r.owner === w.uid || w.room === r.id;   // приватная комната — только по ссылке: в общем списке её нет
+const listFor = w => [...rooms.values()].filter(r => seeRoom(r, w)).map(row);
+const pushRooms = () => { socks.forEach(w => w.uid && send(w, { t: 'rooms', list: listFor(w).sort((a, b) => b.count - a.count) })); };
 const drop = r => { if (!r.bot && rooms.get(r.id) === r) { rooms.delete(r.id); pushRooms(); } };
 const xfer = r => { if (r.bot || !rooms.has(r.id) || !r.members.size || uniq(r).some(x => x.id === r.owner)) return; const n = uniq(r)[0]; r.owner = n.id; r.ownerName = n.name; toRoom(r, { t: 'host', host: n.id, hn: n.name }); }; // основатель ушёл — права переходят следующему
 function leave(w, instant) {
@@ -655,9 +657,9 @@ async function handle(req, res) {
     fs.writeFileSync(BOTF + '.tmp', JSON.stringify(file, null, 2)); fs.renameSync(BOTF + '.tmp', BOTF); schedRemote(); botsChanged();
     return out(200, { bots: nb, durs: nd });
   }
-  if (url === '/api/rooms' && req.method === 'GET') return out(200, { list: [...rooms.values()].map(row) });
+  if (url === '/api/rooms' && req.method === 'GET') return out(200, { list: [...rooms.values()].filter(r => !r.priv || r.owner === u.id).map(row) });
   if (url === '/api/rooms') {
-    const r = { id: rid(5), title: SEC.cleanText(b.title, 60) || 'Комната', poster: +b.poster || 0, media: cleanMedia(b.media), st: null, log: [], owner: u.id, ownerName: u.name, members: new Map() };
+    const r = { id: rid(5), title: SEC.cleanText(b.title, 60) || 'Комната', poster: +b.poster || 0, priv: b.priv ? 1 : 0, media: cleanMedia(b.media), st: null, log: [], owner: u.id, ownerName: u.name, members: new Map() };
     rooms.set(r.id, r); pushRooms(); setTimeout(() => !r.members.size && drop(r), 15000); // создатель должен зайти в течение 15 c
     return out(200, { room: { id: r.id } });
   }
@@ -672,7 +674,7 @@ wss.on('connection', (w, req) => {
   subState(u).then(st => { if (!st.subscribed) w.close(4403); }).catch(() => w.close(4403));   // не подписан — в комнаты не пускаем
   w.uid = u.id; w.room = null; socks.add(w); w.cc = cfCC(req);
   if (!w.cc) geoLookup(req).then(cc => { if (cc && w.readyState === 1) { w.cc = cc; const gr = rooms.get(w.room); if (gr) toRoom(gr, { t: 'mem', list: memList(gr) }); } });
-  send(w, { t: 'rooms', list: [...rooms.values()].map(row) });
+  send(w, { t: 'rooms', list: listFor(w) });
   w.on('message', async raw => {
     let m; try { m = JSON.parse(raw); } catch (_) { return; }
     if (!m || typeof m !== 'object') return;
@@ -692,6 +694,10 @@ wss.on('connection', (w, req) => {
       const gr = rooms.get(w.room); if (gr) toRoom(gr, { t: 'mem', list: memList(gr) }); return;
     }
     const r = rooms.get(w.room); if (!r) return;
+    if (m.t === 'priv') {   // публичная / приватная — переключает основатель прямо в комнате
+      if (r.bot || u.id !== r.owner) return send(w, { t: 'err', msg: 'Менять доступ может только создатель комнаты' });
+      r.priv = m.priv ? 1 : 0; toRoom(r, { t: 'priv', priv: r.priv }); pushRooms(); return;
+    }
     if (r.bot && (m.t === 'ctl' || m.t === 'media')) return; // эфир: никто не ставит на паузу и не перематывает
     if ((m.t === 'ctl' || m.t === 'media') && u.id !== r.owner && r.media && (r.media.type === 'vk' || r.media.type === 'rt')) return; // VK/Rutube: управляет только основатель; YouTube и пустые комнаты — как раньше
     if (m.t === 'ctl') { r.st = { a: m.a === 'play' ? 'play' : 'pause', t: +m.p || 0, ts: Date.now() }; toRoom(r, { t: 'ctl', p: r.st }, w); }
