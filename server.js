@@ -2,6 +2,9 @@
 const http = require('http'), fs = require('fs'), path = require('path'), crypto = require('crypto');
 const { WebSocketServer } = require('ws'), zlib = require('zlib');
 const SEC = require('./security');
+/* ---- Капча (Cloudflare Turnstile, бесплатно): https://dash.cloudflare.com → Turnstile → Add site ----
+   TURNSTILE_SITEKEY (публичный) и TURNSTILE_SECRET (секретный) — переменные окружения или config.json: { "turnstileSiteKey": "...", "turnstileSecret": "..." }.
+   Пока ключей нет — капча выключена, сайт работает как раньше. */
 const PORT = process.env.PORT || 3000, DIR = process.env.DATA_DIR || __dirname, DBF = path.join(DIR, 'data.json'); // DATA_DIR — папка на постоянном диске хостинга, иначе вход слетает при каждом перезапуске
 /* Настройки: переменные окружения ИЛИ файл config.json рядом с server.js:
    { "tgToken": "123456:AA...(токен из BotFather)", "tgName": "my_vibe_bot", "admins": ["you@mail.com"] } */
@@ -12,6 +15,16 @@ const ADMIN = String(process.env.ADMIN_EMAILS || [].concat(cfg.admins || []).joi
 const TGAPP = String(process.env.TG_APP_NAME || cfg.tgApp || '').replace(/^[@/]+/, '').trim();   // короткое имя Mini App из BotFather (/newapp) — для ссылок t.me/бот/приложение?startapp=room_ID; пусто — используется Main Mini App (t.me/бот?startapp=...)
 const FRONT = String(process.env.FRONT_URL || cfg.frontUrl || '').replace(/\/$/, '');   // адрес сайта на Netlify, например https://vibe.netlify.app (куда вернуть после входа через Telegram)
 const STARS = Math.max(1, +(process.env.PREMIUM_STARS || cfg.premiumStars || 100)), TGA = String(process.env.TG_ADMIN_IDS || [].concat(cfg.adminTgIds || []).join(',')).split(',').map(x => x.trim()).filter(Boolean);   // цена в Telegram Stars; числовые Telegram-id админов (необязательно)
+const TSK = String(process.env.TURNSTILE_SITEKEY || cfg.turnstileSiteKey || '').trim(), TSS = String(process.env.TURNSTILE_SECRET || cfg.turnstileSecret || '').trim(), CAPTCHA_ON = !!(TSK && TSS);
+if (!CAPTCHA_ON) console.warn('⚠ Капча выключена: задайте TURNSTILE_SITEKEY и TURNSTILE_SECRET');
+async function captchaOk(token, ip) {
+  if (!CAPTCHA_ON) return true;
+  token = String(token || ''); if (!token || token.length > 2048) return false;
+  try {
+    const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ secret: TSS, response: token, remoteip: ip || '' }), signal: AbortSignal.timeout(5000) });
+    const j = await r.json(); return !!(j && j.success);
+  } catch (e) { console.error('captcha:', why(e)); return false; }   // нет связи с Cloudflare — не пускаем (безопаснее)
+}
 const TZ = process.env.STATS_TZ || 'Europe/Moscow';
 const BOTF = path.join(DIR, 'bots.json'), bots = () => { try { return JSON.parse(fs.readFileSync(BOTF, 'utf8')); } catch (_) { return {}; } };
 // bots.json: { "Название": "ссылка", "__durs": { "Название": минуты } }
@@ -530,6 +543,7 @@ async function handle(req, res) {
     res.end(JSON.stringify(o));
   };
   if (req.method === 'OPTIONS') return out(204, {});
+  if (process.env.TRUST_PROXY === '1' && url.startsWith('/api/') && !SEC.rateLimit('all:' + SEC.clientIp(req), 600, 60e3)) return out(429, { error: 'Слишком много запросов, подождите минуту' });   // защита от флуда/перебора
   if (url === '/api/tg-cb') {   // Telegram Login Widget в режиме редиректа (работает на телефоне и в PWA, где popup блокируется)
     const q = Object.fromEntries(new URL(req.url, 'http://x').searchParams), r = tgVerify(q) ? tgUpsert(q, null) : null;
     if (!r || !r.user) { res.writeHead(302, { Location: FRONT + '/#tgerr' }); return res.end(); }
@@ -548,10 +562,11 @@ async function handle(req, res) {
   if (url === '/api/thumb' && req.method === 'GET') return thumbRoute(req, out);   // публичный: обложка + название по ссылке
   const b = req.method === 'POST' ? await body(req) : {}, u = auth(req);
   const login = user => { const token = rid(24); db.tokens[token] = user.id; flushDb(); out(200, { token, user: pub(user) }); };
-  if (url === '/api/config') return out(200, { tgBot: TGT && TGN ? TGN : '', tgApp: TGAPP, pay: !!TGT, price: STARS + ' ⭐' });
+  if (url === '/api/config') return out(200, { tgBot: TGT && TGN ? TGN : '', tgApp: TGAPP, pay: !!TGT, price: STARS + ' ⭐', captcha: CAPTCHA_ON ? TSK : '' });
   if (url === '/api/hit') { hit(b.vid); return out(200, {}); }   // счётчик посетителей (без авторизации)
   if (url === '/api/register') {
     if (!SEC.rateLimit('reg:' + SEC.clientIp(req), 5, 3600e3)) return out(429, { error: 'Слишком много регистраций, попробуйте позже' });
+    if (!(await captchaOk(b.captcha, SEC.clientIp(req)))) return out(400, { error: 'captcha' });
     const em = String(b.email || '').trim().toLowerCase(), nm = SEC.cleanText(b.name, 30), pw = String(b.password || '');
     if (!SEC.RE.email.test(em) || pw.length < 6 || pw.length > 200 || !nm) return out(400, { error: 'Заполните почту, имя и пароль (от 6 до 200 символов)' });
     if (Object.values(db.users).some(x => x.email === em)) return out(409, { error: 'Почта уже занята' });
@@ -561,6 +576,7 @@ async function handle(req, res) {
     const em = String(b.email || '').trim().toLowerCase(), pw = String(b.password || '').slice(0, 200);
     if (!SEC.rateLimit('login:' + SEC.clientIp(req), 10, 15 * 60e3) || !SEC.rateLimit('loginmail:' + em, 10, 15 * 60e3))
       return out(429, { error: 'Слишком много попыток, подождите 15 минут' });
+    if (!(await captchaOk(b.captcha, SEC.clientIp(req)))) return out(400, { error: 'captcha' });
     const user = Object.values(db.users).find(x => x.email === em);
     if (!user) return out(404, { error: 'nouser' });
     return SEC.safeEq(hash(pw, user.salt), user.pass) ? login(user) : out(401, { error: 'Неверный пароль' });
