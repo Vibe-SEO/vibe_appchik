@@ -4141,6 +4141,7 @@ body.sg-on #toast{z-index:100003!important}
   }
 
   async function check(manual) {
+    hide(); return;   /* подтверждение через Telegram отключено */
     if (busy) return;
     if (!myUid()) { hide(); return; }
     busy = true; if (manual) { bChk.classList.add('ld'); bChk.disabled = true; }
