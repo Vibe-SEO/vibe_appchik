@@ -295,9 +295,9 @@ const notifyAdmins = text => adminChats().forEach(id => tgApi('sendMessage', { c
 
 /* ---- Доступ только для подписчиков новостного канала ----
    Бот должен быть АДМИНИСТРАТОРОМ канала (права не нужны), иначе Telegram не отдаёт getChatMember.
-   Переменные (необязательно): TG_CHANNEL=@vibeparty_new, SUB_REQUIRED=0 — выключить проверку. */
+   Переменные (необязательно): TG_CHANNEL=@vibeparty_new, SUB_REQUIRED=1 — включить проверку (по умолчанию выключена). */
 const SUB_CH = String(process.env.TG_CHANNEL || cfg.tgChannel || '@vibeparty_new').trim();
-const SUB_ON = !!TGT && process.env.SUB_REQUIRED !== '0';
+const SUB_ON = !!TGT && process.env.SUB_REQUIRED === '1';   // проверка подписки на канал ВЫКЛЮЧЕНА; включить: SUB_REQUIRED=1
 const subCache = new Map();   // tgId -> { ok, ts }
 const subBypass = u => isAdmin(u) || (!!u.tgId && isTgAdmin(u.tgId));
 async function isMember(tgId) {
@@ -711,6 +711,6 @@ wss.on('connection', (w, req) => {
   if (REMOTE) { try { await loadRemote(); } catch (e) { console.error('Supabase недоступен — остановка, чтобы не потерять данные:', e.message); process.exit(1); } schedRemote(); }
   else console.warn('ВНИМАНИЕ: SUPABASE_URL/SUPABASE_KEY не заданы — данные только в data.json (на бесплатном Render он стирается)');
   { let fix = 0; Object.values(db.users).forEach(x => { if (!x.created) { x.created = Date.now(); fix++; } }); if (fix) { console.log('Старым аккаунтам без даты регистрации проставлена сегодняшняя: ' + fix); save(); } }   // у кого даты не было — отсчёт «с нами с» пойдёт с сегодняшнего дня
-  server.listen(PORT, () => console.log('vibe: http://localhost:' + PORT + (TGT ? ' · бот включён' : ' · бот НЕ настроен (TG_BOT_TOKEN)') + (REMOTE ? ' · Supabase' : '')));
+  server.listen(PORT, process.env.HOST || '0.0.0.0', () => console.log('vibe: http://localhost:' + PORT + (TGT ? ' · бот включён' : ' · бот НЕ настроен (TG_BOT_TOKEN)') + (REMOTE ? ' · Supabase' : '')));
   if (TGT) tgPoll();
 })();
