@@ -126,11 +126,12 @@ function tgUpsert(b, cur) {
   const tid = String(b.id), nm = ([b.first_name, b.last_name].filter(Boolean).join(' ') || b.username || 'Telegram').slice(0, 30);
   let user = Object.values(db.users).find(x => x.tgId === tid);
   if (cur && user && user.id !== cur.id) return { error: 'Этот Telegram уже привязан к другому аккаунту' };
-  if (!user) { user = cur || { id: rid(6), name: nm, color: 'p', friends: [], created: Date.now() }; db.users[user.id] = user; }
+  if (!user) { user = cur || { id: rid(6), name: nm, color: 'p', friends: [], created: Date.now(), until: Date.now() + TRIAL_MS }; db.users[user.id] = user; }
   Object.assign(user, { tgId: tid, tgUser: String(b.username || ''), tgName: nm, tgPhoto: String(b.photo_url || '') });
   if (!user.photo && b.photo_url) user.photo = String(b.photo_url);
   return { user };
 }
+const TRIAL_MS = 3 * 864e5;   // пробный Premium для новых аккаунтов: 3 дня с момента регистрации
 const pub = u => ({ tg: u.tgId ? { id: u.tgId, username: u.tgUser || '', name: u.tgName || '' } : null, admin: isAdmin(u), id: u.id, name: u.name, bio: u.bio || '', color: u.color || 'p', photo: u.photo || null, until: u.until || null, premium: !!(u.until && u.until > Date.now()), friends: u.friends || [], prefs: u.prefs || null, gallery: u.gallery || [], created: u.created || null, stats: statsPub(u) });
 
 /* ---- статистика: время в комнатах, самый долгий сеанс, самая большая комната, часы по месяцам ----
@@ -577,7 +578,7 @@ async function handle(req, res) {
     const em = String(b.email || '').trim().toLowerCase(), nm = SEC.cleanText(b.name, 30), pw = String(b.password || '');
     if (!SEC.RE.email.test(em) || pw.length < 6 || pw.length > 200 || !nm) return out(400, { error: 'Заполните почту, имя и пароль (от 6 до 200 символов)' });
     if (Object.values(db.users).some(x => x.email === em)) return out(409, { error: 'Почта уже занята' });
-    const salt = rid(8), user = { id: rid(6), email: em, salt, pass: hash(pw, salt), name: nm, color: 'p', friends: [], created: Date.now() }; db.users[user.id] = user; return login(user);
+    const salt = rid(8), user = { id: rid(6), email: em, salt, pass: hash(pw, salt), name: nm, color: 'p', friends: [], created: Date.now(), until: Date.now() + TRIAL_MS }; db.users[user.id] = user; return login(user);
   }
   if (url === '/api/login') {
     const em = String(b.email || '').trim().toLowerCase(), pw = String(b.password || '').slice(0, 200);
