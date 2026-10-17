@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07040f">
+<title>Фильмы — vibe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--night:#07040f;--violet:#a259ff;--lbl:#8f83bd;--hint:#6f649a;--soft:#a996e0;--line:rgba(150,120,255,.28);--card:linear-gradient(135deg,rgba(38,24,82,.7),rgba(18,12,42,.85));color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;background:var(--night);color:#fff;font:500 16px/1.4 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit;color:inherit;border:0;outline:0;background:none}
+button,a{cursor:pointer;touch-action:manipulation}
+:focus-visible{outline:2px solid #c9b8ff;outline-offset:3px}
+.ico{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+::-webkit-scrollbar{width:10px;height:10px;background:transparent}
+::-webkit-scrollbar-track{background:rgba(14,8,29,.55);border-radius:10px}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#b06bff,#6f5cff);border-radius:10px;border:2px solid #0e081d}
+
+/* ===== фон: живые пятна света ===== */
+#vbg{position:fixed;inset:0;z-index:-1;overflow:hidden;background:linear-gradient(180deg,#0c0720,#080512 55%,#0a0512)}
+.blob{position:absolute;border-radius:50%;filter:blur(60px);will-change:transform}
+.b1{width:60vmax;height:60vmax;left:-16vmax;top:-22vmax;background:rgba(115,50,210,.6);animation:d1 13s ease-in-out infinite alternate}
+.b2{width:54vmax;height:54vmax;right:-18vmax;top:8vh;background:rgba(30,80,210,.55);animation:d2 16s ease-in-out infinite alternate}
+.b3{width:48vmax;height:48vmax;left:-14vmax;top:48vh;background:rgba(95,30,150,.5);animation:d3 15s ease-in-out infinite alternate}
+.b4{width:50vmax;height:50vmax;left:22vw;bottom:-28vmax;background:rgba(170,30,105,.45);animation:d4 18s ease-in-out infinite alternate}
+.b5{width:34vmax;height:34vmax;left:38vw;top:18vh;background:rgba(140,80,255,.34);animation:d5 11s ease-in-out infinite alternate}
+@keyframes d1{50%{transform:translate3d(34vw,10vh,0) scale(1.3)}100%{transform:translate3d(14vw,36vh,0) scale(.9)}}
+@keyframes d2{50%{transform:translate3d(-30vw,26vh,0) scale(.82)}100%{transform:translate3d(-10vw,-6vh,0) scale(1.2)}}
+@keyframes d3{50%{transform:translate3d(36vw,-22vh,0) scale(1.3)}100%{transform:translate3d(12vw,-40vh,0) scale(.85)}}
+@keyframes d4{50%{transform:translate3d(-38vw,-16vh,0) scale(1.2)}100%{transform:translate3d(18vw,-30vh,0) scale(.9)}}
+@keyframes d5{0%{transform:translate3d(-20vw,0,0) scale(.8)}100%{transform:translate3d(24vw,30vh,0) scale(1.35)}}
+.aur{position:absolute;left:50%;top:50%;width:150vmax;height:150vmax;margin:-75vmax 0 0 -75vmax;background:conic-gradient(from 0deg,transparent,rgba(145,104,241,.38),transparent 28%,rgba(128,104,183,.32),transparent 58%,rgba(143,111,219,.3),transparent);filter:blur(40px);animation:aur 60s linear infinite}
+@keyframes aur{to{transform:rotate(360deg)}}
+.spk{position:absolute;bottom:-14px;left:var(--x);width:var(--s);height:var(--s);border-radius:50%;background:#fff;box-shadow:0 0 12px 3px rgba(185,162,239,.8);opacity:0;animation:spk var(--t) linear var(--dl) infinite}
+@keyframes spk{0%{transform:translate3d(0,0,0);opacity:0}12%{opacity:.85}100%{transform:translate3d(var(--dx),-112vh,0);opacity:0}}
+
+/* ===== каркас ===== */
+.app{display:grid;grid-template-columns:264px 1fr;min-height:100vh}
+aside{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:28px 20px;background:#0c0720;border-right:1px solid rgba(150,120,255,.16);animation:sl .8s cubic-bezier(.2,.7,.2,1) backwards}
+@keyframes sl{from{opacity:0;transform:translateX(-36px)}}
+.logo{display:block;width:104px;height:auto;margin-left:8px}
+.menu{display:flex;flex-direction:column;gap:6px;margin-top:40px;font-size:15px;font-weight:500}
+.navbtn{position:relative;display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:16px;border:1px solid transparent;color:#b8a9e6;transition:.2s}
+.navbtn:hover{background:rgba(255,255,255,.05);color:#fff}
+.navbtn.on{color:#fff;background:rgba(70,40,160,.45);border-color:rgba(160,120,255,.4);box-shadow:0 0 18px rgba(120,70,255,.25)}
+.navbtn.on::before{content:'';position:absolute;left:-20px;top:24%;bottom:24%;width:3px;border-radius:0 4px 4px 0;background:linear-gradient(#d8c9ff,#a259ff);box-shadow:0 0 12px #a259ff}
+.me{margin-top:auto;display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;border:1px solid rgba(150,120,255,.22);background:rgba(40,25,90,.4);font-size:14px;transition:.2s}
+.me:hover{border-color:rgba(190,150,255,.5);background:rgba(70,45,150,.5)}
+.me i{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#ff4d9a,#9b5cff);display:grid;place-items:center;font-style:normal;font-weight:600}
+.me .ico{margin-left:auto;width:18px;height:18px;color:#8f7bff}
+.content{min-width:0;padding:36px 56px 70px}
+.mhead,.tabs,.fab{display:none}
+
+/* ===== заголовок + поиск ===== */
+.rise{animation:rise .75s cubic-bezier(.2,.7,.2,1) backwards;animation-delay:calc(var(--i,0)*80ms + 120ms)}
+@keyframes rise{from{opacity:0;transform:translateY(24px) scale(.98)}}
+h1{font-size:36px;font-weight:600;letter-spacing:-.02em}
+.sub{margin-top:8px;font-size:18px;color:var(--soft)}
+.tools{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:30px 0 26px}
+.find{display:flex;align-items:center;gap:12px;height:48px;width:100%;max-width:460px;padding:0 18px;border-radius:999px;border:1px solid rgba(150,120,255,.18);background:rgba(10,6,25,.8);color:#a58bff;transition:.2s}
+.find:hover{border-color:rgba(180,150,255,.45)}
+.find:focus-within{border-color:var(--violet);box-shadow:0 0 0 3px rgba(162,89,255,.2)}
+.find .ico{width:20px;height:20px}
+.find input{flex:1;min-width:0;font-weight:500}
+.find input::placeholder{color:#b79cff}
+.cta{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:999px;font-size:15px;font-weight:500;background:linear-gradient(90deg,#b06bff,#6f5cff);box-shadow:0 8px 28px rgba(130,80,255,.5),inset 0 1px 0 rgba(255,255,255,.35);transition:.2s;white-space:nowrap}
+.cta:hover{filter:brightness(1.1);transform:translateY(-2px);box-shadow:0 12px 36px rgba(130,80,255,.7),inset 0 1px 0 rgba(255,255,255,.35)}
+.cta:active{transform:scale(.98)}
+.cta::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.4) 50%,transparent 62%);animation:sheen 3.8s ease-in-out infinite}
+@keyframes sheen{0%,30%{transform:translateX(-130%)}70%,100%{transform:translateX(130%)}}
+.cta .ico{width:20px;height:20px;stroke-width:2.4}
+
+/* ===== баннер ===== */
+.banner{position:relative;display:flex;align-items:center;justify-content:space-between;gap:20px;height:190px;padding:0 48px;margin-bottom:34px;overflow:hidden;border-radius:32px;border:1.5px solid rgba(160,130,255,.4);background:radial-gradient(70% 140% at 88% 10%,rgba(120,70,235,.5),transparent 62%),radial-gradient(60% 120% at 0% 100%,rgba(90,50,200,.3),transparent 65%),linear-gradient(170deg,#1a1038,#140b2e 55%,#0d0820);box-shadow:0 14px 36px rgba(0,0,0,.45),0 0 34px rgba(120,70,255,.2),inset 0 0 30px rgba(144,108,226,.08);transition:.3s}
+.banner:hover{transform:translateY(-2px);box-shadow:0 0 48px rgba(150,100,255,.45)}
+.banner h2{position:relative;font:700 54px/1.02 Oswald,Impact,sans-serif;text-transform:uppercase}
+.banner p{position:relative;max-width:300px;font-size:18px;line-height:1.35;color:#efe6ff}
+.go{position:relative;display:grid;place-items:center;width:80px;height:80px;flex:none;border-radius:50%;border:1px solid rgba(255,255,255,.75);background:radial-gradient(90% 90% at 30% 20%,#fff,#e9deff 45%,#b9a0ff);box-shadow:0 0 28px rgba(210,185,255,.75),0 10px 26px rgba(40,20,120,.45),inset 0 1px 0 #fff;transition:.3s}
+.banner:hover .go{transform:scale(1.1)}
+.go svg{width:36px;height:36px;fill:none;stroke:#5b34e6;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== фильтры ===== */
+.bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:24px}
+.chips{display:flex;gap:8px;overflow-x:auto;flex:1 1 420px;padding:4px 2px 8px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{height:40px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(8,5,20,.6));font-size:14px;font-weight:600;color:#a99bd8;white-space:nowrap;transition:.25s}
+.chip:hover{color:#fff;border-color:rgba(180,150,255,.5)}
+.chip.on{color:#fff;border-color:rgba(200,170,255,.75);background:linear-gradient(135deg,rgba(150,100,255,.8),rgba(90,70,230,.8));box-shadow:0 0 22px rgba(150,100,255,.6),inset 0 0 12px rgba(255,255,255,.2)}
+.sel{display:flex;gap:8px}
+select{appearance:none;-webkit-appearance:none;height:40px;padding:0 34px 0 16px;border-radius:999px;border:1px solid var(--line);background:rgba(8,5,20,.6) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23b79cff' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 14px center;font-size:14px;font-weight:600;color:#c9b8ff;cursor:pointer;transition:.2s}
+select:hover{border-color:rgba(180,150,255,.5)}
+select option{background:#140b2e}
+
+/* ===== список фильмов ===== */
+.sec{display:flex;align-items:center;justify-content:space-between;margin:0 4px 18px;font-size:20px;font-weight:600}
+.sec span{display:flex;align-items:center;gap:12px}
+.sec .ico{width:26px;height:26px;color:#d8c9ff}
+.sec small{font-size:14px;font-weight:500;color:var(--soft)}
+.sec b{color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:24px}
+.film{display:flex;flex-direction:column;text-align:left;width:100%;overflow:hidden;border-radius:26px;border:1px solid var(--line);background:var(--card);box-shadow:0 6px 20px rgba(0,0,0,.3),inset 0 0 20px rgba(120,80,255,.08);transition:.2s;animation:fi .5s cubic-bezier(.2,.7,.2,1) backwards;animation-delay:calc(var(--i)*30ms)}
+@keyframes fi{from{opacity:0;transform:translateY(20px) scale(.97)}}
+.film:hover,.film:focus-visible{transform:translateY(-4px);border-color:rgba(190,150,255,.65);box-shadow:0 18px 50px rgba(140,80,255,.35)}
+.film:active{transform:scale(.98)}
+.pic{position:relative;aspect-ratio:2/3;overflow:hidden;background:#140b2e}
+.gen{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-end;text-align:right;padding:0 16px 22%;background:radial-gradient(60% 50% at 50% 38%,hsl(var(--h) 85% 55% / .8),transparent 70%),linear-gradient(150deg,hsl(var(--h) 70% 42%),hsl(calc(var(--h) + 40) 60% 18%) 55%,#0d0820);transition:transform .5s}
+.gen span{font:700 clamp(22px,2.1vw,30px)/1.02 Oswald,Impact,sans-serif;text-transform:uppercase;text-shadow:0 2px 14px rgba(0,0,0,.7)}
+.pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.film:hover .gen,.film:hover .pic img{transform:scale(1.1)}
+.tag{position:absolute;left:12px;top:12px;display:flex;flex-direction:column;gap:6px;z-index:2}
+.tag em{display:inline-flex;align-items:center;gap:6px;width:max-content;padding:4px 10px;border-radius:999px;background:rgba(0,0,0,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-size:11px;font-weight:600;font-style:normal}
+.tag em b{color:#ffcf6b;font-weight:700}
+.pl{position:absolute;inset:0;z-index:1;display:grid;place-items:center}
+.pl i{display:grid;place-items:center;width:56px;height:56px;border-radius:50%;border:2px solid rgba(255,255,255,.8);background:rgba(255,255,255,.15);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;transform:scale(.8);transition:.25s}
+.film:hover .pl i{opacity:1;transform:scale(1)}
+.pl svg{width:22px;height:22px;fill:#fff;margin-left:3px}
+.info{padding:14px 18px 18px}
+.info h3{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.info p{margin-top:4px;font-size:13px;color:var(--soft)}
+.empty{grid-column:1/-1;padding:70px 0;text-align:center;color:var(--soft)}
+.more{display:flex;align-items:center;justify-content:center;gap:10px;margin:36px auto 0;height:50px;padding:0 30px;border-radius:999px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(8,5,20,.6));font-weight:600;color:#c9b8ff;transition:.25s}
+.more:hover{color:#fff;border-color:rgba(200,170,255,.7);box-shadow:0 0 26px rgba(140,90,255,.4)}
+
+/* ===== окно фильма ===== */
+.modal{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(7,4,15,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.modal.open{display:flex;animation:fd .3s ease}
+@keyframes fd{from{opacity:0}}
+.sheet{position:relative;display:grid;grid-template-columns:250px 1fr;gap:30px;width:100%;max-width:800px;max-height:92vh;overflow:auto;padding:30px;border-radius:32px;border:1px solid rgba(160,130,255,.38);background:radial-gradient(110% 45% at 0 0,rgba(110,60,220,.3),transparent 60%),linear-gradient(170deg,#1a1038,#140b2e 55%,#0d0820);box-shadow:0 40px 100px rgba(0,0,0,.6);animation:pop .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes pop{from{opacity:0;transform:translateY(30px) scale(.97)}}
+.sheet .pic{border-radius:22px;border:1px solid rgba(150,120,255,.35);box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 30px rgba(120,70,255,.2)}
+.x{position:absolute;top:20px;right:20px;z-index:3;display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid rgba(180,150,255,.5);color:#d8ccff;background:rgba(255,255,255,.04);transition:.25s}
+.x:hover{color:#fff;border-color:#c9a8ff;background:rgba(150,100,255,.25);transform:rotate(90deg);box-shadow:0 0 18px rgba(150,100,255,.45)}
+.x .ico{width:18px;height:18px}
+.shine{padding-right:50px;font:700 44px/1.02 Oswald,Impact,sans-serif;text-transform:uppercase;color:transparent;-webkit-text-fill-color:transparent;background:linear-gradient(100deg,#fff 0%,#eadfff 12%,#c7a3ff 26%,#8f7dff 40%,#6fa0ff 47%,#fff 50%,#eadfff 62%,#c7a3ff 76%,#8f7dff 90%,#fff 100%) 0 0/200% 100% repeat-x;-webkit-background-clip:text;background-clip:text;animation:shine 5s linear infinite}
+@keyframes shine{to{background-position:200% 0}}
+.chipsrow{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.pc{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;border:1px solid rgba(160,130,255,.3);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(10,6,28,.5));font-size:13px;color:#c9b8ff;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.pc b{color:#fff;font-weight:600}
+.desc{font-size:15px;line-height:1.65;color:#e4dbf8}
+.acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.acts .cta{height:54px;padding:0 28px;font-size:16px}
+.ghost{display:inline-flex;align-items:center;gap:8px;height:54px;padding:0 24px;border-radius:999px;border:1px solid var(--line);background:rgba(8,5,20,.5);font-weight:600;color:#c9b8ff;transition:.25s}
+.ghost:hover{color:#fff;border-color:rgba(200,170,255,.7);box-shadow:0 0 22px rgba(140,90,255,.35)}
+#toast{position:fixed;left:50%;top:20px;z-index:400;padding:12px 20px;border-radius:999px;border:1px solid rgba(190,150,255,.5);background:rgba(30,18,70,.92);backdrop-filter:blur(10px);font-size:14px;font-weight:600;box-shadow:0 10px 40px rgba(0,0,0,.5),0 0 24px rgba(130,80,255,.4);transform:translate(-50%,-16px);opacity:0;pointer-events:none;transition:.3s}
+#toast.show{transform:translate(-50%,0);opacity:1}
+
+/* ===== телефон ===== */
+@media(max-width:1023px){
+  .app{display:block}aside,.tools .cta,.banner p{display:none}
+  .content{max-width:760px;margin:0 auto;padding:max(14px,env(safe-area-inset-top)) 14px 110px}
+  .mhead{display:flex;justify-content:center;margin-bottom:16px}.mhead .logo{width:92px;margin:0}
+  h1{font-size:24px}.sub{font-size:15px;margin-top:4px}
+  .tools{margin:18px 0}.find{height:44px;max-width:none}
+  .banner{height:112px;padding:0 20px;border-radius:24px;margin-bottom:22px}.banner h2{font-size:30px}.go{width:52px;height:52px}.go svg{width:24px;height:24px}
+  .grid{grid-template-columns:repeat(2,1fr);gap:14px}.film{border-radius:22px}.info{padding:12px 14px 14px}.info h3{font-size:15px}
+  .gen span{font-size:22px}.sec{font-size:16px}.sec .ico{width:22px;height:22px}
+  .sel{width:100%}.sel select{flex:1}
+  .tabs{position:fixed;inset:auto 0 0;z-index:30;display:flex;justify-content:space-around;padding:8px 8px max(8px,env(safe-area-inset-bottom));border-top:1px solid rgba(150,120,255,.2);background:rgba(10,6,25,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+  .tab{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;border-radius:14px;font-size:11px;color:var(--lbl)}
+  .tab.on{color:#fff}.tab.on .ico{filter:drop-shadow(0 0 8px #a259ff)}
+  .tab.on::before{content:'';position:absolute;top:-9px;left:32%;right:32%;height:2px;border-radius:2px;background:#a259ff;box-shadow:0 0 10px #a259ff}
+  .fab{position:fixed;right:18px;bottom:84px;z-index:31;display:grid;place-items:center;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#b06bff,#7c4dff);box-shadow:0 0 0 4px rgba(160,100,255,.25),0 10px 30px rgba(130,80,255,.7)}
+  .fab .ico{width:26px;height:26px;stroke:#fff;stroke-width:2.6}
+  .modal{align-items:flex-end;padding:0}.sheet{grid-template-columns:1fr;gap:20px;max-height:92vh;padding:26px 22px calc(26px + env(safe-area-inset-bottom));border-radius:32px 32px 0 0;border-bottom:0}
+  .sheet .pic{width:52%;margin:0 auto}.shine{font-size:30px}.acts .cta,.ghost{flex:1;justify-content:center}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs><linearGradient id="vibe-play" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4d9a"/><stop offset="1" stop-color="#9b5cff"/></linearGradient></defs>
+  <symbol id="vibe-logo" viewBox="0 0 190 90">
+    <defs><linearGradient id="vibe-ink" gradientUnits="userSpaceOnUse" x1="0" y1="-6" x2="0" y2="66"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d9c9ff"/></linearGradient></defs>
+    <g transform="translate(9 16)" fill="none" stroke="url(#vibe-ink)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 22 L21 60 L37 22"/><path d="M54 22 V60"/><path d="M76 0 V60"/><circle cx="95" cy="41" r="19"/><path d="M131 41 H169 A19 19 0 1 0 164.6 53.2"/>
+    </g>
+    <circle cx="63" cy="16" r="7.5" fill="url(#vibe-play)"/>
+  </symbol>
+</svg>
+
+<div id="vbg" aria-hidden="true"></div>
+
+<div class="app">
+  <aside>
+    <a href="index.html" aria-label="vibe"><svg class="logo" viewBox="0 0 190 90"><use href="#vibe-logo"/></svg></a>
+    <nav class="menu">
+      <a class="navbtn" href="index.html"><svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>Публичный</a>
+      <a class="navbtn on" href="movies.html"><svg viewBox="0 0 24 24" class="ico"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 9.5h18M8 5l-2 4.5M13 5l-2 4.5M18 5l-2 4.5"/></svg>Фильмы</a>
+      <a class="navbtn" href="#"><svg viewBox="0 0 24 24" class="ico"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20c.6-3.3 3.1-5 6.5-5s5.9 1.7 6.5 5"/><path d="M16 5.2a3.5 3.5 0 010 6.6M18.5 15.3c1.7.7 2.7 2.2 3 4.7"/></svg>Друзья</a>
+      <a class="navbtn" href="#"><svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="9"/><path d="M9.9 8.6v6.8L15.5 12z" stroke-linejoin="round"/></svg>Как пользоваться</a>
+      <a class="navbtn" href="#"><svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="3.3"/><path d="M19.4 13.5a7.6 7.6 0 000-3l1.8-1.4-1.8-3.1-2.1.8a7.5 7.5 0 00-2.6-1.5L14.4 3h-3.6l-.3 2.3a7.5 7.5 0 00-2.6 1.5l-2.1-.8-1.8 3.1L6 10.5a7.6 7.6 0 000 3l-1.8 1.4 1.8 3.1 2.1-.8a7.5 7.5 0 002.6 1.5l.3 2.3h3.6l.3-2.3a7.5 7.5 0 002.6-1.5l2.1.8 1.8-3.1z"/></svg>Настройки</a>
+    </nav>
+    <a class="me" href="#"><i>Г</i><span>Гость</span><svg viewBox="0 0 24 24" class="ico"><path d="M9 5l7 7-7 7"/></svg></a>
+  </aside>
+
+  <div class="content">
+    <div class="mhead"><a href="index.html" aria-label="vibe"><svg class="logo" viewBox="0 0 190 90"><use href="#vibe-logo"/></svg></a></div>
+
+    <div class="rise"><h1>Фильмы</h1><p class="sub">Выберите фильм и создайте комнату для друзей</p></div>
+
+    <div class="tools rise" style="--i:1">
+      <label class="find"><svg viewBox="0 0 24 24" class="ico"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input id="q" type="search" placeholder="Поиск" autocomplete="off" aria-label="Поиск"></label>
+      <button class="cta" data-create><svg viewBox="0 0 24 24" class="ico"><path d="M12 5v14M5 12h14"/></svg>Создать комнату</button>
+    </div>
+
+    <a href="#" class="banner rise" style="--i:2" data-create>
+      <h2>Фильм на вечер —<br>смотрите вместе</h2>
+      <p>Выберите кино, отправьте ссылку друзьям — видео идёт у всех одновременно</p>
+      <span class="go"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </a>
+
+    <div class="bar rise" style="--i:3">
+      <div class="chips" id="chips" aria-label="Жанры"></div>
+      <div class="sel">
+        <select id="year" aria-label="Год"></select>
+        <select id="sort" aria-label="Сортировка">
+          <option value="pop">Популярные</option><option value="kp">По рейтингу КП</option><option value="im">По рейтингу IMDb</option><option value="new">Сначала новые</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sec rise" style="--i:4">
+      <span><svg viewBox="0 0 24 24" class="ico"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 9.5h18M8 5l-2 4.5M13 5l-2 4.5M18 5l-2 4.5"/></svg>Подборка</span>
+      <small>Найдено: <b id="cnt">0</b></small>
+    </div>
+    <div class="grid" id="grid"></div>
+    <button class="more" id="more" hidden>Показать ещё</button>
+  </div>
+</div>
+
+<nav class="tabs" aria-label="Разделы">
+  <a class="tab" href="index.html"><svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>Комнаты</a>
+  <a class="tab on" href="movies.html"><svg viewBox="0 0 24 24" class="ico"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 9.5h18M8 5l-2 4.5M13 5l-2 4.5M18 5l-2 4.5"/></svg>Фильмы</a>
+  <a class="tab" href="#"><svg viewBox="0 0 24 24" class="ico"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20c.6-3.3 3.1-5 6.5-5s5.9 1.7 6.5 5"/><path d="M16 5.2a3.5 3.5 0 010 6.6M18.5 15.3c1.7.7 2.7 2.2 3 4.7"/></svg>Друзья</a>
+  <a class="tab" href="#"><svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c.8-3.6 3.8-5.5 7.5-5.5s6.7 1.9 7.5 5.5"/></svg>Профиль</a>
+</nav>
+<button class="fab" data-create aria-label="Создать комнату"><svg viewBox="0 0 24 24" class="ico"><path d="M12 5v14M5 12h14"/></svg></button>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mt"><div class="sheet" id="sheet"></div></div>
+<div id="toast" role="status"></div>
+
+<script>
+/* фон */
+(function(){var s='<i class="aur"></i><i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i>';
+for(var i=0;i<22;i++)s+='<i class="spk" style="--x:'+(Math.random()*100).toFixed(1)+'%;--s:'+(2+Math.random()*3.5).toFixed(1)+'px;--t:'+(9+Math.random()*12).toFixed(1)+'s;--dl:-'+(Math.random()*20).toFixed(1)+'s;--dx:'+((Math.random()-.5)*18).toFixed(1)+'vw"></i>';
+document.getElementById('vbg').innerHTML=s})();
+
+/* Данные для примера — замените на свой API/БД.
+   t — название, g — жанр, y — год, kp/im — рейтинги, h — оттенок обложки (0–360),
+   d — описание, len — длительность, img — (необязательно) ссылка на постер. */
+const FILMS=[
+{t:"Человек-паук: Новый день",g:"Фантастика",y:2026,kp:8.0,im:8.1,h:350,len:"2 ч 10 мин",d:"Одинокий и повзрослевший Питер Паркер полностью посвящает себя борьбе с преступностью в Нью-Йорке."},
+{t:"Орудия: Варвар",g:"Ужасы",y:2026,kp:7.3,im:7.6,h:230,len:"1 ч 55 мин",d:"Зимняя ночь, пустой перрон и история, после которой город уже не будет прежним."},
+{t:"Одиссея",g:"Приключения",y:2026,kp:8.2,im:8.4,h:215,len:"2 ч 50 мин",d:"Эпическое возвращение домой через моря, чудовищ и волю богов."},
+{t:"Битва моторов",g:"Драма",y:2026,kp:7.1,im:6.9,h:28,len:"2 ч 05 мин",d:"Трое друзей и гонка, которая решит судьбу целого завода."},
+{t:"Девятая планета",g:"Фантастика",y:2026,kp:7.4,im:7.0,h:195,len:"2 ч 00 мин",d:"Экспедиция к границе Солнечной системы находит то, чего не должно было там быть."},
+{t:"Интерстеллар",g:"Фантастика",y:2014,kp:8.6,im:8.7,h:265,len:"2 ч 49 мин",d:"Команда исследователей отправляется сквозь червоточину, чтобы спасти человечество."},
+{t:"Дюна: Часть вторая",g:"Фантастика",y:2024,kp:8.0,im:8.5,h:32,len:"2 ч 46 мин",d:"Пол Атрейдес объединяется с фрименами, чтобы отомстить за свою семью."},
+{t:"Оппенгеймер",g:"Драма",y:2023,kp:8.1,im:8.3,h:18,len:"3 ч 00 мин",d:"История создателя атомной бомбы и цены, которую пришлось заплатить."},
+{t:"Начало",g:"Триллер",y:2010,kp:8.7,im:8.8,h:200,len:"2 ч 28 мин",d:"Вор, способный проникать в сны, получает шанс вернуть себе жизнь."},
+{t:"Бэтмен",g:"Боевик",y:2022,kp:7.7,im:7.8,h:320,len:"2 ч 56 мин",d:"Тёмный рыцарь расследует цепь жестоких преступлений в Готэме."},
+{t:"Джокер",g:"Драма",y:2019,kp:8.0,im:8.4,h:290,len:"2 ч 02 мин",d:"Неудавшийся комик превращается в символ хаоса."},
+{t:"Мстители: Финал",g:"Фантастика",y:2019,kp:7.9,im:8.4,h:275,len:"3 ч 01 мин",d:"Оставшиеся герои собираются, чтобы изменить исход битвы с Таносом."},
+{t:"1+1",g:"Комедия",y:2011,kp:8.8,im:8.5,h:330,len:"1 ч 52 мин",d:"Аристократ в инвалидном кресле нанимает помощником парня с улицы."},
+{t:"Побег из Шоушенка",g:"Драма",y:1994,kp:9.1,im:9.3,h:245,len:"2 ч 22 мин",d:"Банкир, осуждённый за убийство, не теряет надежды на свободу."},
+{t:"Зелёная миля",g:"Драма",y:1999,kp:9.1,im:8.6,h:170,len:"3 ч 09 мин",d:"Надзиратель встречает заключённого с необыкновенным даром."},
+{t:"Форсаж 10",g:"Боевик",y:2023,kp:6.7,im:5.7,h:8,len:"2 ч 21 мин",d:"Доминик Торетто снова сталкивается с прошлым, которое мчится за ним."},
+{t:"Джон Уик 4",g:"Боевик",y:2023,kp:7.7,im:7.7,h:300,len:"2 ч 49 мин",d:"Джон Уик выходит на тропу войны против Высшего стола."},
+{t:"Круэлла",g:"Комедия",y:2021,kp:7.4,im:7.3,h:340,len:"2 ч 14 мин",d:"Юная мошенница мечтает стать великим модельером в Лондоне 70-х."},
+{t:"Зверополис",g:"Мультфильм",y:2016,kp:8.3,im:8.0,h:280,len:"1 ч 48 мин",d:"Крольчиха-полицейский и хитрый лис раскрывают заговор в городе зверей."},
+{t:"Король Лев",g:"Мультфильм",y:1994,kp:8.8,im:8.5,h:35,len:"1 ч 29 мин",d:"Юный львёнок должен вернуть себе трон и своё место в круге жизни."},
+{t:"Прибытие",g:"Фантастика",y:2016,kp:7.6,im:7.9,h:185,len:"1 ч 56 мин",d:"Лингвист пытается наладить контакт с пришельцами, пока мир на грани войны."},
+{t:"Достать ножи",g:"Триллер",y:2019,kp:7.8,im:7.9,h:25,len:"2 ч 10 мин",d:"Знаменитый детектив расследует смерть патриарха эксцентричного семейства."},
+{t:"Моя вина: Лондон",g:"Мелодрама",y:2025,kp:6.2,im:5.9,h:325,len:"1 ч 56 мин",d:"Запретная любовь, которая сводит с ума и не отпускает."},
+{t:"Мглистая ночь",g:"Ужасы",y:2025,kp:6.9,im:6.6,h:255,len:"1 ч 44 мин",d:"Туристы заблудились в тумане, и что-то бродит рядом."}
+];
+const PAGE=12,$=s=>document.querySelector(s);
+let genre="Все",year="all",sort="pop",query="",shown=PAGE,opened=null,tt;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const playIco='<svg viewBox="0 0 24 24"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>';
+const f1=n=>n.toFixed(1);
+
+const genres=["Все",...new Set(FILMS.map(f=>f.g))];
+$("#chips").innerHTML=genres.map(g=>`<button class="chip${g===genre?" on":""}" data-g="${g}">${g}</button>`).join("");
+$("#year").innerHTML='<option value="all">Любой год</option>'+[...new Set(FILMS.map(f=>f.y))].sort((a,b)=>b-a).map(y=>`<option>${y}</option>`).join("");
+
+function pic(f,hover){
+  return `<div class="pic">
+    <div class="gen" style="--h:${f.h}"><span>${esc(f.t)}</span></div>
+    ${f.img?`<img src="${esc(f.img)}" alt="${esc(f.t)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:""}
+    <div class="tag"><em><b>★</b>КП ${f1(f.kp)}</em><em>IMDb ${f1(f.im)}</em></div>
+    ${hover?`<div class="pl"><i>${playIco}</i></div>`:""}
+  </div>`;
+}
+
+function list(){
+  const a=FILMS.filter(f=>(genre==="Все"||f.g===genre)&&(year==="all"||f.y==year)&&f.t.toLowerCase().includes(query)).map(f=>({...f,i:FILMS.indexOf(f)}));
+  if(sort==="kp")a.sort((x,y)=>y.kp-x.kp);
+  else if(sort==="im")a.sort((x,y)=>y.im-x.im);
+  else if(sort==="new")a.sort((x,y)=>y.y-x.y||y.kp-x.kp);
+  return a;
+}
+function render(){
+  const a=list();$("#cnt").textContent=a.length;
+  $("#grid").innerHTML=a.length?a.slice(0,shown).map((f,n)=>`
+    <button class="film" style="--i:${n%PAGE}" data-i="${f.i}" aria-label="${esc(f.t)}">${pic(f,1)}
+      <div class="info"><h3>${esc(f.t)}</h3><p>${esc(f.g)} · ${f.y}</p></div></button>`).join("")
+    :'<div class="empty">Ничего не найдено. Попробуйте другой фильтр или запрос.</div>';
+  $("#more").hidden=a.length<=shown;
+}
+function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>el.classList.remove("show"),2200)}
+
+function openFilm(i){
+  const f=FILMS[i];opened=i;
+  $("#sheet").innerHTML=`
+    <button class="x" aria-label="Закрыть"><svg viewBox="0 0 24 24" class="ico"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    ${pic(f,0)}
+    <div>
+      <h2 class="shine" id="mt">${esc(f.t)}</h2>
+      <div class="chipsrow"><span class="pc">КП <b>${f1(f.kp)}</b></span><span class="pc">IMDb <b>${f1(f.im)}</b></span><span class="pc"><b>${esc(f.g)}</b></span><span class="pc"><b>${f.y}</b></span><span class="pc"><b>${esc(f.len)}</b></span></div>
+      <p class="desc">${esc(f.d)}</p>
+      <div class="acts">
+        <button class="cta" data-room="${i}"><svg viewBox="0 0 24 24" class="ico"><path d="M12 5v14M5 12h14"/></svg>Создать комнату</button>
+        <button class="ghost" data-solo="${i}">${playIco.replace('<svg','<svg width="16" height="16" fill="currentColor"')}Смотреть</button>
+      </div>
+    </div>`;
+  $("#modal").classList.add("open");document.body.style.overflow="hidden";$("#sheet .x").focus();
+}
+function closeFilm(){
+  $("#modal").classList.remove("open");document.body.style.overflow="";
+  const c=document.querySelector(`.film[data-i="${opened}"]`);if(c)c.focus();opened=null;
+}
+
+const reset=()=>{shown=PAGE;render()};
+$("#chips").onclick=e=>{const b=e.target.closest(".chip");if(!b)return;genre=b.dataset.g;document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c===b));reset()};
+$("#year").onchange=e=>{year=e.target.value;reset()};
+$("#sort").onchange=e=>{sort=e.target.value;reset()};
+$("#q").oninput=e=>{query=e.target.value.trim().toLowerCase();reset()};
+$("#more").onclick=()=>{shown+=PAGE;render()};
+$("#grid").onclick=e=>{const c=e.target.closest(".film");if(c)openFilm(+c.dataset.i)};
+$("#modal").onclick=e=>{
+  if(e.target.id==="modal"||e.target.closest(".x"))return closeFilm();
+  const r=e.target.closest("[data-room]"),s=e.target.closest("[data-solo]");
+  /* TODO: подключите к своей логике — создание комнаты / открытие плеера */
+  if(r)toast("Комната «"+FILMS[r.dataset.room].t+"» создана");
+  if(s)toast("Открываем «"+FILMS[s.dataset.solo].t+"»");
+};
+document.addEventListener("click",e=>{const c=e.target.closest("[data-create]");if(c){e.preventDefault();toast("Создание комнаты — подключите свою логику")}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&opened!==null)closeFilm()});
+render();
+</script>
+</body>
+</html>
