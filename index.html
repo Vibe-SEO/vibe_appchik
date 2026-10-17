@@ -882,6 +882,44 @@ aside#mnu .m-about h3{color:transparent!important;-webkit-text-fill-color:transp
 @keyframes mshine{to{background-position:200% 0}}
 @media (prefers-reduced-motion:reduce){aside#mnu .m-about h3{animation:none}}
 </style>
+<style id="vibe-topbar-redesign">
+:root{--bg:#0c0d11;--sf:#15171c;--sf2:#1c1f26;--ln:rgba(255,255,255,.09);--mut:#9a9eab;--ac:#ff8c4d}
+body{background:var(--bg)!important}
+#vbg{display:none!important}
+/* верхняя строка */
+#topbar{display:none}
+@media(min-width:1024px){
+#topbar{position:fixed;top:0;left:0;right:0;z-index:30;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:rgba(12,13,17,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--ln)}
+#topbar .tb-logo{display:block;border:0;background:none;padding:0;width:84px}
+#topbar .tb-logo svg{width:100%;height:auto;display:block}
+#topbar .tb-right{display:flex;align-items:center;gap:14px}
+#topbar .tb-nav{display:flex;gap:2px;padding:4px;border-radius:12px;background:var(--sf);border:1px solid var(--ln)}
+#topbar .navbtn{display:flex;align-items:center;gap:8px;height:36px;padding:0 14px;border:0;border-radius:9px;background:none;color:var(--mut);font:500 14px Inter,system-ui,sans-serif;transition:background .15s,color .15s}
+#topbar .navbtn .ico{width:18px;height:18px}
+#topbar .navbtn:hover{color:#fff;background:rgba(255,255,255,.05)}
+#topbar .navbtn.on{color:#fff;background:var(--sf2);box-shadow:inset 0 -2px 0 var(--ac)}
+#topbar .navbtn.on::before,#topbar .navbtn.on::after{display:none}
+#topbar .tb-me{display:flex;align-items:center;gap:10px;height:44px;padding:0 14px 0 6px;border-radius:12px;background:var(--sf);border:1px solid var(--ln);cursor:pointer;font:500 14px Inter,system-ui,sans-serif;max-width:200px}
+#topbar .tb-me:hover{border-color:rgba(255,140,77,.55)}
+#topbar #me-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#rooms>div{max-width:1560px;margin:0 auto}
+}
+/* остальной интерфейс: плоские графитовые поверхности, мягкие углы, тонкие линии */
+[class*="text-[#e4af92]"]{color:var(--mut)!important}
+[class*="from-[rgba(84,43,22"],[class*="bg-[rgba(39,23,15"],[class*="bg-[rgba(22,13,9"],[class*="bg-[#1c110b]"]{background:var(--sf)!important}
+[class*="border-[rgba(255,166,120"],[class*="border-[rgba(255,191,150"]{border-color:var(--ln)!important}
+[class*="rounded-3xl"]{border-radius:16px!important}
+[class*="rounded-2xl"]{border-radius:12px!important}
+details[class*="open:"][open]{border-color:rgba(255,140,77,.5)!important}
+label:has(#q),label:has(#fq){background:var(--sf)!important;border:1px solid var(--ln)!important;border-radius:12px!important;box-shadow:none!important}
+[data-act="create"]{background:var(--ac)!important;color:#1a0f08!important;border-radius:12px!important;box-shadow:none!important}
+#rooms a[data-nav="help"]{background:linear-gradient(100deg,#1c1f26 0,#15171c 70%)!important;border:1px solid var(--ln)!important;border-left:3px solid var(--ac)!important;border-radius:16px!important;box-shadow:none!important}
+#rooms a[data-nav="help"] svg[aria-hidden]{display:none}
+#list>li,#flist>li{background:var(--sf)!important;border:1px solid var(--ln)!important;border-radius:16px!important;box-shadow:none!important;transition:border-color .2s,transform .2s}
+#list>li:hover{border-color:rgba(255,140,77,.55)!important;transform:translateY(-2px)}
+#rooms h2{letter-spacing:-.02em}
+nav.fixed{background:rgba(12,13,17,.92)!important;border-color:var(--ln)!important}
+</style>
 </head>
 
 <body data-oled="1" class="min-h-screen bg-night font-sans text-white overflow-x-hidden antialiased">
@@ -1140,17 +1178,9 @@ aside#mnu .m-about h3{color:transparent!important;-webkit-text-fill-color:transp
 </script>
 
 <!-- ================= КОМНАТЫ ================= -->
-  <main id="rooms" class="relative mx-auto gone w-full max-w-[480px] px-[14px] pt-[max(14px,env(safe-area-inset-top))] pb-[110px] lg:grid lg:min-h-screen lg:max-w-none lg:grid-cols-[264px_1fr] lg:p-0">
-<aside class="slide-in sticky top-0 hidden h-screen flex-col self-start border-r border-[rgba(255,166,120,.16)] bg-[#1c110b] px-5 py-7 lg:flex">
-    <svg class="ml-2 h-auto w-[104px]" viewBox="0 0 190 90" role="img" aria-label="vibe"><use href="#vibe-logo"/></svg>
-    <nav class="mt-10 flex flex-col gap-1.5 text-[15px] font-medium"><button data-nav="rooms" class="navbtn on flex w-full items-center gap-3 rounded-2xl border border-transparent px-4 py-3 text-left transition"><svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>Публичный</button><button data-nav="friends" class="navbtn flex w-full items-center gap-3 rounded-2xl border border-transparent px-4 py-3 text-left transition"><svg viewBox="0 0 24 24" class="ico"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20c.6-3.3 3.1-5 6.5-5s5.9 1.7 6.5 5"/><path d="M16 5.2a3.5 3.5 0 010 6.6M18.5 15.3c1.7.7 2.7 2.2 3 4.7"/></svg>Друзья</button><button data-nav="help" class="navbtn flex w-full items-center gap-3 rounded-2xl border border-transparent px-4 py-3 text-left transition"><svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="9"/><path d="M9.9 8.6v6.8L15.5 12z" stroke-linejoin="round"/></svg>Как пользоваться</button><button data-nav="settings" class="navbtn flex w-full items-center gap-3 rounded-2xl border border-transparent px-4 py-3 text-left transition"><svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="3.3"/><path d="M19.4 13.5a7.6 7.6 0 000-3l1.8-1.4-1.8-3.1-2.1.8a7.5 7.5 0 00-2.6-1.5L14.4 3h-3.6l-.3 2.3a7.5 7.5 0 00-2.6 1.5l-2.1-.8-1.8 3.1L6 10.5a7.6 7.6 0 000 3l-1.8 1.4 1.8 3.1 2.1-.8a7.5 7.5 0 002.6 1.5l.3 2.3h3.6l.3-2.3a7.5 7.5 0 002.6-1.5l2.1.8 1.8-3.1z"/></svg>Настройки</button></nav>
-    <div data-nav="profile" role="button" tabindex="0" class="group mt-auto flex cursor-pointer items-center gap-3 rounded-2xl border border-[rgba(255,166,120,.22)] bg-[rgba(94,46,21,.4)] p-3 transition hover:border-[rgba(255,191,150,.5)] hover:bg-[rgba(156,79,39,.5)] active:scale-[.98]">
-      <span id="me-ava" class="shrink-0"></span>
-      <span id="me-name" class="truncate text-sm font-medium">Гость</span>
-      <svg viewBox="0 0 24 24" class="ico ml-auto !h-[18px] !w-[18px] text-[#ffa57b] transition group-hover:translate-x-0.5 group-hover:text-white"><path d="M9 5l7 7-7 7"/></svg>
-    </div>
-  </aside>
-  <div class="min-w-0 lg:px-10 lg:py-9 xl:px-14">
+  <main id="rooms" class="relative mx-auto gone w-full max-w-[480px] px-[14px] pt-[max(14px,env(safe-area-inset-top))] pb-[110px] lg:block lg:min-h-screen lg:max-w-none lg:p-0">
+<header id="topbar"><button data-nav="rooms" class="tb-logo" aria-label="vibe"><svg viewBox="0 0 190 90" role="img"><use href="#vibe-logo"/></svg></button><div class="tb-right"><nav class="tb-nav"><button data-nav="rooms" class="navbtn on"><svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>Публичный</button><button data-nav="friends" class="navbtn"><svg viewBox="0 0 24 24" class="ico"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20c.6-3.3 3.1-5 6.5-5s5.9 1.7 6.5 5"/><path d="M16 5.2a3.5 3.5 0 010 6.6M18.5 15.3c1.7.7 2.7 2.2 3 4.7"/></svg>Друзья</button><button data-nav="help" class="navbtn"><svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="9"/><path d="M9.9 8.6v6.8L15.5 12z" stroke-linejoin="round"/></svg>Как пользоваться</button><button data-nav="settings" class="navbtn"><svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="3.3"/><path d="M19.4 13.5a7.6 7.6 0 000-3l1.8-1.4-1.8-3.1-2.1.8a7.5 7.5 0 00-2.6-1.5L14.4 3h-3.6l-.3 2.3a7.5 7.5 0 00-2.6 1.5l-2.1-.8-1.8 3.1L6 10.5a7.6 7.6 0 000 3l-1.8 1.4 1.8 3.1 2.1-.8a7.5 7.5 0 002.6 1.5l.3 2.3h3.6l.3-2.3a7.5 7.5 0 002.6-1.5l2.1.8 1.8-3.1z"/></svg>Настройки</button></nav><div data-nav="profile" role="button" tabindex="0" class="tb-me"><span id="me-ava" class="shrink-0"></span><span id="me-name">Гость</span></div></div></header>
+  <div class="min-w-0 lg:px-10 lg:pb-10 lg:pt-[96px] xl:px-14">
 
     <header class="rise mb-[14px] lg:hidden flex items-center justify-between">
       <span class="h-[46px] w-[46px]" aria-hidden="true"></span>
