@@ -928,6 +928,23 @@ aside#mnu .m-about h3{color:transparent!important;-webkit-text-fill-color:transp
 .mv-ib:hover{background:rgba(255,255,255,.12)}.mv-ib.on{background:linear-gradient(135deg,rgba(150,100,255,.85),rgba(90,70,230,.85));box-shadow:0 0 20px rgba(150,100,255,.5)}
 .mv-av{display:grid;place-items:center;height:104px;width:104px;margin:0 auto;border-radius:50%;border:1px solid rgba(190,150,255,.4);font-size:26px;font-weight:600;box-shadow:0 10px 30px rgba(100,60,220,.3);transition:transform .3s}
 .mv-actor:hover .mv-av{transform:translateY(-4px) scale(1.04)}
+/* ===== стиль KinoParty ===== */
+.mv-hero.bleed{border:0!important;border-radius:0!important;min-height:clamp(520px,68vh,780px);background:transparent;box-shadow:none;-webkit-mask-image:linear-gradient(#000 80%,transparent);mask-image:linear-gradient(#000 80%,transparent)}
+.mv-hero.mv-dh{-webkit-mask-image:none;mask-image:none;min-height:clamp(600px,90vh,860px)}
+.mv-bg{filter:blur(30px) brightness(.5)}
+.mv-art{width:100%;inset:0;background-size:cover;background-position:center 25%;background-repeat:no-repeat;-webkit-mask-image:linear-gradient(90deg,transparent 4%,#000 46%);mask-image:linear-gradient(90deg,transparent 4%,#000 46%);transform:none!important;transition:none}
+.mv-art.pst{left:auto;width:min(56%,780px);background-size:auto 100%;background-position:right center;-webkit-mask-image:linear-gradient(90deg,transparent,#000 38%);mask-image:linear-gradient(90deg,transparent,#000 38%)}
+.mv-shade{background:linear-gradient(90deg,rgba(8,5,20,.94) 0,rgba(8,5,20,.62) 32%,transparent 68%),linear-gradient(0deg,rgba(8,5,20,.95) 0,transparent 42%)}
+.mv-body{max-width:760px;padding:0 clamp(20px,4vw,40px) clamp(40px,7vh,72px)}
+.mv-dots{left:clamp(20px,4vw,40px);bottom:clamp(18px,3vh,30px)}
+.mv-dots button{width:16px;background:rgba(255,255,255,.2)}.mv-dots button.on{width:32px;background:#a259ff;box-shadow:0 0 10px rgba(162,89,255,.8)}.mv-dots button.on::after{display:none}
+.mv-body h2,.mv-dc h2{font-family:Poppins,Inter,sans-serif!important;font-weight:800!important;line-height:1.08!important;letter-spacing:-.01em}
+.mv-body h2{font-size:clamp(28px,3.5vw,52px)!important}
+.mv-dc h2{font-size:clamp(32px,4.4vw,64px)!important}
+.mv-card{flex:0 0 clamp(140px,38vw,200px)}
+.mv-row{gap:14px}
+@media(min-width:1024px){.mv-card{flex:0 0 max(150px,calc((100% - 70px)/6))}}
+@media(min-width:1280px){.mv-body,.mv-dc{padding-left:56px}.mv-dots{left:56px}}
 </style>
 </head>
 
@@ -1353,8 +1370,8 @@ aside#mnu .m-about h3{color:transparent!important;-webkit-text-fill-color:transp
     <section data-view="settings" class="gone"><div id="stg" class="max-w-[1000px]"></div></section>
 <section data-view="movies" class="gone"><div>
 <div class="mv-hero bleed rise -mx-[14px] lg:-mx-10 lg:-mt-9 xl:-mx-14" id="mv-hero"></div>
-<div class="mt-8 flex items-end justify-between gap-4"><div><h2 class="text-2xl font-semibold tracking-tight lg:text-3xl">Популярные фильмы</h2><p class="mt-1 text-[#a996e0]">Выберите фильм и позовите друзей в комнату</p></div><button id="mv-all" class="shrink-0 text-sm font-medium text-[#c9b8ff] transition hover:text-white">Открыть всё</button></div>
-<div id="mv-chips" class="mt-4 flex gap-2 overflow-x-auto pb-1" style="scrollbar-width:none"></div>
+<div class="mt-6 flex items-center justify-between gap-4"><div><h2 class="text-lg font-semibold lg:text-xl">Популярные фильмы</h2></div><button id="mv-all" class="shrink-0 text-sm font-medium text-[#c9b8ff] transition hover:text-white">Открыть всё</button></div>
+<div id="mv-chips" class="hidden" style="scrollbar-width:none"></div>
 <div id="mv-row" class="mv-row mt-3"></div></div></section>
 <section data-view="mvd" class="gone"><div id="mv-d"></div></section>
 
@@ -6302,16 +6319,16 @@ html body aside#mnu .m-go{stroke:#9d90c9!important}
 </style>
 <script id="vibe-movies-js">
 (function(){
-var T='https://image.tmdb.org/t/p/w500/';
+var T='https://image.tmdb.org/t/p/w500/',B='https://image.tmdb.org/t/p/original/';
 /* ===== ДАННЫЕ: правьте здесь (kp/im — рейтинги, th — локальный постер, alt — запасной) ===== */
 var M=[
 {t:'Человек-паук: Новый день',g:'Фантастика',y:2026,kp:8.0,im:8.1,th:'images/chelovek_park_poster.png',alt:T+'bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg',d:'Одинокий и повзрослевший Питер Паркер полностью посвящает себя борьбе с преступностью в Нью-Йорке, поскольку 4 года назад после заклинания Доктора Стрэнджа о нём забыли все.'},
-{t:'Интерстеллар',g:'Фантастика',y:2014,kp:8.6,im:8.7,th:'images/interstellal.png',alt:T+'gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',d:'Когда засуха уничтожает урожаи, команда исследователей отправляется сквозь червоточину в поисках нового дома для человечества.'},
-{t:'Мстители: Финал',g:'Фантастика',y:2019,kp:7.9,im:8.4,th:'images/mstiteli_final.png',alt:T+'or06FN3Dka5tukK1e9sl16pB3iy.jpg',d:'Оставшиеся в живых Мстители собираются вместе, чтобы отменить разрушительные действия Таноса и вернуть порядок во Вселенной.'},
-{t:'Круэлла',g:'Комедия',y:2021,kp:7.3,im:7.3,th:'images/cryella_poster.png',alt:T+'hjS9mH8KvRiGHgjk6VUZH7OT0Ng.jpg',d:'Лондон, 70-е. Талантливая мошенница мечтает о карьере модельера и сталкивается с влиятельной баронессой — так рождается легенда.'},
+{t:'Интерстеллар',g:'Фантастика',y:2014,kp:8.6,im:8.7,th:'images/interstellal.png',bd:[B+'xJHokMbljvjADYdit5fK5VQsXEG.jpg'],alt:T+'gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',d:'Когда засуха уничтожает урожаи, команда исследователей отправляется сквозь червоточину в поисках нового дома для человечества.'},
+{t:'Мстители: Финал',g:'Фантастика',y:2019,kp:7.9,im:8.4,th:'images/mstiteli_final.png',bd:[B+'7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg'],alt:T+'or06FN3Dka5tukK1e9sl16pB3iy.jpg',d:'Оставшиеся в живых Мстители собираются вместе, чтобы отменить разрушительные действия Таноса и вернуть порядок во Вселенной.'},
+{t:'Круэлла',g:'Комедия',y:2021,kp:7.3,im:7.3,th:'images/cryella_poster.png',bd:[B+'6MKr3KgOLmzOP6MSuZERO41Lpkt.jpg'],alt:T+'hjS9mH8KvRiGHgjk6VUZH7OT0Ng.jpg',d:'Лондон, 70-е. Талантливая мошенница мечтает о карьере модельера и сталкивается с влиятельной баронессой — так рождается легенда.'},
 {t:'1+1',g:'Драма',y:2011,kp:8.8,im:8.5,th:'images/1%2B1film.png',alt:'',d:'Пострадавший аристократ нанимает в помощники парня из пригорода — и это знакомство меняет жизнь обоих.'},
 {t:'Двойной форсаж',g:'Боевик',y:2003,kp:7.0,im:5.9,th:'images/duoforcage.png',alt:T+'6nDZExrDKIXvSAghsFKVFRVJuSf.jpg',d:'Бывший полицейский и его друг детства берутся за опасную работу под прикрытием против майамского наркобарона.'},
-{t:'Форсаж 10',g:'Боевик',y:2023,kp:6.2,im:5.8,th:'images/forcagex.png',alt:T+'fiVW06jE7z9YnO4trhaMEdclSiC.jpg',d:'Доминик Торетто и его семья сталкиваются с самым опасным врагом из прошлого, готовым разрушить всё, что им дорого.'},
+{t:'Форсаж 10',g:'Боевик',y:2023,kp:6.2,im:5.8,th:'images/forcagex.png',bd:[B+'4XM8DUTQb3lhLemJC51Jx4a2EuA.jpg'],alt:T+'fiVW06jE7z9YnO4trhaMEdclSiC.jpg',d:'Доминик Торетто и его семья сталкиваются с самым опасным врагом из прошлого, готовым разрушить всё, что им дорого.'},
 {t:'Моя вина: Лондон',g:'Драма',y:2025,kp:6.1,im:5.5,th:'images/moyavina.png',alt:'',d:'Новая страсть, новый город и запретные чувства — история, в которой любовь проверяется на прочность.'}
 ];
 var G=['#7c4dff','#ff4d9a','#3b82f6','#f0851c','#12b981'];
@@ -6321,17 +6338,20 @@ function fb(img){var a=img.dataset.alt;if(a&&img.src.indexOf(a)<0){img.src=a;img
 window.__mvfb=fb;
 function img(m,cls){return '<img class="'+(cls||'')+'" src="'+m.th+'" data-alt="'+m.alt+'" alt="'+E(m.t)+'" loading="lazy" referrerpolicy="no-referrer" onerror="__mvfb(this)">'}
 function bd(m){return '<span class="mv-badge kp"><i>КП</i>'+m.kp.toFixed(1)+'</span><span class="mv-badge"><i>IMDb</i>'+m.im.toFixed(1)+'</span>'}
+/* широкий кадр: images/bd/<номер фильма в списке M>.jpg (1 = Человек-паук, 2 = Интерстеллар…), затем m.bd, иначе вертикальный постер */
+function lift(el,m){if(!el)return;var c=['images/bd/'+(M.indexOf(m)+1)+'.jpg'].concat(m.bd||[]);(function n(){var u=c.shift();if(!u)return;var im=new Image();im.onload=function(){var v='url("'+u+'")';el.style.backgroundImage=v;el.classList.remove('pst');if(el.previousElementSibling)el.previousElementSibling.style.backgroundImage=v};im.onerror=n;im.src=u})()}
 var cur=0,tm,H=M.slice(0,5);
 function hero(){
   var u=function(m){return m.th+'"),url("'+m.alt};
   $('#mv-hero').innerHTML=H.map(function(m,i){var bg='style="background-image:url(\''+m.th+'\'),url(\''+m.alt+'\')"';
-    return '<div class="mv-slide'+(i?'':' on')+'" data-i="'+i+'"><div class="mv-bg" '+bg+'></div><div class="mv-art" '+bg+'></div><div class="mv-shade"></div><div class="mv-body">'+
+    return '<div class="mv-slide'+(i?'':' on')+'" data-i="'+i+'"><div class="mv-bg" '+bg+'></div><div class="mv-art pst" '+bg+'></div><div class="mv-shade"></div><div class="mv-body">'+
     '<h2 class="font-cond font-bold uppercase leading-[.95] [text-shadow:0_4px_24px_rgba(0,0,0,.6)]" style="font-size:clamp(38px,6.4vw,84px)">'+E(m.t)+'</h2>'+
     '<div class="mt-4 flex flex-wrap items-center gap-2.5 text-sm text-[#d8cdf5]">'+bd(m)+'<span>'+E(m.g.toLowerCase())+'</span><span class="opacity-80">'+m.y+'</span></div>'+
     '<p class="mt-4 max-w-[560px] text-[15px] leading-relaxed text-[#cfc3f0] [display:-webkit-box] [-webkit-line-clamp:3] [-webkit-box-orient:vertical] overflow-hidden">'+E(m.d)+'</p>'+
-    '<div class="mt-6 flex flex-wrap gap-3"><button data-mvwatch="'+E(m.t)+'" class="inline-flex h-12 items-center gap-2 rounded-full bg-gradient-to-r from-[#b06bff] via-[#6f5cff] to-[#6f5cff] px-6 text-[13px] font-semibold uppercase tracking-wider shadow-[0_8px_28px_rgba(130,80,255,.5),inset_0_1px_0_rgba(255,255,255,.35)] transition hover:brightness-110 active:scale-95"><svg viewBox="0 0 24 24" class="h-4 w-4 fill-white"><path d="M7 5v14l12-7z"/></svg>Смотреть вместе</button>'+
-    '<button data-mvinfo="'+E(m.t)+'" class="inline-flex h-12 items-center gap-2 rounded-full border border-[rgba(150,120,255,.35)] bg-white/5 px-6 text-[13px] font-semibold uppercase tracking-wider backdrop-blur transition hover:bg-white/10 active:scale-95"><svg viewBox="0 0 24 24" class="ico !h-4 !w-4"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></svg>Подробнее</button></div></div></div>';
+    '<div class="mt-6 flex flex-wrap gap-3"><button data-mvwatch="'+E(m.t)+'" class="inline-flex h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-[#b06bff] via-[#6f5cff] to-[#6f5cff] px-6 text-[13px] font-semibold uppercase tracking-wider shadow-[0_8px_28px_rgba(130,80,255,.5),inset_0_1px_0_rgba(255,255,255,.35)] transition hover:brightness-110 active:scale-95"><svg viewBox="0 0 24 24" class="h-4 w-4 fill-white"><path d="M7 5v14l12-7z"/></svg>Смотреть вместе</button>'+
+    '<button data-mvinfo="'+E(m.t)+'" class="inline-flex h-11 items-center gap-2 rounded-xl border border-[rgba(150,120,255,.35)] bg-white/5 px-6 text-[13px] font-semibold uppercase tracking-wider backdrop-blur transition hover:bg-white/10 active:scale-95"><svg viewBox="0 0 24 24" class="ico !h-4 !w-4"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></svg>Подробнее</button></div></div></div>';
   }).join('')+'<div class="mv-dots">'+H.map(function(_,i){return '<button data-mvgo="'+i+'" aria-label="Слайд '+(i+1)+'"'+(i?'':' class="on"')+'></button>'}).join('')+'</div>';
+  H.forEach(function(m,i){lift(document.querySelector('.mv-slide[data-i="'+i+'"] .mv-art'),m)});
 }
 function go(i){cur=(i+H.length)%H.length;
   document.querySelectorAll('.mv-slide').forEach(function(s,k){s.classList.toggle('on',k===cur)});
@@ -6366,7 +6386,7 @@ function info(t){var m=find(t);if(!m)return;var x=X[t]||{gs:[m.g.toLowerCase()],
   var meta=function(a,b){return '<div><p class="text-sm text-[#8f83bd]">'+a+'</p><b class="mt-1 block text-[15px] font-semibold">'+E(b)+'</b></div>'};
   var ib='<svg viewBox="0 0 24 24" class="ico !h-5 !w-5">';
   document.getElementById('mv-d').innerHTML=
-  '<div class="mv-hero mv-dh bleed -mx-[14px] lg:-mx-10 lg:-mt-9 xl:-mx-14"><div class="mv-bg" '+bg+'></div><div class="mv-art" '+bg+'></div><div class="mv-shade"></div>'+
+  '<div class="mv-hero mv-dh bleed -mx-[14px] lg:-mx-10 lg:-mt-9 xl:-mx-14"><div class="mv-bg" '+bg+'></div><div class="mv-art pst" '+bg+'></div><div class="mv-shade"></div>'+
   '<div class="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-3 px-5 pt-5 lg:px-10 xl:px-14"><nav class="flex min-w-0 items-center gap-2 text-[13px] text-[#a996e0]"><button data-mvback aria-label="Назад" class="mv-ib !h-10 !w-10 !rounded-full text-white">'+ib+'<path d="M15 5l-7 7 7 7"/></svg></button><button data-mvback class="transition hover:text-white">Кино</button><span class="opacity-50">/</span><span>Каталог</span><span class="opacity-50">/</span><b class="truncate text-white">'+E(m.t)+'</b></nav>'+
   '<div class="hidden gap-1 rounded-full border border-[rgba(150,120,255,.25)] bg-[rgba(10,6,25,.6)] p-1 text-[13px] font-medium backdrop-blur-xl md:flex"><button data-mvsc="mv-cast" class="rounded-full px-4 py-2 text-[#c9b8ff] transition hover:bg-white/10 hover:text-white">Актёры</button><button data-mvsc="mv-sim" class="rounded-full px-4 py-2 text-[#c9b8ff] transition hover:bg-white/10 hover:text-white">Похожее</button></div></div>'+
   '<div class="mv-dc"><h2 class="font-cond font-bold uppercase leading-[.95] [text-shadow:0_4px_24px_rgba(0,0,0,.6)]" style="font-size:clamp(40px,6vw,88px)">'+E(m.t)+'</h2>'+
@@ -6375,13 +6395,13 @@ function info(t){var m=find(t);if(!m)return;var x=X[t]||{gs:[m.g.toLowerCase()],
   '<div class="mt-7 grid grid-cols-2 gap-x-10 gap-y-5 sm:grid-cols-3">'+meta('Режиссёр',x.dir)+meta('Длительность',x.dur)+meta('Год производства',m.y)+'</div><div class="mt-5">'+meta('Страна производства',x.c)+'</div>'+
   '<div class="mt-6 flex flex-wrap gap-2">'+x.gs.map(function(g){return '<span class="mv-tag">'+E(g)+'</span>'}).join('')+'</div>'+
   '<p class="mt-6 max-w-[580px] text-[15px] leading-[1.75] text-[#d8cdf5]">'+E(m.d)+'</p>'+
-  '<div class="mt-8 flex flex-wrap items-center gap-3"><button data-mvwatch="'+E(m.t)+'" class="inline-flex h-12 items-center gap-2 rounded-full bg-gradient-to-r from-[#b06bff] via-[#6f5cff] to-[#6f5cff] px-6 text-sm font-semibold shadow-[0_8px_28px_rgba(130,80,255,.55),inset_0_1px_0_rgba(255,255,255,.35)] transition hover:brightness-110 active:scale-95"><svg viewBox="0 0 24 24" class="ico !h-[18px] !w-[18px]"><circle cx="9" cy="8.5" r="3.2"/><path d="M2.8 19.5c.6-3 2.8-4.5 6.2-4.5s5.6 1.5 6.2 4.5M16 5.5a3.2 3.2 0 010 6M18.5 15.3c1.6.6 2.5 2 2.8 4.2"/></svg>Смотреть в комнате</button>'+
-  '<a href="https://www.youtube.com/results?search_query='+encodeURIComponent(m.t+' трейлер')+'" target="_blank" rel="noopener" class="inline-flex h-12 items-center gap-2 rounded-full border border-[rgba(150,120,255,.35)] bg-white/5 px-5 text-sm font-semibold backdrop-blur transition hover:bg-white/10 active:scale-95"><svg viewBox="0 0 24 24" class="ico !h-[18px] !w-[18px]"><rect x="3" y="6" width="13" height="12" rx="3"/><path d="M16 10l5-3v10l-5-3"/></svg>Трейлер</a>'+
+  '<div class="mt-8 flex flex-wrap items-center gap-3"><button data-mvwatch="'+E(m.t)+'" class="inline-flex h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-[#b06bff] via-[#6f5cff] to-[#6f5cff] px-6 text-sm font-semibold shadow-[0_8px_28px_rgba(130,80,255,.55),inset_0_1px_0_rgba(255,255,255,.35)] transition hover:brightness-110 active:scale-95"><svg viewBox="0 0 24 24" class="ico !h-[18px] !w-[18px]"><circle cx="9" cy="8.5" r="3.2"/><path d="M2.8 19.5c.6-3 2.8-4.5 6.2-4.5s5.6 1.5 6.2 4.5M16 5.5a3.2 3.2 0 010 6M18.5 15.3c1.6.6 2.5 2 2.8 4.2"/></svg>Смотреть в комнате</button>'+
+  '<a href="https://www.youtube.com/results?search_query='+encodeURIComponent(m.t+' трейлер')+'" target="_blank" rel="noopener" class="inline-flex h-11 items-center gap-2 rounded-xl border border-[rgba(150,120,255,.35)] bg-white/5 px-5 text-sm font-semibold backdrop-blur transition hover:bg-white/10 active:scale-95"><svg viewBox="0 0 24 24" class="ico !h-[18px] !w-[18px]"><rect x="3" y="6" width="13" height="12" rx="3"/><path d="M16 10l5-3v10l-5-3"/></svg>Трейлер</a>'+
   '<button data-mvtog="w" class="mv-ib'+(sv[t+'w']?' on':'')+'" aria-label="Просмотрено">'+ib+'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>'+
   '<button data-mvtog="b" class="mv-ib'+(sv[t+'b']?' on':'')+'" aria-label="В закладки">'+ib+'<path d="M6 4h12v17l-6-4-6 4z"/></svg></button></div></div></div>'+
   (x.cast.length?'<section id="mv-cast" class="mt-10"><h3 class="text-2xl font-semibold tracking-tight lg:text-3xl">Создатели и актёры</h3><div class="mv-row mt-6">'+x.cast.map(function(a,i){return '<div class="mv-actor w-[116px] flex-none text-center"><span class="mv-av" style="background:linear-gradient(150deg,'+G[i%5]+',#1b0f3a 85%)">'+E(ini(a[0]))+'</span><b class="mt-3 block text-[13px] font-semibold leading-tight">'+E(a[0])+'</b><span class="mt-0.5 block text-xs text-[#a996e0]">'+E(a[1])+'</span></div>'}).join('')+'</div></section>':'')+
   '<section id="mv-sim" class="mt-8 pb-6"><h3 class="text-2xl font-semibold tracking-tight lg:text-3xl">Похожие фильмы</h3><div class="mv-row mt-5">'+sim(m).map(card).join('')+'</div></section>';
-  show('mvd');document.querySelectorAll('[data-nav="movies"]').forEach(function(b){b.classList.add('on')});var f=$('#fab');if(f)f.classList.add('!hidden');
+  show('mvd');lift(document.querySelector('#mv-d .mv-art'),m);document.querySelectorAll('[data-nav="movies"]').forEach(function(b){b.classList.add('on')});var f=$('#fab');if(f)f.classList.add('!hidden');
   document.querySelector('#mv-d').dataset.t=t}
 document.addEventListener('click',function(e){var t;
   if(t=e.target.closest('[data-mvwatch]')){if(typeof closeModal==='function')closeModal();return watch(t.dataset.mvwatch)}
